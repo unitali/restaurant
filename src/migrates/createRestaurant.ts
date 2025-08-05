@@ -1,14 +1,16 @@
 import { db } from "../firebase";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import type { Restaurant } from "../types/restaurantsTypes";
 
-export async function createRestaurant(restaurantId: string) {
+export async function createRestaurant(props: Restaurant) {
   const data = {
-    name: "Meu Restaurante",
-    address: "Rua Exemplo, 123",
-    phone: "(11) 99999-9999",
+    name: props.name,
+    address: props.address,
+    phone: props.phone,
     createdAt: serverTimestamp(),
   };
 
-  await setDoc(doc(db, restaurantId, "company"), data);
-  console.log("Restaurante criado!");
+  // Cria um documento com ID único na coleção "restaurants"
+  const docRef = await addDoc(collection(db, "restaurants"), data);
+  console.log("Restaurante criado com ID:", docRef.id);
 }
