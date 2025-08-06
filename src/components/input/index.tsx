@@ -8,7 +8,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     classNameInput?: string;
 }
 
-export default function Input({ ...props }: InputProps) {
+export function Input({ ...props }: InputProps) {
     const [showPassword, setShowPassword] = React.useState(false);
     const [touched, setTouched] = React.useState(false);
 

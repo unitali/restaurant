@@ -1,8 +1,8 @@
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import type { Restaurant } from "../types/restaurantsTypes";
+import type { RestaurantType } from "../types";
 
-export async function createRestaurant(props: Restaurant) {
+export async function createRestaurant(props: RestaurantType) {
   const data = {
     name: props.name,
     address: props.address,

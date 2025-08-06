@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { ButtonOutline, ButtonPrimary } from "../components/button";
-import Input from "../components/input";
+import { ButtonOutline, ButtonPrimary, Input } from "../components";
 import { handleEmailLogin, handleGoogleLogin } from "../services/loginServices";
-import type { User } from "../types/usersType";
+import type { UserType } from "../types";
 import { LoadingPage } from "./LoadingPage";
 
 export function LoginPage() {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserType | null>(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -34,14 +33,14 @@ export function LoginPage() {
                             type="email"
                             label="E-mail"
                             value={user?.email || ""}
-                            onChange={e => setUser(prevUser => ({ ...prevUser, email: e.target.value } as User))}
+                            onChange={e => setUser(prevUser => ({ ...prevUser, email: e.target.value } as UserType))}
                             required
                         />
                         <Input
                             type="password"
                             label="Senha"
                             value={user?.password || ""}
-                            onChange={e => setUser(prevUser => ({ ...prevUser, password: e.target.value } as User))}
+                            onChange={e => setUser(prevUser => ({ ...prevUser, password: e.target.value } as UserType))}
                             required
                         />
                         <ButtonPrimary type="submit">Acessar com e-mail e senha</ButtonPrimary>

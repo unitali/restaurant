@@ -1,19 +1,17 @@
-import { createUserWithEmailAndPassword, getAuth, fetchSignInMethodsForEmail } from "firebase/auth";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Input, ButtonPrimary } from "../components";
 import { db } from "../firebase";
 import { createRestaurant } from "../migrates/createRestaurant";
-import type { Restaurant } from "../types/restaurantsTypes";
-import { toast } from "react-toastify";
-import Input from "../components/input";
-import { ButtonPrimary } from "../components/button";
-import type { User } from "../types/usersType";
+import { webRoutes } from "../routes";
+import type { RestaurantType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";
-import { Navigate, useNavigate } from "react-router-dom";
-import { webRoutes } from "../routes";
 
-const restaurantInitialState: Restaurant = {
+const restaurantInitialState: RestaurantType = {
     id: "",
     name: "",
     address: "",
@@ -23,7 +21,7 @@ const restaurantInitialState: Restaurant = {
     status: "active",
 };
 
-const userInitialState: User = {
+const userInitialState: UserType = {
     id: "",
     email: "",
     profile: "admin",
@@ -35,8 +33,8 @@ const userInitialState: User = {
 
 
 export function CreateRestaurant() {
-    const [restaurant, setRestaurant] = useState<Restaurant>(restaurantInitialState);
-    const [userAdmin, setUserAdmin] = useState<User>(userInitialState);
+    const [restaurant, setRestaurant] = useState<RestaurantType>(restaurantInitialState);
+    const [userAdmin, setUserAdmin] = useState<UserType>(userInitialState);
     const [loading, setLoading] = useState(false);
     const auth = getAuth();
     const navigate = useNavigate();

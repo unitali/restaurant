@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdminPage, CreateRestaurant, HomePage, LoginPage } from "./pages";
+import { AdminPage, CreateRestaurant, HomePage, LoginPage, MenuPage } from "./pages";
 import { ClientPage } from './pages/ClientPage';
 
 export const webRoutes =
@@ -9,6 +9,7 @@ export const webRoutes =
     login: "/login",
     admin: "/admin",
     client: "/client",
+    menu: "/menu/:restaurantId",
 }
 
 export const publicRoutes = [
@@ -23,6 +24,10 @@ export const publicRoutes = [
     {
         path: webRoutes.login,
         element: React.createElement(LoginPage),
+    },
+    {
+        path: webRoutes.menu,
+        element: React.createElement(MenuPage),
     }
 ];
 

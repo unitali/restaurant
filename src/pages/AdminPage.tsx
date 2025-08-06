@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { webRoutes } from "../routes";
 import { fetchRestaurantById } from "../services/restaurantsService";
+import type { RestaurantType } from "../types";
 import { LoadingPage } from "./LoadingPage";
-import type { Restaurant } from "../types/restaurantsTypes";
 
 
 export function AdminPage() {
     const restaurantId = localStorage.getItem("restaurantId");
-    const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+    const [restaurant, setRestaurant] = useState<RestaurantType | null>(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -19,7 +19,7 @@ export function AdminPage() {
                 return;
             }
             fetchRestaurantById(restaurantId).then(data => {
-                setRestaurant(data as Restaurant);
+                setRestaurant(data as RestaurantType);
                 setLoading(false);
             }).catch(error => {
                 console.error("Error fetching restaurant:", error);
