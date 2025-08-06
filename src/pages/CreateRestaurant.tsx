@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, deleteUser, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,8 +16,8 @@ const restaurantInitialState: RestaurantType = {
     name: "",
     address: "",
     phone: "",
-    createdAt: new Date(),
-    expiredAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    createdAt: today(),
+    expiredAt: plusDays(today(), 30),
     status: "active",
 };
 
@@ -42,6 +42,7 @@ export function CreateRestaurant() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
+        let createdUser = null;
         try {
 
             if (userAdmin.password !== userAdmin.confirmPassword) {
@@ -75,10 +76,14 @@ export function CreateRestaurant() {
                 expiredAt: plusDays(today(), 15),
             };
 
+            const result = await createUserWithEmailAndPassword(auth, userAdmin.email, userAdmin.password!);
+            createdUser = result.user;
+
+
+            // Agora o usuário está autenticado!
             const restaurantId = await createRestaurant(restaurantData);
 
-            const result = await createUserWithEmailAndPassword(auth, userAdmin.email, userAdmin.password!);
-            await setDoc(doc(db, "users", result.user.uid), {
+            await setDoc(doc(db, "users", createdUser.uid), {
                 email: userAdmin.email,
                 profile: userAdmin.profile,
                 restaurantId,
@@ -89,9 +94,17 @@ export function CreateRestaurant() {
             setUserAdmin(userInitialState);
             navigate(webRoutes.admin, { replace: true });
         } catch (err: any) {
+            if (createdUser) {
+                try {
+                    await deleteUser(createdUser);
+                } catch (deleteErr) {
+                    console.error("Erro ao remover usuário do Auth:", deleteErr);
+                }
+            }
             if (err.code === "auth/email-already-in-use") {
                 toast.error("E-mail já cadastrado");
             } else {
+                console.error("Erro ao criar restaurante ou admin:", err);
                 toast.error("Erro ao criar restaurante ou admin");
             }
         } finally {
@@ -105,27 +118,29 @@ export function CreateRestaurant() {
                     <h2 className="text-xl font-bold mb-6">Criar Restaurante e Admin</h2>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <Input
-                            type="text"
+                            id="restaurantName"
                             label="Nome do restaurante"
                             value={restaurant.name}
                             onChange={e => setRestaurant({ ...restaurant, name: e.target.value })}
                             required
                         />
                         <Input
-                            type="text"
+                            id="restaurantAddress"
                             label="Endereço"
                             value={restaurant.address}
                             onChange={e => setRestaurant({ ...restaurant, address: e.target.value })}
                             required
                         />
                         <Input
-                            type="text"
+                            id="restaurantPhone"
+                            type="tel"
                             label="Telefone"
                             value={restaurant.phone}
                             onChange={e => setRestaurant({ ...restaurant, phone: e.target.value })}
                             required
                         />
                         <Input
+                            id="adminEmail"
                             type="email"
                             label="E-mail do admin"
                             value={userAdmin.email}
@@ -133,6 +148,7 @@ export function CreateRestaurant() {
                             required
                         />
                         <Input
+                            id="adminPassword"
                             type="password"
                             label="Senha do admin"
                             value={userAdmin.password}
@@ -140,13 +156,16 @@ export function CreateRestaurant() {
                             required
                         />
                         <Input
+                            id="adminConfirmPassword"
                             type="password"
                             label="Confirmar Senha do admin"
                             value={userAdmin.confirmPassword}
                             onChange={e => setUserAdmin({ ...userAdmin, confirmPassword: e.target.value })}
                             required
                         />
-                        <ButtonPrimary className="w-full"
+                        <ButtonPrimary
+                            id="createRestaurantButton"
+                            className="w-full"
                             type="submit"
                             children={
                                 <>Iniciar Período de Teste</>

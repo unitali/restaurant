@@ -1,12 +1,12 @@
-import React from 'react';
+import type { ModalProps } from "..";
+import type { ProductType } from "../../types";
 
-export interface ModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    children?: React.ReactNode;
+interface ProductModalProps extends ModalProps {
+    product?: ProductType;
 }
 
-export function Modal({ ...props }: ModalProps) {
+
+export function ProductModal({ ...props }: ProductModalProps) {
     if (!props.isOpen) return null;
 
     return (

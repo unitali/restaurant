@@ -7,7 +7,7 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 }
 
 
-export default function TextArea({ id, fixed, ...props }: TextAreaProps) {
+export function TextArea({ id, fixed, ...props }: TextAreaProps) {
     return (
         <div className="relative flex-1">
             <label

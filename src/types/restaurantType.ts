@@ -1,6 +1,6 @@
 
 export interface RestaurantType {
-  id: string;
+  id?: string;
   name: string;
   address: string;
   phone: string;

@@ -1,8 +1,9 @@
-
+import type { ImageType } from "./imageType";
 export interface ProductType {
   id: string;
   name: string;
   description: string;
   price: number;
-  category: string;
+  image?: ImageType;
+  categoryId: string;
 }
