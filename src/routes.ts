@@ -1,28 +1,38 @@
 import React from 'react';
-import { AdminPage, HomePage, LoginPage } from "./pages";
+import { AdminPage, CreateRestaurant, HomePage, LoginPage } from "./pages";
+import { ClientPage } from './pages/ClientPage';
+
+export const webRoutes =
+{
+    home: "/",
+    createRestaurant: "/create-restaurant",
+    login: "/login",
+    admin: "/admin",
+    client: "/client",
+}
 
 export const publicRoutes = [
     {
-        path: "/home",
+        path: webRoutes.home,
         element: React.createElement(HomePage),
     },
     {
-        path: "/admin",
-        element: React.createElement(AdminPage),
+        path: webRoutes.createRestaurant,
+        element: React.createElement(CreateRestaurant),
     },
     {
-        path: "/login",
+        path: webRoutes.login,
         element: React.createElement(LoginPage),
     }
 ];
 
 export const privateRoutes = [
     {
-        path: "/dashboard",
+        path: webRoutes.admin,
         element: React.createElement(AdminPage),
     },
     {
-        path: "/settings",
-        element: React.createElement(AdminPage),
-    },
+        path: webRoutes.client,
+        element: React.createElement(ClientPage),
+    }
 ];

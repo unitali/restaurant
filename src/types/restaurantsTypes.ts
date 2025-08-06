@@ -5,4 +5,6 @@ export interface Restaurant {
   address: string;
   phone: string;
   createdAt: Date;
+  expiredAt?: Date;
+  status?: "active" | "inactive";
 }

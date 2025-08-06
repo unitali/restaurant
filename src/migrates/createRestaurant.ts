@@ -10,7 +10,6 @@ export async function createRestaurant(props: Restaurant) {
     createdAt: serverTimestamp(),
   };
 
-  // Cria um documento com ID único na coleção "restaurants"
   const docRef = await addDoc(collection(db, "restaurants"), data);
-  console.log("Restaurante criado com ID:", docRef.id);
+  return docRef.id;
 }
