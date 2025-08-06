@@ -1,5 +1,6 @@
-import { collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
+import type { RestaurantType } from "../types";
 
 export const fetchRestaurants = async () => {
   const snapshot = await getDocs(collection(db, "categories"));
@@ -14,4 +15,16 @@ export async function fetchRestaurantById(id: string) {
   } else {
     throw new Error("Restaurant not found");
   }
+}
+
+export async function createRestaurant(props: RestaurantType) {
+  const data = {
+    name: props.name,
+    address: props.address,
+    phone: props.phone,
+    createdAt: serverTimestamp(),
+  };
+
+  const docRef = await addDoc(collection(db, "restaurants"), data);
+  return docRef.id;
 }

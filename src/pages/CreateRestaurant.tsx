@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Input, ButtonPrimary } from "../components";
 import { db } from "../firebase";
-import { createRestaurant } from "../migrates/createRestaurant";
+import { createRestaurant } from "../services/restaurantsService";
 import { webRoutes } from "../routes";
 import type { RestaurantType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
