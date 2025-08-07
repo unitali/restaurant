@@ -30,6 +30,7 @@ export async function createRestaurant(props: RestaurantType) {
     categories: [],
     settings: [],
     orders: [],
+    products: [],
   };
 
   const docRef = await addDoc(collection(db, "restaurants"), data);

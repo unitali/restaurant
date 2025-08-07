@@ -1,50 +1,56 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Modal, type ModalProps } from ".";
-import { LoadingPage } from "../../pages/LoadingPage";
-import { addCategoryToRestaurant } from "../../services/categoriesService";
+import { addCategory } from "../../services/categoriesService";
 import type { CategoryType } from "../../types";
 import { ButtonPrimary, Input, TextArea } from "../index";
+import { LoadingPage } from "../../pages/LoadingPage";
 
 interface CategoryModalProps extends ModalProps {
-    category?: CategoryType;
     restaurantId: string;
+    onCategoryChanged?: () => Promise<void>;
+    category?: CategoryType;
 }
 
 
 export function CategoryModal({ ...props }: CategoryModalProps) {
-    const [loading, setLoading] = useState(false);
     const [name, setName] = useState(props.category?.name || "");
+    const [loading, setLoading] = useState(false);
     const [description, setDescription] = useState(props.category?.description || "");
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
         try {
-            await addCategoryToRestaurant({
+            await addCategory({
                 restaurantId: props.restaurantId,
                 name,
                 description,
             });
             toast.success("Categoria salva com sucesso!");
+            if (props.onCategoryChanged) {
+                await props.onCategoryChanged();
+            }
+            props.onClose();
         } catch (error) {
             console.error("Erro ao salvar categoria:", error);
             toast.error("Erro ao salvar categoria");
         } finally {
             setLoading(false);
-            props.onClose();
         }
     };
 
     return (
+
         <Modal
-            isOpen={true}
+            isOpen={props.isOpen}
             onClose={() => { props.onClose() }}
+            id="category-modal"
         >
             {loading ? (
                 <LoadingPage />
             ) : (
-                <>
+                <div>
                     <h2 className="text-lg font-semibold text-center mb-4">{props.category ? "Editar Categoria" : "Criar Categoria"}</h2>
                     <form onSubmit={handleSubmit}>
                         <Input
@@ -71,7 +77,7 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                             }
                         />
                     </form>
-                </>
+                </div>
             )}
         </Modal>
     );

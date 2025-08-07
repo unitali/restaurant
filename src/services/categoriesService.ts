@@ -9,7 +9,7 @@ interface CategoryProps {
   products?: any[];
 }
 
-export async function addCategoryToRestaurant(props: CategoryProps) {
+export async function addCategory(props: CategoryProps) {
   if (!props.restaurantId) throw new Error("restaurantId não informado!");
 
   const restaurantRef = doc(db, "restaurants", props.restaurantId);
@@ -23,8 +23,7 @@ export async function addCategoryToRestaurant(props: CategoryProps) {
     id: Date.now().toString(),
     name: props.name,
     description: props.description || "",
-    createdAt: today(),
-    products: props.products || [],
+    createdAt: today()
   };
 
   await updateDoc(restaurantRef, {

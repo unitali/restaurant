@@ -3,10 +3,11 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
     onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     label: string;
     id: string;
-    fixed?: boolean; // Adiciona a propriedade para comportamento fixo
+    name: string; 
+    fixed?: boolean;
 }
 
-export default function Select({ fixed, ...props }: SelectProps) {
+export function Select({ fixed, ...props }: SelectProps) {
     const disabledClasses = props.disabled
         ? "bg-gray-600 text-gray-400 cursor-not-allowed"
         : "bg-gray-700 text-white";
@@ -20,19 +21,22 @@ export default function Select({ fixed, ...props }: SelectProps) {
                 }`}
             >
                 {props.label}
+                {props.required && <span className="mx-1">*</span>}
             </label>
             <select
                 id={props.id}
+                name={props.name}
                 className={`w-full p-3 pt-5 border border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${
                     fixed ? "pt-3" : "peer"
                 } ${disabledClasses}`}
                 onChange={props.onChange}
                 value={props.value}
                 disabled={props.disabled}
+                required={props.required}
             >
                 {props.options.map((opt, index) => (
                     <option
-                        id={`select-option-${opt.value.toString().toLowerCase()}-${index}`}
+                        id={`select-option-${index}`}
                         key={index}
                         value={opt.value}
                     >

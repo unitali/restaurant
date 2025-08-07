@@ -1,5 +1,5 @@
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import React from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;

@@ -3,5 +3,7 @@ export * from './header';
 export * from './footer';
 export * from './input';
 export * from './textArea';
-export * from './select';
 export * from './modal';
+export * from './select';
+export * from './modal/ProductModal';
+export * from './modal/CategoryModal';
