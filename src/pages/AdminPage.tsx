@@ -1,19 +1,19 @@
-import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ButtonPrimary, Input } from "../components";
-import { db } from "../firebase";
+import { CategoryModal } from "../components/modal/CategoryModal";
+import { ProductModal } from "../components/modal/ProductModal";
 import { webRoutes } from "../routes";
+import { fetchCategoriesByRestaurantId } from "../services/categoriesService";
 import { fetchRestaurantById } from "../services/restaurantsService";
 import type { CategoryType, ProductType, RestaurantType } from "../types";
 import { LoadingPage } from "./LoadingPage";
-import { CategoryModal } from "../components/modal/CategoryModal";
-import { ProductModal } from "../components/modal/ProductModal";
 
 
 export function AdminPage() {
     const [restaurant, setRestaurant] = useState<RestaurantType | null>(null);
+    const [restaurantId, setRestaurantId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState<CategoryType[]>([]);
     const [products, setProducts] = useState<ProductType[]>([]);
@@ -27,39 +27,21 @@ export function AdminPage() {
 
         async function loadData() {
             try {
-                const restaurantId = localStorage.getItem("restaurantId");
-                if (!restaurantId) {
+                const id = localStorage.getItem("restaurantId");
+                setRestaurantId(id);
+                if (!id) {
                     navigate(webRoutes.login, { replace: true });
                     return;
                 }
-                const response = await fetchRestaurantById(restaurantId);
+                const response = await fetchRestaurantById(id);
                 if (!response) {
                     navigate(webRoutes.login, { replace: true });
                     return;
                 }
                 setRestaurant(response as RestaurantType);
 
-                const categoriesSnap = await getDocs(collection(db, `restaurants/${restaurantId}/categories`));
-                const allCategories: CategoryType[] = [];
-                let allProducts: ProductType[] = [];
-                for (const categoryDoc of categoriesSnap.docs) {
-                    const categoryData = categoryDoc.data();
-                    const productsArr = Array.isArray(categoryData.products) ? categoryData.products : [];
-                    allCategories.push({
-                        id: categoryDoc.id,
-                        name: categoryData.name || '',
-                        description: categoryData.description || '',
-                        products: productsArr,
-                    });
-                    allProducts = allProducts.concat(
-                        productsArr.map((prod: ProductType) => ({
-                            ...prod,
-                            categoryName: categoryData.name,
-                        }))
-                    );
-                }
-                setCategories(allCategories);
-                setProducts(allProducts);
+                setCategories(await fetchCategoriesByRestaurantId(id));
+                console.log("Categorias:", categories);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -110,7 +92,7 @@ export function AdminPage() {
                             )}
                         </div>
                     </div>
-                    {(categories.length === 0 || products.length === 0) ? (
+                    {(categories.length === 0) ? (
                         <div className="text-center text-gray-500 py-12">
                             Nenhum produto e/ou categoria registrado.
                         </div>
@@ -162,7 +144,7 @@ export function AdminPage() {
                 <CategoryModal
                     isOpen={isOpenModalCategory}
                     onClose={() => setIsOpenModalCategory(false)}
-                    restaurantId={restaurant?.id || ""}
+                    restaurantId={restaurantId || ""}
                 />
             )}
             {isOpenModalProduct && (

@@ -1,32 +1,17 @@
-import { collection, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../firebase";
-import type { ProductType } from "../types";
 import { today } from "../utils/date";
 
 interface CategoryProps {
   restaurantId: string;
-  id?: string;
   name: string;
-  description: string;
-  products: ProductType[];
+  description?: string;
+  products?: any[];
 }
 
-export const fetchCategories = async () => {
-  const snapshot = await getDocs(collection(db, "categories"));
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-};
+export async function addCategoryToRestaurant(props: CategoryProps) {
+  if (!props.restaurantId) throw new Error("restaurantId não informado!");
 
-export async function fetchCategoryById(categoryId: string) {
-  const snapshot = await getDocs(collection(db, "categories"));
-  const category = snapshot.docs.find(doc => doc.id === categoryId);
-  if (category) {
-    return { id: category.id, ...category.data() };
-  } else {
-    throw new Error("Category not found");
-  }
-}
-
-export async function addCategoryToRestaurant({ ...props }: CategoryProps) {
   const restaurantRef = doc(db, "restaurants", props.restaurantId);
   const restaurantSnap = await getDoc(restaurantRef);
 
@@ -34,20 +19,31 @@ export async function addCategoryToRestaurant({ ...props }: CategoryProps) {
     throw new Error("Restaurante não encontrado");
   }
 
-  const restaurantData = restaurantSnap.data();
-  const categories = restaurantData.categories || [];
-
   const newCategory = {
     id: Date.now().toString(),
     name: props.name,
     description: props.description || "",
     createdAt: today(),
-    products: [],
+    products: props.products || [],
   };
 
   await updateDoc(restaurantRef, {
-    categories: [...categories, newCategory],
+    categories: arrayUnion(newCategory),
   });
 
   return newCategory.id;
+}
+
+export async function fetchCategoriesByRestaurantId(restaurantId: string) {
+  if (!restaurantId) throw new Error("restaurantId não informado!");
+
+  const restaurantRef = doc(db, "restaurants", restaurantId);
+  const restaurantSnap = await getDoc(restaurantRef);
+
+  if (!restaurantSnap.exists()) {
+    throw new Error("Restaurante não encontrado");
+  }
+
+  const data = restaurantSnap.data();
+  return data.categories || [];
 }

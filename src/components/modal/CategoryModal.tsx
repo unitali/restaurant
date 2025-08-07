@@ -28,11 +28,11 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
             });
             toast.success("Categoria salva com sucesso!");
         } catch (error) {
+            console.error("Erro ao salvar categoria:", error);
             toast.error("Erro ao salvar categoria");
         } finally {
             setLoading(false);
             props.onClose();
-
         }
     };
 
