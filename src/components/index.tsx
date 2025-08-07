@@ -7,3 +7,4 @@ export * from './modal';
 export * from './select';
 export * from './modal/ProductModal';
 export * from './modal/CategoryModal';
+export * from './modal/ConfirmModal';

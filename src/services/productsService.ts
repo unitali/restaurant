@@ -48,7 +48,24 @@ export async function addProduct(restaurantId: string, product: ProductType) {
 
     const data = restaurantSnap.data();
     const products = data.products || [];
-    products.push({ ...product, id: crypto.randomUUID() });
+    products.push({ ...product, id: Date.now().toString() });
 
     await updateDoc(restaurantRef, { products });
 }
+
+export const deleteProduct = async (restaurantId: string, productId: string) => {
+    if (!restaurantId || !productId) throw new Error("restaurantId ou productId não informado!");
+
+    const restaurantRef = doc(db, "restaurants", restaurantId);
+    const restaurantSnap = await getDoc(restaurantRef);
+
+    if (!restaurantSnap.exists()) {
+        throw new Error("Restaurante não encontrado");
+    }
+
+    const data = restaurantSnap.data();
+    const products = data.products || [];
+    const updatedProducts = products.filter((p: { id: string }) => p.id !== productId);
+
+    await updateDoc(restaurantRef, { products: updatedProducts });
+};

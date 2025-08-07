@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { ButtonPrimary, CategoryModal, Input, ProductModal } from "../components";
+import { ButtonPrimary, CategoryModal, ConfirmModal, Input, ProductModal } from "../components";
 import { webRoutes } from "../routes";
 import { fetchCategoriesByRestaurantId } from "../services/categoriesService";
-import { fetchProductsByRestaurantId } from "../services/productsService";
+import { deleteProduct, fetchProductsByRestaurantId } from "../services/productsService";
 import { fetchRestaurantById } from "../services/restaurantsService";
 import type { CategoryType, ProductType, RestaurantType } from "../types";
 import { LoadingPage } from "./LoadingPage";
+import { toast } from "react-toastify";
 
 
 export function AdminPage() {
@@ -19,11 +20,12 @@ export function AdminPage() {
     const [search, setSearch] = useState("");
     const [isOpenModalCategory, setIsOpenModalCategory] = useState(false);
     const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
+    const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false);
+    const [productSelected, setProductSelected] = useState<ProductType | null>(null);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-
         async function loadData() {
             try {
                 const id = localStorage.getItem("restaurantId");
@@ -60,6 +62,27 @@ export function AdminPage() {
         if (restaurantId) {
             const updatedProducts = await fetchProductsByRestaurantId(restaurantId);
             setProducts(updatedProducts);
+        }
+    };
+
+    const handleDeleteProduct = (product: ProductType) => {
+        setProductSelected(product);
+        setIsOpenModalConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        setLoading(true);
+        if (!productSelected?.id || !restaurantId) return;
+        try {
+            await deleteProduct(restaurantId, productSelected.id);
+            await reloadProducts();
+        } catch (error) {
+            toast.error("Erro ao excluir o produto");
+            console.error("Erro ao excluir o produto:", error);
+        } finally {
+            setIsOpenModalConfirm(false);
+            setProductSelected(null);
+            setLoading(false);
         }
     };
 
@@ -134,9 +157,9 @@ export function AdminPage() {
                                             <button className="text-teal-600 hover:text-teal-800" title="Editar">
                                                 <FaEdit />
                                             </button>
-                                            <button className="text-red-600 hover:text-red-800" title="Deletar">
-                                                <FaTrash />
-                                            </button>
+                                            <FaTrash type="button"
+                                                className="text-red-600 hover:text-red-800 hover:cursor-pointer"
+                                                onClick={() => handleDeleteProduct(product)} />
                                         </td>
                                     </tr>
                                 ))}
@@ -144,6 +167,19 @@ export function AdminPage() {
                         </table>
                     )}
                 </div>
+            )}
+
+            {/* Modal de confirmação de exclusão */}
+            {isOpenModalConfirm && (
+                <ConfirmModal
+                    id="confirm-delete-modal"
+                    isOpen={isOpenModalConfirm}
+                    value={productSelected?.name || ""}
+                    onCancel={() => setIsOpenModalConfirm(false)}
+                    onConfirm={confirmDelete}
+                    onClose={() => setIsOpenModalConfirm(false)}
+                    loading={loading}
+                />
             )}
 
             {isOpenModalCategory && (
@@ -155,6 +191,7 @@ export function AdminPage() {
                     onCategoryChanged={reloadCategories}
                 />
             )}
+
             {isOpenModalProduct && (
                 <ProductModal
                     id="product-modal"
