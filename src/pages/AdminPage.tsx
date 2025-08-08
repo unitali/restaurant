@@ -60,13 +60,13 @@ export function AdminPage() {
                     {/* Tabs */}
                     <div className="flex gap-2 mb-6 border-b border-gray-200">
                         <button
-                            className={`px-4 py-2 font-semibold ${activeTab === "products" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
+                            className={`px-4 py-2 font-semibold hover:cursor-pointer ${activeTab === "products" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
                             onClick={() => setActiveTab("products")}
                         >
                             Produtos
                         </button>
                         <button
-                            className={`px-4 py-2 font-semibold ${activeTab === "categories" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
+                            className={`px-4 py-2 font-semibold hover:cursor-pointer ${activeTab === "categories" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
                             onClick={() => setActiveTab("categories")}
                         >
                             Categorias
