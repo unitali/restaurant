@@ -158,7 +158,7 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                 <ConfirmModal
                     id="confirm-delete-modal"
                     isOpen={isOpenModalConfirm}
-                    value={categories.find(c => c.id === categorySelected?.id)?.name || ""}
+                    message={`Tem certeza que deseja excluir a categoria ${categories.find(c => c.id === categorySelected?.id)?.name || ""}?`}
                     onCancel={() => setIsOpenModalConfirm(false)}
                     onConfirm={confirmDelete}
                     onClose={() => setIsOpenModalConfirm(false)}

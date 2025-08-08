@@ -2,6 +2,7 @@ import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import type { CategoryType } from '../types';
 import { today } from "../utils/date";
+import { deleteProduct } from "./productsService";
 
 interface CategoryProps {
   restaurantId: string;
@@ -59,8 +60,18 @@ export const deleteCategory = async (restaurantId: string, categoryId: string) =
   }
   const data = restaurantSnap.data();
   const categories = data.categories || [];
+  const products = data.products || [];
+
   const updatedCategories = categories.filter((c: { id: string }) => c.id !== categoryId);
-  await updateDoc(restaurantRef, { categories: updatedCategories });
+
+  const productsToDelete = products.filter((p: { categoryId: string }) => p.categoryId === categoryId);
+  for (const p of productsToDelete) {
+    await deleteProduct(restaurantId, p.id);
+  }
+
+  await updateDoc(restaurantRef, {
+    categories: updatedCategories
+  });
 };
 
 export const updateCategory = async (restaurantId: string, category: CategoryType) => {
@@ -79,5 +90,7 @@ export const updateCategory = async (restaurantId: string, category: CategoryTyp
     c.id === category.id ? { ...c, ...category } : c
   );
 
-  await updateDoc(restaurantRef, { categories: updatedCategories });
+  await updateDoc(restaurantRef, {
+    categories: updatedCategories,
+  });
 };

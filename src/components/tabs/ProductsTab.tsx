@@ -167,7 +167,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                     restaurantId={props.restaurantId}
                     categories={categories}
                     onProductChanged={reloadProducts}
-                    productId={productSelected || null}
+                    productId={productSelected}
                 />
             )}
 
@@ -175,7 +175,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                 <ConfirmModal
                     id="confirm-delete-modal"
                     isOpen={isOpenModalConfirm}
-                    value={products.find(p => p.id === productSelected)?.name || ""}
+                    message={`Tem certeza que deseja excluir o produto ${products.find(p => p.id === productSelected)?.name || ""}?`}
                     onCancel={() => setIsOpenModalConfirm(false)}
                     onConfirm={confirmDelete}
                     onClose={() => setIsOpenModalConfirm(false)}
