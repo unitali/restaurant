@@ -1,6 +1,9 @@
 describe('Login', () => {
-  it('deve exibir erro ao tentar logar com senha errada', () => {
+  beforeEach(() => {
     cy.visit('/login');
+  });
+
+  it('deve exibir erro ao tentar logar com senha errada', () => {
     cy.get('#email').type('porpetone@gmail.com');
     cy.get('#password').type('senhaerrada', { log: false });
     cy.get('#submit').click();
@@ -8,7 +11,6 @@ describe('Login', () => {
   });
 
   it('deve exibir erro ao tentar logar com usuario errado', () => {
-    cy.visit('/login');
     cy.get('#email').type('usuario@teste.com');
     cy.get('#password').type('202020', { log: false });
     cy.get('#submit').click();
@@ -16,7 +18,6 @@ describe('Login', () => {
   });
 
   it('deve exibir erro ao tentar logar com email vazio', () => {
-    cy.visit('/login');
     cy.get('#email').clear();
     cy.get('#password').type('202020', { log: false });
     cy.get('#submit').click();
@@ -24,7 +25,6 @@ describe('Login', () => {
   });
 
   it('deve exibir erro ao tentar logar com senha vazia', () => {
-    cy.visit('/login');
     cy.get('#email').type('porpetone@gmail.com');
     cy.get('#password').clear();
     cy.get('#submit').click();
@@ -32,7 +32,6 @@ describe('Login', () => {
   });
 
   it('clicar no botão de mostrar senha', () => {
-    cy.visit('/login');
     cy.get('#email').type('porpetone@gmail.com');
     cy.get('#password').type('202020', { log: false });
     cy.get('#show-password').click();
@@ -40,7 +39,6 @@ describe('Login', () => {
   });
 
   it('deve logar com sucesso com dados válidos', () => {
-    cy.visit('/login');
     cy.get('#email').type('porpetone@gmail.com');
     cy.get('#password').type('202020', { log: false });
     cy.get('#submit').click();

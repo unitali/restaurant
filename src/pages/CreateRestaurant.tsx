@@ -3,10 +3,10 @@ import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Input, ButtonPrimary } from "../components";
+import { ButtonPrimary, Input } from "../components";
 import { db } from "../config/firebase";
-import { createRestaurant } from "../services/restaurantsService";
 import { webRoutes } from "../routes";
+import { createRestaurant } from "../services/restaurantsService";
 import type { RestaurantType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";
@@ -79,8 +79,6 @@ export function CreateRestaurant() {
             const result = await createUserWithEmailAndPassword(auth, userAdmin.email, userAdmin.password!);
             createdUser = result.user;
 
-
-            // Agora o usuário está autenticado!
             const restaurantId = await createRestaurant(restaurantData);
 
             await setDoc(doc(db, "users", createdUser.uid), {
@@ -115,24 +113,24 @@ export function CreateRestaurant() {
         <div className="flex justify-center items-center min-h-screen">
             {loading ? <LoadingPage /> : (
                 <div className="w-full max-w-md bg-white p-8 rounded shadow">
-                    <h2 className="text-xl font-bold mb-6">Criar Restaurante e Admin</h2>
+                    <h2 id="create-restaurant-title" className="text-xl font-bold mb-6">Criar Restaurante e Admin</h2>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <Input
-                            id="restaurantName"
+                            id="restaurant-name"
                             label="Nome do restaurante"
                             value={restaurant.name}
                             onChange={e => setRestaurant({ ...restaurant, name: e.target.value })}
                             required
                         />
                         <Input
-                            id="restaurantAddress"
+                            id="restaurant-address"
                             label="Endereço"
                             value={restaurant.address}
                             onChange={e => setRestaurant({ ...restaurant, address: e.target.value })}
                             required
                         />
                         <Input
-                            id="restaurantPhone"
+                            id="restaurant-phone"
                             type="tel"
                             label="Telefone"
                             value={restaurant.phone}
@@ -140,7 +138,7 @@ export function CreateRestaurant() {
                             required
                         />
                         <Input
-                            id="adminEmail"
+                            id="admin-email"
                             type="email"
                             label="E-mail do admin"
                             value={userAdmin.email}
@@ -148,7 +146,7 @@ export function CreateRestaurant() {
                             required
                         />
                         <Input
-                            id="adminPassword"
+                            id="admin-password"
                             type="password"
                             label="Senha do admin"
                             value={userAdmin.password}
@@ -156,7 +154,7 @@ export function CreateRestaurant() {
                             required
                         />
                         <Input
-                            id="adminConfirmPassword"
+                            id="admin-confirm-password"
                             type="password"
                             label="Confirmar Senha do admin"
                             value={userAdmin.confirmPassword}
@@ -164,12 +162,10 @@ export function CreateRestaurant() {
                             required
                         />
                         <ButtonPrimary
-                            id="createRestaurantButton"
+                            id="create-restaurant-button"
                             className="w-full"
                             type="submit"
-                            children={
-                                <>Iniciar Período de Teste</>
-                            }
+                            children="Iniciar Período de Teste"
                         />
                     </form>
                 </div>
