@@ -1,5 +1,6 @@
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
+import type { CategoryType } from '../types';
 import { today } from "../utils/date";
 
 interface CategoryProps {
@@ -46,3 +47,37 @@ export async function fetchCategoriesByRestaurantId(restaurantId: string) {
   const data = restaurantSnap.data();
   return data.categories || [];
 }
+
+export const deleteCategory = async (restaurantId: string, categoryId: string) => {
+  if (!restaurantId || !categoryId) throw new Error("restaurantId ou categoryId não informado!");
+
+  const restaurantRef = doc(db, "restaurants", restaurantId);
+  const restaurantSnap = await getDoc(restaurantRef);
+
+  if (!restaurantSnap.exists()) {
+    throw new Error("Restaurante não encontrado");
+  }
+  const data = restaurantSnap.data();
+  const categories = data.categories || [];
+  const updatedCategories = categories.filter((c: { id: string }) => c.id !== categoryId);
+  await updateDoc(restaurantRef, { categories: updatedCategories });
+};
+
+export const updateCategory = async (restaurantId: string, category: CategoryType) => {
+  if (!category.id) throw new Error("category.id não informado!");
+
+  const restaurantRef = doc(db, "restaurants", restaurantId);
+  const restaurantSnap = await getDoc(restaurantRef);
+
+  if (!restaurantSnap.exists()) {
+    throw new Error("Restaurante não encontrado");
+  }
+
+  const data = restaurantSnap.data();
+  const categories = data.categories || [];
+  const updatedCategories = categories.map((c: CategoryType) =>
+    c.id === category.id ? { ...c, ...category } : c
+  );
+
+  await updateDoc(restaurantRef, { categories: updatedCategories });
+};

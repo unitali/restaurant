@@ -1,59 +1,37 @@
 import { useEffect, useState } from "react";
-import { FaEdit, FaTrash, FaFileImage } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { ButtonPrimary, CategoryModal, ConfirmModal, Input, ProductModal } from "../components";
+import { CategoriesTab, ProductsTab } from "../components";
 import { webRoutes } from "../routes";
-import { fetchCategoriesByRestaurantId } from "../services/categoriesService";
-import { deleteProduct, fetchProductsByRestaurantId } from "../services/productsService";
 import { fetchRestaurantById } from "../services/restaurantsService";
-import type { CategoryType, ProductType, RestaurantType } from "../types";
+import type { RestaurantType } from "../types";
 import { LoadingPage } from "./LoadingPage";
-import { toast } from "react-toastify";
 
 
 export function AdminPage() {
     const [restaurant, setRestaurant] = useState<RestaurantType | null>(null);
-    const [restaurantId, setRestaurantId] = useState<string | null>(null);
+    const [restaurantId, setRestaurantId] = useState<string>();
     const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState<CategoryType[]>([]);
-    const [products, setProducts] = useState<ProductType[]>([]);
-    const [search, setSearch] = useState("");
-    const [filteredProducts, setFilteredProducts] = useState<ProductType[]>([]);
-    const [isOpenModalCategory, setIsOpenModalCategory] = useState(false);
-    const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
-    const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false);
-    const [productSelected, setProductSelected] = useState<string | null>(null);
-    const [loadingDelete, setLoadingDelete] = useState(false);
+    const [activeTab, setActiveTab] = useState<"products" | "categories">("products");
 
     const navigate = useNavigate();
 
-
-    useEffect(() => {
-        const filtered = products.filter(product =>
-            product.name.toLowerCase().includes(search.toLowerCase())
-        );
-        setFilteredProducts(filtered);
-    }, [search, products]);
-
     useEffect(() => {
         async function loadData() {
+            setLoading(true);
             try {
-                const id = localStorage.getItem("restaurantId");
-                setRestaurantId(id);
-                if (!id) {
+                const restaurantId = localStorage.getItem("restaurantId");
+                if (!restaurantId) {
                     navigate(webRoutes.login, { replace: true });
                     return;
                 }
-                const restaurant = await fetchRestaurantById(id);
+                setRestaurantId(restaurantId);
+
+                const restaurant = await fetchRestaurantById(restaurantId);
                 if (!restaurant) {
                     navigate(webRoutes.login, { replace: true });
                     return;
                 }
                 setRestaurant(restaurant);
-                setCategories(await fetchCategoriesByRestaurantId(id));
-                const initialProducts = await fetchProductsByRestaurantId(id);
-                setProducts(initialProducts);
-                setFilteredProducts(initialProducts);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -64,50 +42,9 @@ export function AdminPage() {
     }, [navigate]);
 
 
-    const reloadCategories = async () => {
-        if (restaurantId) {
-            const updatedCategories = await fetchCategoriesByRestaurantId(restaurantId);
-            setCategories(updatedCategories);
-        }
-    };
-
-    const reloadProducts = async () => {
-        if (restaurantId) {
-            const updatedProducts = await fetchProductsByRestaurantId(restaurantId);
-            setProducts(updatedProducts);
-            setFilteredProducts(updatedProducts);
-        }
-    };
-
-    const handleEditProduct = (productId: string) => {
-        setProductSelected(productId);
-        setIsOpenModalProduct(true);
-    };
-
-    const handleDeleteProduct = (productId: string) => {
-        setProductSelected(productId);
-        setIsOpenModalConfirm(true);
-    };
-
-    const confirmDelete = async () => {
-        setLoadingDelete(true);
-        if (!productSelected || !restaurantId) return;
-        try {
-            await deleteProduct(restaurantId, productSelected);
-            await reloadProducts();
-            toast.success("Produto excluído com sucesso!");
-        } catch (error) {
-            toast.error("Erro ao excluir o produto");
-            console.error("Erro ao excluir o produto:", error);
-        } finally {
-            setIsOpenModalConfirm(false);
-            setProductSelected(null);
-            setLoadingDelete(false);
-        }
-    };
 
     return (
-        <div className="flex flex-col items-center  bg-gray-50">
+        <div className="flex flex-col items-center bg-gray-50">
             {loading ? <LoadingPage /> : (
                 <div className="bg-white rounded shadow p-40 w-full">
                     <h1 className="text-2xl font-bold mb-4 text-center">Painel Administrativo</h1>
@@ -119,111 +56,36 @@ export function AdminPage() {
                             <p><strong>Telefone:</strong> {restaurant.phone}</p>
                         </div>
                     )}
-                    <h2 className="text-xl font-semibold mb-4">Produtos</h2>
 
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                        <Input
-                            type="text"
-                            label="Buscar produto"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                        />
-                        <div className="flex w-full md:w-1/3 gap-2">
-                            <ButtonPrimary
-                                onClick={() => {
-                                    setIsOpenModalCategory(true);
-                                }}
-                            >
-                                Nova Categoria
-                            </ButtonPrimary>
-                            {categories.length > 0 && (
-                                <ButtonPrimary
-                                    onClick={() => {
-                                        setProductSelected(null);
-                                        setIsOpenModalProduct(true);
-                                    }}
-                                >
-                                    Novo Produto
-                                </ButtonPrimary>
-                            )}
-                        </div>
+                    {/* Tabs */}
+                    <div className="flex gap-2 mb-6 border-b border-gray-200">
+                        <button
+                            className={`px-4 py-2 font-semibold ${activeTab === "products" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
+                            onClick={() => setActiveTab("products")}
+                        >
+                            Produtos
+                        </button>
+                        <button
+                            className={`px-4 py-2 font-semibold ${activeTab === "categories" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
+                            onClick={() => setActiveTab("categories")}
+                        >
+                            Categorias
+                        </button>
                     </div>
-                    {categories.length === 0 || products.length === 0 ? (
-                        <p className="text-gray-500 text-center">Nenhum produto encontrado</p>
-                    ) : (
-                        <table className="w-full border-collapse">
-                            <thead>
-                                <tr className="bg-gray-100">
-                                    <th className="p-2 border">Imagem</th>
-                                    <th className="p-2 border">Nome</th>
-                                    <th className="p-2 border">Descrição</th>
-                                    <th className="p-2 border">Preço</th>
-                                    <th className="p-2 border">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredProducts.map(product => (
-                                    <tr key={product.id} className="text-center">
-                                        <td className="p-2 border">
-                                            {product.image?.url ? (
-                                                <img src={product.image.url} alt={product.name} className="h-12 w-12 object-cover rounded" />
-                                            ) : (
-                                                <FaFileImage className="h-12 w-12 object-cover rounded text-gray-400" />
-                                            )}
-                                        </td>
-                                        <td className="p-2 border">{product.name}</td>
-                                        <td className="p-2 border">{product.description}</td>
-                                        <td className="p-2 border">€ {product.price}</td>
-                                        <td className="p-2 border flex justify-center gap-2">
-                                            <FaEdit type="button"
-                                                className="text-teal-600 hover:text-teal-800 hover:cursor-pointer"
-                                                onClick={() => handleEditProduct(product.id!)}
-                                            />
-                                            <FaTrash type="button"
-                                                className="text-red-600 hover:text-red-800 hover:cursor-pointer"
-                                                onClick={() => handleDeleteProduct(product.id!)} />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+
+                    {/* Conteúdo das Tabs */}
+                    {activeTab === "products" && (
+                        <ProductsTab
+                            restaurantId={restaurantId!}
+                        />
+                    )}
+
+                    {activeTab === "categories" && (
+                        <CategoriesTab
+                            restaurantId={restaurantId!}
+                        />
                     )}
                 </div>
-            )}
-
-            {/* Modal de confirmação de exclusão */}
-            {isOpenModalConfirm && (
-                <ConfirmModal
-                    id="confirm-delete-modal"
-                    isOpen={isOpenModalConfirm}
-                    value={products.find(p => p.id === productSelected)?.name || ""}
-                    onCancel={() => setIsOpenModalConfirm(false)}
-                    onConfirm={confirmDelete}
-                    onClose={() => setIsOpenModalConfirm(false)}
-                    loading={loadingDelete}
-                />
-            )}
-
-            {isOpenModalCategory && (
-                <CategoryModal
-                    id="category-modal"
-                    isOpen={isOpenModalCategory}
-                    onClose={() => setIsOpenModalCategory(false)}
-                    restaurantId={restaurantId || ""}
-                    onCategoryChanged={reloadCategories}
-                />
-            )}
-
-            {isOpenModalProduct && (
-                <ProductModal
-                    id="product-modal"
-                    isOpen={isOpenModalProduct}
-                    onClose={() => setIsOpenModalProduct(false)}
-                    restaurantId={restaurantId || ""}
-                    categories={categories}
-                    onProductChanged={reloadProducts}
-                    productId={productSelected || null}
-                />
             )}
         </div>
     );

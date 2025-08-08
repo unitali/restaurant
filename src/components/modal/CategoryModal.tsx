@@ -1,33 +1,48 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Modal, type ModalProps } from ".";
-import { addCategory } from "../../services/categoriesService";
-import type { CategoryType } from "../../types";
-import { ButtonPrimary, Input, TextArea } from "../index";
+import { ButtonPrimary, Input, Modal, TextArea, type ModalProps } from "..";
 import { LoadingPage } from "../../pages/LoadingPage";
+import { addCategory, updateCategory } from "../../services/categoriesService";
+import type { CategoryType } from "../../types";
 
 interface CategoryModalProps extends ModalProps {
     restaurantId: string;
     onCategoryChanged?: () => Promise<void>;
-    category?: CategoryType;
+    category?: CategoryType | null;
 }
-
 
 export function CategoryModal({ ...props }: CategoryModalProps) {
     const [name, setName] = useState(props.category?.name || "");
     const [loading, setLoading] = useState(false);
     const [description, setDescription] = useState(props.category?.description || "");
 
+    useEffect(() => {
+        setName(props.category?.name || "");
+        setDescription(props.category?.description || "");
+    }, [props.category, props.isOpen]);
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
         try {
-            await addCategory({
-                restaurantId: props.restaurantId,
-                name,
-                description,
-            });
-            toast.success("Categoria salva com sucesso!");
+            if (props.category) {
+                await updateCategory(
+                    props.restaurantId,
+                    {
+                        ...props.category!,
+                        name,
+                        description,
+                    }
+                );
+                toast.success("Categoria atualizada com sucesso!");
+            } else {
+                await addCategory({
+                    restaurantId: props.restaurantId,
+                    name,
+                    description,
+                });
+                toast.success("Categoria salva com sucesso!");
+            }
             if (props.onCategoryChanged) {
                 await props.onCategoryChanged();
             }
