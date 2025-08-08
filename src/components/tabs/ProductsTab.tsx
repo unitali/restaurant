@@ -83,6 +83,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                         {products.length !== 0 && (
                             <>
                                 <Input
+                                    id="search-product"
                                     type="text"
                                     label="Buscar produto"
                                     value={search}
@@ -90,6 +91,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                                 />
                                 <div className="flex w-full md:w-1/3 gap-2">
                                     <Select
+                                        id="category-select"
                                         label="Buscar produtos por categoria"
                                         name="categoryId"
                                         value={selectedCategory}
@@ -102,13 +104,13 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                                                 label: category.name,
                                             }))
                                         ]}
-                                        id="category-select"
                                     />
                                 </div>
                             </>
                         )}
                         <div className={`flex gap-2 ${products.length === 0 ? "w-full" : "md:w-1/3"}`}>
                             <ButtonPrimary
+                                id="new-product-button"
                                 onClick={() => {
                                     setProductSelected(null);
                                     setIsOpenModalProduct(true);
@@ -119,7 +121,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                         </div>
                     </div>
                     {products.length === 0 ? (
-                        <p className="text-gray-500 text-center">Nenhum produto encontrado.</p>
+                        <p id="no-products-message" className="text-gray-500 text-center">Nenhum produto encontrado.</p>
                     ) : (
                         <table className="w-full text-sm">
                             {products.filter(product =>
@@ -128,11 +130,11 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                             ).length > 0 && (
                                     <thead>
                                         <tr className="bg-gray-700 text-white">
-                                            <th className="p-4" style={{ width: 32, height: 32 }}></th>
-                                            <th className="p-2 text-center">Nome</th>
-                                            <th className="p-2 text-left">Descrição</th>
-                                            <th className="p-2 text-center">Preço</th>
-                                            <th className="p-2">Ações</th>
+                                            <th id="product-image" className="p-4" style={{ width: 32, height: 32 }}></th>
+                                            <th id="product-name" className="p-2 text-center">Nome</th>
+                                            <th id="product-description" className="p-2 text-left">Descrição</th>
+                                            <th id="product-price" className="p-2 text-center">Preço</th>
+                                            <th id="product-actions" className="p-2">Ações</th>
                                         </tr>
                                     </thead>
                                 )}
@@ -144,6 +146,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                                     )
                                     .map((product, idx) => (
                                         <tr
+                                            id={`product-${idx}`}
                                             key={product.id}
                                             className={
                                                 idx % 2 === 0
@@ -151,7 +154,8 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                                                     : "bg-gray-200"
                                             }
                                         >
-                                            <td className="p-2" style={{ width: 80 }}>
+                                            <td id={`product-image-${idx}`}
+                                                className="p-2" style={{ width: 80 }}>
                                                 {product.image?.url ? (
                                                     <img
                                                         src={product.image.url}
@@ -164,12 +168,13 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                                                     />
                                                 )}
                                             </td>
-                                            <td className="p-2 text-left">{product.name}</td>
-                                            <td className="p-2 text-left">{product.description}</td>
-                                            <td className="p-2 w-32 text-center font-bold">{formatCurrencyBRL(product.price)}</td>
-                                            <td className="p-2 w-16 align-middle">
+                                            <td id={`product-name-${idx}`} className="p-2 text-left">{product.name}</td>
+                                            <td id={`product-description-${idx}`} className="p-2 text-left">{product.description}</td>
+                                            <td id={`product-price-${idx}`} className="p-2 w-32 text-center font-bold">{formatCurrencyBRL(product.price)}</td>
+                                            <td id={`product-actions-${idx}`} className="p-2 w-16 align-middle">
                                                 <div className="flex items-center justify-center gap-4 h-full">
                                                     <FaEdit
+                                                        id={`product-edit-${idx}`}
                                                         type="button"
                                                         size={18}
                                                         className="text-teal-600 hover:text-teal-800 hover:cursor-pointer"
@@ -177,6 +182,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                                                         title="Editar produto"
                                                     />
                                                     <FaTrash
+                                                        id={`product-delete-${idx}`}
                                                         type="button"
                                                         size={18}
                                                         className="text-red-600 hover:text-red-800 hover:cursor-pointer"
@@ -217,10 +223,9 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                 </div>
             ) : (
                 <div className="flex items-center justify-center h-full">
-                    <p className="text-gray-500">Nenhuma categoria encontrada. Cadastre uma categoria para começar a cadastrar produtos.</p>
+                    <p id="no-category-message" className="text-gray-500">Nenhuma categoria encontrada. Cadastre uma categoria para começar a cadastrar produtos.</p>
                 </div>
-            )
-            }
+            )}
         </>
     );
 }
