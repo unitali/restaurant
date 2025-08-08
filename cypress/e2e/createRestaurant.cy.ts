@@ -38,7 +38,7 @@ describe('Página de Criação de Restaurante', () => {
         cy.get('#restaurant-name').type('Restaurante Novo');
         cy.get('#restaurant-address').type('Rua Nova, 456');
         cy.get('#restaurant-phone').type('11988888888');
-        cy.get('#admin-email').type('admin@teste.com');
+        cy.get('#admin-email').type('admin@existente.com');
         cy.get('#admin-password').type('123456', { log: false });
         cy.get('#admin-confirm-password').type('123456', { log: false });
         cy.get('#create-restaurant-button').click();

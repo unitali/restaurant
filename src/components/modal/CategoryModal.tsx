@@ -54,7 +54,7 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                 toast.success("Categoria atualizada com sucesso!");
             } else if (category) {
                 await addCategory(props.restaurantId, category);
-                toast.success("Categoria salva com sucesso!");
+                toast.success("Categoria cadastrada com sucesso!");
             } else {
                 throw new Error("Categoria inválida");
             }
@@ -78,11 +78,12 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
         >
             {loading ? <LoadingPage /> : (
                 <div className="p-4">
-                    <h2 className="text-lg font-semibold mb-4">
+                    <h2 id="category-modal-title" className="text-lg font-semibold mb-4">
                         {props.category ? "Editar Categoria" : "Criar Categoria"}
                     </h2>
-                    <form onSubmit={handleSubmit}>
+                    <form id="category-form" onSubmit={handleSubmit}>
                         <Input
+                            id="category-name"
                             type="text"
                             label="Nome da Categoria"
                             name="name"
@@ -90,8 +91,9 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                             onChange={handleChange}
                             required
                         />
+
                         <TextArea
-                            id="description"
+                            id="category-description"
                             label="Descrição da Categoria"
                             name="description"
                             rows={3}
@@ -100,10 +102,10 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                         />
 
                         <ButtonPrimary
+                            id="submit-category-button"
                             type="submit"
-                        >
-                            {props.category ? "Salvar Alterações" : "Criar Categoria"}
-                        </ButtonPrimary>
+                            children={props.category ? "Salvar Alterações" : "Criar Categoria"}
+                        />
                     </form>
                 </div>
             )}

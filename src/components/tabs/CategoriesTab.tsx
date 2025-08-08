@@ -77,32 +77,34 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                 {categories.length > 0 ? (
                     <div className="flex-1">
                         <Input
+                            id="search-category"
                             type="text"
                             label="Buscar categoria"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                         />
                     </div>
-                ) : null}
-                <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
-                    <ButtonPrimary
-                        className={categories.length > 0 ? "w-40" : "w-full"}
-                        onClick={() => {
-                            setCategorySelected(null);
-                            setIsOpenModalCategory(true);
-                        }}
-                    >
-                        Nova Categoria
-                    </ButtonPrimary>
-                </div>
+                ) : (
+                    <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
+                        <ButtonPrimary
+                            id="new-category-button"
+                            className={categories.length > 0 ? "w-40" : ""}
+                            onClick={() => {
+                                setCategorySelected(null);
+                                setIsOpenModalCategory(true);
+                            }}
+                            children="Nova Categoria"
+                        />
+                    </div>
+                )}
             </div>
             {categories.length > 0 && (
-                <table className="w-full text-sm">
+                <table id="admin-categories-table" className="w-full text-sm">
                     <thead>
                         <tr className="bg-gray-700 text-white">
-                            <th className="p-2 text-left">Nome</th>
-                            <th className="p-2 text-left">Descrição</th>
-                            <th className="p-2">Ações</th>
+                            <th id="category-name-header" className="p-2 text-left">Nome</th>
+                            <th id="category-description-header" className="p-2 text-left">Descrição</th>
+                            <th id="category-actions-header" className="p-2">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,11 +120,12 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                                 }
                             >
 
-                                <td className="p-2 text-left">{category.name}</td>
-                                <td className="p-2 text-left">{category.description}</td>
+                                <td id={`category-name-${idx}`} className="p-2 text-left">{category.name}</td>
+                                <td id={`category-description-${idx}`} className="p-2 text-left">{category.description}</td>
                                 <td className="p-2 w-16 align-middle">
                                     <div className="flex items-center justify-center gap-4 h-full">
                                         <FaEdit
+                                            id={`edit-category-${idx}`}
                                             type="button"
                                             size={18}
                                             className="text-teal-600 hover:text-teal-800 hover:cursor-pointer"
@@ -130,6 +133,7 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                                             title="Editar categoria"
                                         />
                                         <FaTrash
+                                            id={`delete-category-${idx}`}
                                             type="button"
                                             size={18}
                                             className="text-red-600 hover:text-red-800 hover:cursor-pointer"

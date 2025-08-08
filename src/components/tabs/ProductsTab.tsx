@@ -123,7 +123,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                     {products.length === 0 ? (
                         <p id="no-products-message" className="text-gray-500 text-center">Nenhum produto encontrado.</p>
                     ) : (
-                        <table className="w-full text-sm">
+                        <table id="admin-products-table" className="w-full text-sm">
                             {products.filter(product =>
                                 product.name.toLowerCase().includes(search.toLowerCase()) &&
                                 (selectedCategory === "" || product.categoryId === selectedCategory)
