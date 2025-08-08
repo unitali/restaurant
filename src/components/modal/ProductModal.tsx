@@ -206,7 +206,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                                     onChange={handleChange}
                                     required
                                     options={props.categories.map(category => ({
-                                        value: category.id,
+                                        value: category.id ?? "",
                                         label: category.name,
                                     }))}
                                     id="productCategory"

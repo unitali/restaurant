@@ -10,70 +10,84 @@ interface CategoryModalProps extends ModalProps {
     onCategoryChanged?: () => Promise<void>;
     category?: CategoryType | null;
 }
+const initialCategoryState: CategoryType = {
+    id: "",
+    name: "",
+    description: "",
+};
 
 export function CategoryModal({ ...props }: CategoryModalProps) {
-    const [name, setName] = useState(props.category?.name || "");
+    const [category, setCategory] = useState<CategoryType>(initialCategoryState);
     const [loading, setLoading] = useState(false);
-    const [description, setDescription] = useState(props.category?.description || "");
 
     useEffect(() => {
-        setName(props.category?.name || "");
-        setDescription(props.category?.description || "");
+        if (props.category) {
+            setCategory({
+                id: props.category?.id,
+                name: props.category?.name,
+                description: props.category?.description,
+            });
+        }
     }, [props.category, props.isOpen]);
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+
+        setCategory(prev => {
+            if (!prev) return prev;
+            let updatedValue: string = value;
+            return { ...prev, [name]: updatedValue };
+        });
+    };
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
         try {
             if (props.category) {
-                await updateCategory(
-                    props.restaurantId,
-                    {
-                        ...props.category!,
-                        name,
-                        description,
-                    }
-                );
-                toast.success("Categoria atualizada com sucesso!");
-            } else {
-                await addCategory({
-                    restaurantId: props.restaurantId,
-                    name,
-                    description,
+                await updateCategory(props.restaurantId, {
+                    id: props.category.id,
+                    name: props.category.name,
+                    description: props.category.description,
                 });
-                toast.success("Categoria salva com sucesso!");
+            } else if (category) {
+                await addCategory(props.restaurantId, category);
+            } else {
+                console.log(category)
+                throw new Error("Categoria inválida");
             }
+            toast.success("Categoria salva com sucesso!");
             if (props.onCategoryChanged) {
                 await props.onCategoryChanged();
             }
-            props.onClose();
         } catch (error) {
             console.error("Erro ao salvar categoria:", error);
             toast.error("Erro ao salvar categoria");
         } finally {
             setLoading(false);
+            setCategory(initialCategoryState);
         }
     };
 
     return (
-
         <Modal
+            id="category-modal"
             isOpen={props.isOpen}
             onClose={() => { props.onClose() }}
-            id="category-modal"
         >
-            {loading ? (
-                <LoadingPage />
-            ) : (
-                <div>
-                    <h2 className="text-lg font-semibold text-center mb-4">{props.category ? "Editar Categoria" : "Criar Categoria"}</h2>
+            {loading ? <LoadingPage /> : (
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold mb-4">
+                        {props.category ? "Editar Categoria" : "Criar Categoria"}
+                    </h2>
                     <form onSubmit={handleSubmit}>
                         <Input
                             type="text"
                             label="Nome da Categoria"
-                            name="categoryName"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
+                            name="name"
+                            value={category?.name ?? ""}
+                            onChange={handleChange}
                             required
                         />
                         <TextArea
@@ -81,16 +95,15 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                             label="Descrição da Categoria"
                             name="description"
                             rows={3}
-                            value={description}
-                            onChange={e => setDescription(e.target.value)}
+                            value={category?.description ?? ""}
+                            onChange={handleChange}
                         />
 
                         <ButtonPrimary
                             type="submit"
-                            children={
-                                props.category ? "Salvar Alterações" : "Criar Categoria"
-                            }
-                        />
+                        >
+                            {props.category ? "Salvar Alterações" : "Criar Categoria"}
+                        </ButtonPrimary>
                     </form>
                 </div>
             )}

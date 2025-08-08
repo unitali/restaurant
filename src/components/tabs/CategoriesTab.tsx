@@ -53,9 +53,11 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
 
     const confirmDelete = async () => {
         setLoading(true);
-        if (!categorySelected || !props.restaurantId) return;
+        if (!categorySelected) return;
+        const restaurantId = props.restaurantId;
+        if (!restaurantId) return;
         try {
-            await deleteCategory(props.restaurantId, categorySelected.id);
+            await deleteCategory(restaurantId, categorySelected.id || "");
             await reloadCategories();
             toast.success("Categoria excluída com sucesso!");
         } catch (error) {
@@ -71,23 +73,28 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
     return (
         <div className="flex flex-col gap-4 mt-10">
             {loading && <LoadingPage />}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                {categories.length > 0 && (
-                    <Input
-                        type="text"
-                        label="Buscar categoria"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                    />
-                )}
-                <ButtonPrimary
-                    onClick={() => {
-                        setCategorySelected(null);
-                        setIsOpenModalCategory(true);
-                    }}
-                >
-                    Nova Categoria
-                </ButtonPrimary>
+            <div className="flex gap-2 mb-6 items-stretch">
+                {categories.length > 0 ? (
+                    <div className="flex-1">
+                        <Input
+                            type="text"
+                            label="Buscar categoria"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                        />
+                    </div>
+                ) : null}
+                <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
+                    <ButtonPrimary
+                        className={categories.length > 0 ? "w-40" : "w-full"}
+                        onClick={() => {
+                            setCategorySelected(null);
+                            setIsOpenModalCategory(true);
+                        }}
+                    >
+                        Nova Categoria
+                    </ButtonPrimary>
+                </div>
             </div>
             {categories.length > 0 && (
                 <table className="w-full text-sm">

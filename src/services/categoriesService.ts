@@ -4,17 +4,12 @@ import type { CategoryType } from '../types';
 import { today } from "../utils/date";
 import { deleteProduct } from "./productsService";
 
-interface CategoryProps {
-  restaurantId: string;
-  name: string;
-  description?: string;
-  products?: any[];
-}
 
-export async function addCategory(props: CategoryProps) {
-  if (!props.restaurantId) throw new Error("restaurantId não informado!");
 
-  const restaurantRef = doc(db, "restaurants", props.restaurantId);
+export async function addCategory(restaurantId: string, category: CategoryType) {
+  if (!restaurantId) throw new Error("restaurantId não informado!");
+
+  const restaurantRef = doc(db, "restaurants", restaurantId);
   const restaurantSnap = await getDoc(restaurantRef);
 
   if (!restaurantSnap.exists()) {
@@ -23,8 +18,8 @@ export async function addCategory(props: CategoryProps) {
 
   const newCategory = {
     id: Date.now().toString(),
-    name: props.name,
-    description: props.description || "",
+    name: category.name,
+    description: category.description,
     createdAt: today()
   };
 
