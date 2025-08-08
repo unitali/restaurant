@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import type { ModalProps } from "..";
 import { ButtonPrimary, ImageUpload, Input, Modal, Select } from "..";
 import { LoadingPage } from "../../pages/LoadingPage";
-import { updateImage, uploadImage, removeImage } from '../../services/imagesServices';
+import { removeImage, updateImage, uploadImage } from '../../services/imagesServices';
 import { addProduct, fetchProductById, updateProduct } from "../../services/productsService";
 import type { CategoryType, ProductType } from "../../types";
 import { formatCurrencyBRL } from "../../utils/currency";
@@ -61,7 +61,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
         if (!props.isOpen) {
             initializedRef.current = false;
         }
-    }, [props.isOpen, props.productId, props.restaurantId, props.categories]);
+    }, [props.isOpen, props.productId, props.restaurantId]);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
