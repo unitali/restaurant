@@ -72,29 +72,24 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
         <div className="flex flex-col gap-4 mt-10">
             {loading && <LoadingPage />}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                <Input
-                    type="text"
-                    label="Buscar categoria"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                />
-                <div className="flex w-full md:w-1/3 gap-2">
-
-                    {categories.length > 0 && (
-                        <ButtonPrimary
-                            onClick={() => {
-                                setCategorySelected(null);
-                                setIsOpenModalCategory(true);
-                            }}
-                        >
-                            Nova Categoria
-                        </ButtonPrimary>
-                    )}
-                </div>
+                {categories.length > 0 && (
+                    <Input
+                        type="text"
+                        label="Buscar categoria"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                    />
+                )}
+                <ButtonPrimary
+                    onClick={() => {
+                        setCategorySelected(null);
+                        setIsOpenModalCategory(true);
+                    }}
+                >
+                    Nova Categoria
+                </ButtonPrimary>
             </div>
-            {categories.length === 0 ? (
-                <p className="text-gray-500 text-center">Nenhuma categoria cadastrada</p>
-            ) : (
+            {categories.length > 0 && (
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="bg-gray-700 text-white">
