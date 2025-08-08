@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { FaCamera, FaTrash } from 'react-icons/fa';
+import { validateImageFile } from '../../services/imagesServices';
 
 interface ImageUploadProps {
     label: string;
@@ -11,8 +12,6 @@ interface ImageUploadProps {
     classNameLabel?: string;
 }
 
-
-
 export function ImageUpload({ ...props }: ImageUploadProps) {
     const [preview, setPreview] = useState<string | null>(props.value || null);
     const [touched, setTouched] = useState(false);
@@ -23,28 +22,24 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
         setTouched(true);
 
         if (file) {
-            if (!file.type.startsWith('image/')) {
-                alert('Por favor, selecione apenas arquivos de imagem.');
-                return;
+            try {
+                validateImageFile(file);
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    setPreview(e.target?.result as string);
+                };
+                reader.readAsDataURL(file);
+
+                props.onChange(file);
+            } catch (error) {
+                console.error("Erro na validação da imagem:", error);
+                // Não faz nada se a validação falhar
             }
-
-            if (file.size > 5 * 1024 * 1024) {
-                alert('A imagem deve ter no máximo 5MB.');
-                return;
-            }
-
-            // Criar preview
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setPreview(e.target?.result as string);
-            };
-            reader.readAsDataURL(file);
-
-            props.onChange(file);
         }
     };
 
-    const handleRemoveImage = () => {
+    const resetImage = () => {
         setPreview(null);
         props.onChange(null);
         if (fileInputRef.current) {
@@ -52,13 +47,17 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
         }
     };
 
-    const handleClick = () => {
+    const triggerFileInput = () => {
         if (!props.disabled) {
             fileInputRef.current?.click();
         }
     };
 
     const isRequiredError = props.required && touched && !preview && !props.value;
+
+    const containerClasses = `w-full p-3 pt-5 rounded border border-gray-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500 ${
+        props.disabled ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 text-white"
+    } ${isRequiredError ? "border-red-500" : ""}`;
 
     return (
         <div className="relative flex-1 mb-2">
@@ -71,11 +70,7 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                 {props.required && <span className="mx-1">*</span>}
             </label>
 
-            <div
-                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 text-white"
-                    } border border-gray-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500 ${isRequiredError ? "border-red-500" : ""
-                    }`}
-            >
+            <div className={containerClasses}>
                 {preview ? (
                     <div className="relative w-full h-32 flex items-center justify-center">
                         <img
@@ -86,7 +81,7 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                         {!props.disabled && (
                             <button
                                 type="button"
-                                onClick={handleRemoveImage}
+                                onClick={resetImage}
                                 className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 transition-colors"
                             >
                                 <FaTrash size={12} />
@@ -95,9 +90,10 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                     </div>
                 ) : (
                     <div
-                        onClick={handleClick}
-                        className={`w-full h-32 border-2 border-dashed border-gray-500 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-colors ${props.disabled ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
+                        onClick={triggerFileInput}
+                        className={`w-full h-32 border-2 border-dashed border-gray-500 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-colors ${
+                            props.disabled ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
                     >
                         <FaCamera className="text-gray-400 mb-2" size={24} />
                         <span className="text-gray-400 text-sm">Clique para adicionar imagem</span>
@@ -106,7 +102,6 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                 )}
             </div>
 
-            {/* Input file oculto */}
             <input
                 ref={fileInputRef}
                 type="file"
@@ -118,7 +113,9 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
             />
 
             {isRequiredError && (
-                <span className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">Campo obrigatório</span>
+                <span className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">
+                    Campo obrigatório
+                </span>
             )}
         </div>
     );

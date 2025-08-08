@@ -53,16 +53,26 @@ export function ProductModal({ ...props }: ProductModalProps) {
         if (name === "price") setIsPriceFormatted(false);
     };
 
-    const handlePriceBlur = () => {
-        setIsPriceFormatted(true);
-    };
+    const handlePriceBlur = () => setIsPriceFormatted(true);
+    const handlePriceFocus = () => setIsPriceFormatted(false);
+    const handleImageChange = (file: File | null) => setSelectedImage(file);
 
-    const handlePriceFocus = () => {
-        setIsPriceFormatted(false);
-    };
-
-    const handleImageChange = (file: File | null) => {
-        setSelectedImage(file);
+    // Função helper para processar upload de imagem
+    const processImageUpload = async (file: File): Promise<{ url: string; path: string; imageId: string }> => {
+        const isEditing = Boolean(props.product?.image?.path);
+        
+        if (isEditing) {
+            return await updateImage({
+                file,
+                folder: 'products',
+                oldImagePath: props.product!.image!.path
+            });
+        } else {
+            return await uploadImage({
+                file,
+                folder: 'products'
+            });
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -74,30 +84,12 @@ export function ProductModal({ ...props }: ProductModalProps) {
 
             if (selectedImage) {
                 try {
-                    if (props.product?.image?.path) {
-                        const imageResult = await updateImage({
-                            file: selectedImage,
-                            folder: 'products',
-                            oldImagePath: props.product.image.path
-                        });
-
-                        productToSave.image = {
-                            url: imageResult.url,
-                            path: imageResult.path,
-                            imageId: imageResult.imageId || props.product.image.imageId
-                        };
-                    } else {
-                        const imageResult = await uploadImage({
-                            file: selectedImage,
-                            folder: 'products'
-                        });
-
-                        productToSave.image = {
-                            url: imageResult.url,
-                            path: imageResult.path,
-                            imageId: imageResult.imageId
-                        };
-                    }
+                    const imageResult = await processImageUpload(selectedImage);
+                    productToSave.image = {
+                        url: imageResult.url,
+                        path: imageResult.path,
+                        imageId: imageResult.imageId || props.product?.image?.imageId || ""
+                    };
                 } catch (imageError) {
                     console.error("Erro no upload da imagem:", imageError);
                     toast.error("Erro ao fazer upload da imagem");
@@ -105,9 +97,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                 }
             }
 
-            console.log("Submitting product:", productToSave);
             await addProduct(props.restaurantId, productToSave);
-
             toast.success("Produto salvo com sucesso!");
 
             if (props.onProductChanged) {
@@ -137,10 +127,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
     }, [props.isOpen, props.product, props.categories]);
 
     return (
-        <Modal id={props.id}
-            onClose={props.onClose}
-            isOpen={props.isOpen}
-        >
+        <Modal id={props.id} onClose={props.onClose} isOpen={props.isOpen}>
             {loading ? (
                 <LoadingPage />
             ) : (
