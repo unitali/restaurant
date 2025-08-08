@@ -16,7 +16,7 @@ interface ProductModalProps extends ModalProps {
     productId?: string | null;
 }
 
-const productEmptyState: ProductType = {
+const initialProductState: ProductType = {
     id: "",
     name: "",
     price: 0,
@@ -28,7 +28,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
     const [loading, setLoading] = useState(false);
     const initializedRef = useRef(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
-    const [product, setProduct] = useState<ProductType>(productEmptyState);
+    const [product, setProduct] = useState<ProductType>(initialProductState);
 
     useEffect(() => {
         async function loadProductData() {
@@ -49,7 +49,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                 }
             } else if (props.isOpen) {
                 setProduct({
-                    ...productEmptyState,
+                    ...initialProductState,
                     categoryId: props.categories[0]?.id || "",
                 });
                 setSelectedImage(null);
@@ -120,7 +120,6 @@ export function ProductModal({ ...props }: ProductModalProps) {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
-
         try {
             let productToSave = { ...product };
 
@@ -155,14 +154,15 @@ export function ProductModal({ ...props }: ProductModalProps) {
             console.error("Erro ao salvar produto:", error);
         } finally {
             setLoading(false);
+            setProduct(initialProductState);
         }
     };
 
     return (
-        <Modal id={props.id} onClose={props.onClose} isOpen={props.isOpen}>
-            {loading ? (
-                <LoadingPage />
-            ) : (
+        <Modal id={props.id}
+            onClose={props.onClose}
+            isOpen={props.isOpen}>
+            {loading ? <LoadingPage /> : (
                 <>
                     <h2 className="text-lg font-semibold text-center mb-4">
                         {props.productId ? "Editar Produto" : "Criar Produto"}

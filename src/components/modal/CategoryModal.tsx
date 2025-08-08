@@ -51,13 +51,13 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                     name: props.category.name,
                     description: props.category.description,
                 });
+                toast.success("Categoria atualizada com sucesso!");
             } else if (category) {
                 await addCategory(props.restaurantId, category);
+                toast.success("Categoria salva com sucesso!");
             } else {
-                console.log(category)
                 throw new Error("Categoria inválida");
             }
-            toast.success("Categoria salva com sucesso!");
             if (props.onCategoryChanged) {
                 await props.onCategoryChanged();
             }
