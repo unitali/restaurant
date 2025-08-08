@@ -94,3 +94,39 @@ export const deleteProduct = async (restaurantId: string, productId: string) => 
     const updatedProducts = products.filter((p: { id: string }) => p.id !== productId);
     await updateDoc(restaurantRef, { products: updatedProducts });
 };
+
+export const updateProduct = async (restaurantId: string, product: ProductType) => {
+    if (!restaurantId || !product.id) throw new Error("restaurantId ou productId não informado!");
+
+    const restaurantRef = doc(db, "restaurants", restaurantId);
+    const restaurantSnap = await getDoc(restaurantRef);
+
+    if (!restaurantSnap.exists()) {
+        throw new Error("Restaurante não encontrado");
+    }
+
+    const data = restaurantSnap.data();
+    const products = data.products || [];
+    const productIndex = products.findIndex((p: ProductType) => p.id === product.id);
+
+    if (productIndex === -1) {
+        throw new Error("Produto não encontrado");
+    }
+
+    const cleanProduct = Object.entries(product).reduce((acc, [key, value]) => {
+        if (value === undefined) return acc;
+        if (key === "price" && typeof value === "string") {
+            acc[key] = parseFloat(value);
+        } else {
+            acc[key] = value;
+        }
+
+        return acc;
+    }, {} as Record<string, any>);
+
+    products[productIndex] = { ...products[productIndex], ...cleanProduct };
+
+    await updateDoc(restaurantRef, { products });
+
+    return products[productIndex];
+};

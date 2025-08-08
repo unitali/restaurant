@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaFileImage } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ButtonPrimary, CategoryModal, ConfirmModal, Input, ProductModal } from "../components";
 import { webRoutes } from "../routes";
@@ -14,16 +14,26 @@ import { toast } from "react-toastify";
 export function AdminPage() {
     const [restaurant, setRestaurant] = useState<RestaurantType | null>(null);
     const [restaurantId, setRestaurantId] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState<CategoryType[]>([]);
     const [products, setProducts] = useState<ProductType[]>([]);
     const [search, setSearch] = useState("");
+    const [filteredProducts, setFilteredProducts] = useState<ProductType[]>([]);
     const [isOpenModalCategory, setIsOpenModalCategory] = useState(false);
     const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false);
-    const [productSelected, setProductSelected] = useState<ProductType | null>(null);
+    const [productSelected, setProductSelected] = useState<string | null>(null);
+    const [loadingDelete, setLoadingDelete] = useState(false);
 
     const navigate = useNavigate();
+
+
+    useEffect(() => {
+        const filtered = products.filter(product =>
+            product.name.toLowerCase().includes(search.toLowerCase())
+        );
+        setFilteredProducts(filtered);
+    }, [search, products]);
 
     useEffect(() => {
         async function loadData() {
@@ -41,7 +51,9 @@ export function AdminPage() {
                 }
                 setRestaurant(restaurant);
                 setCategories(await fetchCategoriesByRestaurantId(id));
-                setProducts(await fetchProductsByRestaurantId(id));
+                const initialProducts = await fetchProductsByRestaurantId(id);
+                setProducts(initialProducts);
+                setFilteredProducts(initialProducts);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -50,6 +62,7 @@ export function AdminPage() {
         }
         loadData();
     }, [navigate]);
+
 
     const reloadCategories = async () => {
         if (restaurantId) {
@@ -62,27 +75,34 @@ export function AdminPage() {
         if (restaurantId) {
             const updatedProducts = await fetchProductsByRestaurantId(restaurantId);
             setProducts(updatedProducts);
+            setFilteredProducts(updatedProducts);
         }
     };
 
-    const handleDeleteProduct = (product: ProductType) => {
-        setProductSelected(product);
+    const handleEditProduct = (productId: string) => {
+        setProductSelected(productId);
+        setIsOpenModalProduct(true);
+    };
+
+    const handleDeleteProduct = (productId: string) => {
+        setProductSelected(productId);
         setIsOpenModalConfirm(true);
     };
 
     const confirmDelete = async () => {
-        setLoading(true);
-        if (!productSelected?.id || !restaurantId) return;
+        setLoadingDelete(true);
+        if (!productSelected || !restaurantId) return;
         try {
-            await deleteProduct(restaurantId, productSelected.id);
+            await deleteProduct(restaurantId, productSelected);
             await reloadProducts();
+            toast.success("Produto excluído com sucesso!");
         } catch (error) {
             toast.error("Erro ao excluir o produto");
             console.error("Erro ao excluir o produto:", error);
         } finally {
             setIsOpenModalConfirm(false);
             setProductSelected(null);
-            setLoading(false);
+            setLoadingDelete(false);
         }
     };
 
@@ -119,6 +139,7 @@ export function AdminPage() {
                             {categories.length > 0 && (
                                 <ButtonPrimary
                                     onClick={() => {
+                                        setProductSelected(null);
                                         setIsOpenModalProduct(true);
                                     }}
                                 >
@@ -141,25 +162,26 @@ export function AdminPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {products.map(product => (
+                                {filteredProducts.map(product => (
                                     <tr key={product.id} className="text-center">
                                         <td className="p-2 border">
                                             {product.image?.url ? (
                                                 <img src={product.image.url} alt={product.name} className="h-12 w-12 object-cover rounded" />
                                             ) : (
-                                                <span className="text-gray-400">Sem imagem</span>
+                                                <FaFileImage className="h-12 w-12 object-cover rounded text-gray-400" />
                                             )}
                                         </td>
                                         <td className="p-2 border">{product.name}</td>
                                         <td className="p-2 border">{product.description}</td>
                                         <td className="p-2 border">€ {product.price}</td>
                                         <td className="p-2 border flex justify-center gap-2">
-                                            <button className="text-teal-600 hover:text-teal-800" title="Editar">
-                                                <FaEdit />
-                                            </button>
+                                            <FaEdit type="button"
+                                                className="text-teal-600 hover:text-teal-800 hover:cursor-pointer"
+                                                onClick={() => handleEditProduct(product.id!)}
+                                            />
                                             <FaTrash type="button"
                                                 className="text-red-600 hover:text-red-800 hover:cursor-pointer"
-                                                onClick={() => handleDeleteProduct(product)} />
+                                                onClick={() => handleDeleteProduct(product.id!)} />
                                         </td>
                                     </tr>
                                 ))}
@@ -174,11 +196,11 @@ export function AdminPage() {
                 <ConfirmModal
                     id="confirm-delete-modal"
                     isOpen={isOpenModalConfirm}
-                    value={productSelected?.name || ""}
+                    value={products.find(p => p.id === productSelected)?.name || ""}
                     onCancel={() => setIsOpenModalConfirm(false)}
                     onConfirm={confirmDelete}
                     onClose={() => setIsOpenModalConfirm(false)}
-                    loading={loading}
+                    loading={loadingDelete}
                 />
             )}
 
@@ -200,6 +222,7 @@ export function AdminPage() {
                     restaurantId={restaurantId || ""}
                     categories={categories}
                     onProductChanged={reloadProducts}
+                    productId={productSelected || null}
                 />
             )}
         </div>

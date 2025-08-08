@@ -24,7 +24,7 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
         if (file) {
             try {
                 validateImageFile(file);
-                
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     setPreview(e.target?.result as string);
@@ -34,7 +34,6 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                 props.onChange(file);
             } catch (error) {
                 console.error("Erro na validação da imagem:", error);
-                // Não faz nada se a validação falhar
             }
         }
     };
@@ -55,9 +54,8 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
 
     const isRequiredError = props.required && touched && !preview && !props.value;
 
-    const containerClasses = `w-full p-3 pt-5 rounded border border-gray-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500 ${
-        props.disabled ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 text-white"
-    } ${isRequiredError ? "border-red-500" : ""}`;
+    const containerClasses = `w-full p-3 pt-5 rounded border border-gray-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500 ${props.disabled ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 text-white"
+        } ${isRequiredError ? "border-red-500" : ""}`;
 
     return (
         <div className="relative flex-1 mb-2">
@@ -82,7 +80,8 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                             <button
                                 type="button"
                                 onClick={resetImage}
-                                className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 transition-colors"
+                                className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 hover:cursor-pointer transition-colors"
+                                aria-label="Remover imagem"
                             >
                                 <FaTrash size={12} />
                             </button>
@@ -91,9 +90,8 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                 ) : (
                     <div
                         onClick={triggerFileInput}
-                        className={`w-full h-32 border-2 border-dashed border-gray-500 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-colors ${
-                            props.disabled ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                        className={`w-full h-32 border-2 border-dashed border-gray-500 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-colors ${props.disabled ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                     >
                         <FaCamera className="text-gray-400 mb-2" size={24} />
                         <span className="text-gray-400 text-sm">Clique para adicionar imagem</span>
