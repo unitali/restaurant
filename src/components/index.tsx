@@ -8,3 +8,4 @@ export * from './select';
 export * from './modal/ProductModal';
 export * from './modal/CategoryModal';
 export * from './modal/ConfirmModal';
+export * from './imageUpload';

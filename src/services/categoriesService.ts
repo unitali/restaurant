@@ -1,5 +1,5 @@
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../config/firebase";
 import { today } from "../utils/date";
 
 interface CategoryProps {

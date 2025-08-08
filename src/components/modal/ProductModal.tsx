@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import type { ModalProps } from "..";
-import { ButtonPrimary, Input, Modal, Select } from "..";
+import { ButtonPrimary, ImageUpload, Input, Modal, Select } from "..";
+import { LoadingPage } from "../../pages/LoadingPage";
+import { updateImage, uploadImage } from '../../services/imagesServices';
 import { addProduct } from "../../services/productsService";
 import type { ProductType } from "../../types";
 import { formatCurrencyBRL } from "../../utils/currency";
-import { LoadingPage } from "../../pages/LoadingPage";
 
 interface ProductModalProps extends ModalProps {
     product?: ProductType;
@@ -18,6 +19,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
     const [loading, setLoading] = useState(false);
     const [isPriceFormatted, setIsPriceFormatted] = useState(false);
     const initializedRef = useRef(false);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
     const [product, setProduct] = useState<ProductType>(() => {
         if (props.product) {
@@ -59,15 +61,60 @@ export function ProductModal({ ...props }: ProductModalProps) {
         setIsPriceFormatted(false);
     };
 
+    const handleImageChange = (file: File | null) => {
+        setSelectedImage(file);
+    };
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
+
         try {
-            await addProduct(props.restaurantId, product);
+            let productToSave = { ...product };
+
+            if (selectedImage) {
+                try {
+                    if (props.product?.image?.path) {
+                        const imageResult = await updateImage({
+                            file: selectedImage,
+                            folder: 'products',
+                            oldImagePath: props.product.image.path
+                        });
+
+                        productToSave.image = {
+                            url: imageResult.url,
+                            path: imageResult.path,
+                            imageId: imageResult.imageId || props.product.image.imageId
+                        };
+                    } else {
+                        const imageResult = await uploadImage({
+                            file: selectedImage,
+                            folder: 'products'
+                        });
+
+                        productToSave.image = {
+                            url: imageResult.url,
+                            path: imageResult.path,
+                            imageId: imageResult.imageId
+                        };
+                    }
+                } catch (imageError) {
+                    console.error("Erro no upload da imagem:", imageError);
+                    toast.error("Erro ao fazer upload da imagem");
+                    return;
+                }
+            }
+
+            console.log("Submitting product:", productToSave);
+            await addProduct(props.restaurantId, productToSave);
+
             toast.success("Produto salvo com sucesso!");
+
             if (props.onProductChanged) {
                 await props.onProductChanged();
             }
+            props.onClose();
+
         } catch (error) {
             toast.error("Erro ao salvar produto.");
             console.error("Erro ao salvar produto:", error);
@@ -98,8 +145,16 @@ export function ProductModal({ ...props }: ProductModalProps) {
                 <LoadingPage />
             ) : (
                 <>
-                    <h2 className="text-lg font-semibold text-center mb-4">{props.product ? "Editar Produto" : "Criar Produto"}</h2>
+                    <h2 className="text-lg font-semibold text-center mb-4">
+                        {props.product ? "Editar Produto" : "Criar Produto"}
+                    </h2>
                     <form onSubmit={handleSubmit}>
+                        <ImageUpload
+                            label="Imagem do Produto"
+                            value={product?.image?.url}
+                            onChange={handleImageChange}
+                            disabled={loading}
+                        />
                         <Input
                             label="Produto"
                             name="name"
