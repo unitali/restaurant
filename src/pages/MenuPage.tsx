@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { HeaderMenu, ProductCarousel, } from "../components";
+import { HeaderMenu, ProductCarousel, Slider } from "../components";
 import { fetchCategoriesByRestaurantId } from "../services/categoriesService";
 import { fetchProductsByRestaurantId } from "../services/productsService";
 import type { CategoryType, ProductType } from "../types";
@@ -40,7 +40,7 @@ export function MenuPage() {
       <main className="max-w-xl w-full mx-auto px-2">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
-          <ProductCarousel
+          <Slider
             products={featuredProducts}
             autoSlide
             slideInterval={3000}

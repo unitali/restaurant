@@ -14,3 +14,4 @@ export * from './tabs/ProductsTab';
 export * from './textArea';
 export * from './productCard';
 export * from './productCarousel';
+export * from './slider';
