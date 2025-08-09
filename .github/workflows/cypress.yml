@@ -1,0 +1,44 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build do projeto
+        run: npm run build
+
+      - name: Iniciar servidor (porta 5173)
+        run: npm run preview &
+        env:
+          NODE_ENV: test
+
+      - name: Esperar servidor subir
+        run: npx wait-on http://localhost:5173
+
+      - name: Rodar testes Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:5173'
+          browser: chrome
+        env:
+          CYPRESS_baseUrl: http://localhost:5173
