@@ -1,45 +1,64 @@
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { db } from "../config/firebase";
+import { HeaderMenu, ProductCarousel, Slider } from "../components";
+import { fetchCategoriesByRestaurantId } from "../services/categoriesService";
+import { fetchProductsByRestaurantId } from "../services/productsService";
+import type { CategoryType, ProductType } from "../types";
+import { LoadingPage } from "./LoadingPage";
+import { CartProvider } from "../contexts/CartContext";
 
 export function MenuPage() {
   const { restaurantId } = useParams();
-  const [restaurant, setRestaurant] = useState<any>(null);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      const restDoc = await getDoc(doc(db, "restaurants", restaurantId!));
-      if (restDoc.exists()) {
-        const restData = { id: restDoc.id, ...restDoc.data() };
-        setRestaurant(restData);
-
-        const productsSnap = await getDocs(collection(db, `restaurants/${restDoc.id}/categories`));
-        const productsList = productsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setProducts(productsList);
+      setLoading(true);
+      if (restaurantId) {
+        const [products, categories] = await Promise.all([
+          fetchProductsByRestaurantId(restaurantId),
+          fetchCategoriesByRestaurantId(restaurantId),
+        ]);
+        setProducts(products);
+        setCategories(categories);
       }
+      setLoading(false);
     }
     if (restaurantId) fetchData();
   }, [restaurantId]);
 
-  const handleSendWhatsApp = () => {
-    const items = products.map(p => `${p.name} - €${p.price}`).join("\n");
-    const url = `https://wa.me/${restaurant.phone}?text=${encodeURIComponent(items)}`;
-    window.open(url, "_blank");
-  };
+  if (loading) return <LoadingPage />;
 
-  if (!restaurant) return <div>Carregando...</div>;
+  // Destaques: os 3 primeiros produtos (ajuste conforme sua lógica de destaque)
+  const featuredProducts = products.slice(0, 3);
 
   return (
-    <div>
-      <h1>{restaurant.name}</h1>
-      {products.map((p) => (
-        <div key={p.id}>
-          <p>{p.name} - €{p.price}</p>
-        </div>
-      ))}
-      <button onClick={handleSendWhatsApp}>Enviar Pedido</button>
-    </div>
+    <CartProvider>
+      <HeaderMenu />
+      <main className="max-w-xl w-full mx-auto px-2">
+        <section className="my-6">
+          <h2 className="text-xl font-bold mb-2">Destaques</h2>
+          <Slider
+            products={featuredProducts}
+            autoSlide
+            slideInterval={3000}
+          />
+        </section>
+        {categories.map((category) => {
+          const productsOfCategory = products.filter(
+            (p) => p.categoryId === category.id
+          );
+          if (productsOfCategory.length === 0) return null;
+          return (
+            <section key={category.id} className="my-8">
+              <h3 className="text-lg font-semibold mb-2">{category.name}</h3>
+              <ProductCarousel products={productsOfCategory} />
+            </section>
+          );
+        })}
+      </main>
+    </CartProvider>
   );
 }

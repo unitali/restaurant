@@ -102,7 +102,7 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                         />
 
                         <ButtonPrimary
-                            id="submit-category-button"
+                            id="submit-category"
                             type="submit"
                             children={props.category ? "Salvar Alterações" : "Criar Categoria"}
                         />

@@ -20,7 +20,7 @@ export function TextArea({ id, fixed, ...props }: TextAreaProps) {
             </label>
             <textarea
                 value={props.value}
-                id={id}
+                id={`input-${id}`}
                 className={`w-full p-3 pt-5 rounded bg-gray-700 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500 ${fixed ? "pt-3" : "peer placeholder-transparent"
                     }`}
                 placeholder={fixed ? "" : props.label}

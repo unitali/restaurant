@@ -143,7 +143,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                 toast.success("Produto atualizado com sucesso!");
             } else {
                 await addProduct(props.restaurantId, productToSave);
-                toast.success("Produto salvo com sucesso!");
+                toast.success("Produto cadastrado com sucesso!");
             }
 
             if (props.onProductChanged) {
@@ -169,12 +169,14 @@ export function ProductModal({ ...props }: ProductModalProps) {
                     </h2>
                     <form onSubmit={handleSubmit}>
                         <ImageUpload
+                            id="product-image"
                             label="Imagem do Produto"
                             value={product?.image?.url}
                             onChange={handleImageChange}
                             disabled={loading}
                         />
                         <Input
+                            id="product-name"
                             label="Produto"
                             name="name"
                             value={product?.name || ""}
@@ -182,6 +184,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                             required
                         />
                         <Input
+                            id="product-description"
                             label="Descrição"
                             name="description"
                             value={product?.description || ""}
@@ -190,7 +193,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <Input
-                                    id="price"
+                                    id="product-price"
                                     label="Preço"
                                     name="price"
                                     value={formatCurrencyBRL(product.price)}
@@ -200,6 +203,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                             </div>
                             <div className="flex-1">
                                 <Select
+                                    id="product-category"
                                     label="Categoria"
                                     name="categoryId"
                                     value={product.categoryId}
@@ -209,11 +213,11 @@ export function ProductModal({ ...props }: ProductModalProps) {
                                         value: category.id ?? "",
                                         label: category.name,
                                     }))}
-                                    id="productCategory"
                                 />
                             </div>
                         </div>
                         <ButtonPrimary
+                            id="product-submit"
                             type="submit"
                             children={
                                 props.productId ? "Salvar Alterações" : "Criar Produto"

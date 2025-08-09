@@ -73,10 +73,12 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
         setIsOpenModalConfirm(true);
     };
 
+    if (loading) {
+        return <LoadingPage />;
+    }
+
     return (
         <>
-            {loading && <LoadingPage />}
-
             {categories.length !== 0 ? (
                 <div className="flex flex-col gap-4 mt-10">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -110,7 +112,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                         )}
                         <div className={`flex gap-2 ${products.length === 0 ? "w-full" : "md:w-1/3"}`}>
                             <ButtonPrimary
-                                id="new-product-button"
+                                id="new-product"
                                 onClick={() => {
                                     setProductSelected(null);
                                     setIsOpenModalProduct(true);

@@ -8,7 +8,7 @@ interface ImageUploadProps {
     onChange: (file: File | null) => void;
     required?: boolean;
     disabled?: boolean;
-    id?: string;
+    id: string;
     classNameLabel?: string;
 }
 
@@ -72,12 +72,14 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                 {preview ? (
                     <div className="relative w-full h-32 flex items-center justify-center">
                         <img
+                            id={`preview-${props.id}`}
                             src={preview}
                             alt="Preview"
                             className="max-w-full max-h-full object-contain rounded-lg border border-gray-500"
                         />
                         {!props.disabled && (
                             <button
+                                id={`remove-${props.id}`}
                                 type="button"
                                 onClick={resetImage}
                                 className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 hover:cursor-pointer transition-colors"
@@ -89,29 +91,30 @@ export function ImageUpload({ ...props }: ImageUploadProps) {
                     </div>
                 ) : (
                     <div
+                        id={`dropzone-${props.id}`}
                         onClick={triggerFileInput}
                         className={`w-full h-32 border-2 border-dashed border-gray-500 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-colors ${props.disabled ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                     >
-                        <FaCamera className="text-gray-400 mb-2" size={24} />
-                        <span className="text-gray-400 text-sm">Clique para adicionar imagem</span>
-                        <span className="text-gray-500 text-xs mt-1">JPG, PNG, GIF - Max: 5MB</span>
+                        <FaCamera id={`camera-${props.id}`} className="text-gray-400 mb-2" size={24} />
+                        <span id={`text-${props.id}`} className="text-gray-400 text-sm">Clique para adicionar imagem</span>
+                        <span id={`info-${props.id}`} className="text-gray-500 text-xs mt-1">JPG, PNG, GIF - Max: 5MB</span>
                     </div>
                 )}
             </div>
 
             <input
+                id={`input-${props.id}`}
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
                 className="hidden"
                 disabled={props.disabled}
-                id={`input-${props.id}`}
             />
 
             {isRequiredError && (
-                <span className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">
+                <span id={`error-${props.id}`} className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">
                     Campo obrigatório
                 </span>
             )}

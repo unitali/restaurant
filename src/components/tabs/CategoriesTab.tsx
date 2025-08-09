@@ -24,21 +24,24 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
             const restaurantId = localStorage.getItem("restaurantId")?.toString();
             if (!restaurantId) {
                 toast.error("Restaurante não encontrado");
+                setLoading(false);
                 return;
             }
             const fetchedCategories = await fetchCategoriesByRestaurantId(restaurantId);
             setCategories(fetchedCategories);
+            setLoading(false);
         }
         loadCategories();
-        setLoading(false);
     }, []);
 
 
     const reloadCategories = async () => {
+        setLoading(true);
         if (props.restaurantId) {
             const updatedCategories = await fetchCategoriesByRestaurantId(props.restaurantId);
             setCategories(updatedCategories);
         }
+        setLoading(false);
     };
 
     const handleEditCategory = (category: CategoryType) => {
@@ -59,10 +62,10 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
         try {
             await deleteCategory(restaurantId, categorySelected.id || "");
             await reloadCategories();
-            toast.success("Categoria excluída com sucesso!");
+            toast.success("Categoria removida com sucesso!");
         } catch (error) {
-            toast.error("Erro ao excluir a categoria");
-            console.error("Erro ao excluir a categoria:", error);
+            toast.error("Erro ao remover a categoria");
+            console.error("Erro ao remover a categoria:", error);
         } finally {
             setIsOpenModalConfirm(false);
             setCategorySelected(null);
@@ -70,11 +73,14 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
         }
     };
 
+    if (loading) {
+        return <LoadingPage />;
+    }
+
     return (
         <div className="flex flex-col gap-4 mt-10">
-            {loading && <LoadingPage />}
             <div className="flex gap-2 mb-6 items-stretch">
-                {categories.length > 0 ? (
+                {categories.length > 0 && (
                     <div className="flex-1">
                         <Input
                             id="search-category"
@@ -84,19 +90,18 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                             onChange={e => setSearch(e.target.value)}
                         />
                     </div>
-                ) : (
-                    <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
-                        <ButtonPrimary
-                            id="new-category-button"
-                            className={categories.length > 0 ? "w-40" : ""}
-                            onClick={() => {
-                                setCategorySelected(null);
-                                setIsOpenModalCategory(true);
-                            }}
-                            children="Nova Categoria"
-                        />
-                    </div>
                 )}
+                <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
+                    <ButtonPrimary
+                        id="new-category"
+                        className={categories.length > 0 ? "w-40" : ""}
+                        onClick={() => {
+                            setCategorySelected(null);
+                            setIsOpenModalCategory(true);
+                        }}
+                        children="Nova Categoria"
+                    />
+                </div>
             </div>
             {categories.length > 0 && (
                 <table id="admin-categories-table" className="w-full text-sm">
