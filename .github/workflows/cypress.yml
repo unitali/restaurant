@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 18
 
       - name: Instalar dependências
         run: npm ci
@@ -34,6 +34,9 @@ jobs:
 
       - name: Esperar servidor subir
         run: npx wait-on http://localhost:5173
+
+      - name: Compilar cypress.config.ts
+        run: npx tsc cypress.config.ts --module commonjs --target es2019 --outDir .
 
       - name: Rodar testes Cypress
         uses: cypress-io/github-action@v6

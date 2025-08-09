@@ -59,10 +59,10 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
         try {
             await deleteCategory(restaurantId, categorySelected.id || "");
             await reloadCategories();
-            toast.success("Categoria excluída com sucesso!");
+            toast.success("Categoria removida com sucesso!");
         } catch (error) {
-            toast.error("Erro ao excluir a categoria");
-            console.error("Erro ao excluir a categoria:", error);
+            toast.error("Erro ao remover a categoria");
+            console.error("Erro ao remover a categoria:", error);
         } finally {
             setIsOpenModalConfirm(false);
             setCategorySelected(null);
@@ -87,7 +87,7 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                 ) : (
                     <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
                         <ButtonPrimary
-                            id="new-category-button"
+                            id="new-category"
                             className={categories.length > 0 ? "w-40" : ""}
                             onClick={() => {
                                 setCategorySelected(null);

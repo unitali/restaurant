@@ -110,7 +110,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                         )}
                         <div className={`flex gap-2 ${products.length === 0 ? "w-full" : "md:w-1/3"}`}>
                             <ButtonPrimary
-                                id="new-product-button"
+                                id="new-product"
                                 onClick={() => {
                                     setProductSelected(null);
                                     setIsOpenModalProduct(true);

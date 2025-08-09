@@ -6,6 +6,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
     classNameLabel?: string;
     classNameInput?: string;
+    id: string;
+    required?: boolean;
 }
 
 export function Input({ ...props }: InputProps) {
@@ -28,9 +30,9 @@ export function Input({ ...props }: InputProps) {
                 {props.required && <span className="mx-1">*</span>}
             </label>
             <input
-                id={`input-${props.id}`}
                 value={props.value}
                 {...props}
+                id={`input-${props.id}`}
                 type={inputType}
                 className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 text-white"} border border-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500 ${props.classNameInput} ${isPassword ? "pr-10" : ""} ${isRequiredError ? "border-red-500" : ""}`}
                 onBlur={(e) => {
