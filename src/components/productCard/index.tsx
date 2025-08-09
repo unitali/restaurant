@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaFileImage, FaPlus } from "react-icons/fa";
+import { FaFileImage, FaPlus, FaMinus } from "react-icons/fa";
 import type { ProductType } from "../../types";
 import { formatCurrencyBRL } from "../../utils/currency";
 import { useCart } from "../../contexts/CartContext";
@@ -7,12 +7,22 @@ import { useCart } from "../../contexts/CartContext";
 
 export function ProductCard({ product }: { product: ProductType }) {
     const [clicked, setClicked] = useState(false);
-    const { addToCart } = useCart();
+    const { addToCart, removeFromCart, cart } = useCart();
+
+    // Busca a quantidade do produto no carrinho
+    const cartItem = cart.find(item => item.id === product.id);
+    const quantity = cartItem ? cartItem.quantity : 0;
 
     const handleAddToCart = () => {
         setClicked(true);
         setTimeout(() => setClicked(false), 180); // efeito breve
         addToCart(product);
+    };
+
+    const handleRemoveFromCart = () => {
+        if (product.id) {
+            removeFromCart(product.id);
+        }
     };
 
     return (
@@ -25,23 +35,39 @@ export function ProductCard({ product }: { product: ProductType }) {
                 <FaFileImage className="w-12 h-12 text-gray-200 rounded mb-2" />
             )}
             <h3 className="font-bold text-base text-center">{product.name}</h3>
-            <p className="text-gray-600 text-xs text-center flex-1">{product.description}</p>
-            <div className="flex items-center w-full mt-2">
-                <span className="font-semibold text-green-700 text-base flex-1">
+            <p className="text-gray-600 text-xs text-center">{product.description}</p>
+            <div className="flex flex-col items-center w-full mt-2">
+                <span className="font-semibold text-green-700 text-base mb-1">
                     {formatCurrencyBRL(product.price)}
                 </span>
-                <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    onMouseDown={() => setClicked(true)}
-                    onMouseUp={() => setClicked(false)}
-                    onMouseLeave={() => setClicked(false)}
-                    id="add-to-cart"
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ml-2 transition-colors duration-150
-                        ${clicked ? "bg-green-700" : "bg-green-500 hover:bg-green-600"}`}
-                >
-                    <FaPlus size={14} className="text-white" />
-                </button>
+                <div className="flex items-center justify-center w-full">
+                    {quantity > 0 && (
+                        <button
+                            type="button"
+                            onClick={handleRemoveFromCart}
+                            className="w-8 h-8 rounded-full flex items-center justify-center mr-2 bg-red-500 hover:bg-red-600 transition-colors"
+                            id="remove-from-cart"
+                        >
+                            <FaMinus size={14} className="text-white" />
+                        </button>
+                    )}
+                    <button
+                        type="button"
+                        onClick={handleAddToCart}
+                        onMouseDown={() => setClicked(true)}
+                        onMouseUp={() => setClicked(false)}
+                        onMouseLeave={() => setClicked(false)}
+                        id="add-to-cart"
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ml-2 transition-colors duration-150
+                            ${clicked ? "bg-green-700" : "bg-green-500 hover:bg-green-600"}`}
+                    >
+                        {quantity > 0 ? (
+                            <span className="text-white font-bold">{quantity}</span>
+                        ) : (
+                            <FaPlus size={14} className="text-white" />
+                        )}
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -3,15 +3,6 @@ import { useCart } from "../../contexts/CartContext";
 export function Cart() {
     const { cart, removeFromCart, clearCart } = useCart();
 
-    if (cart.length === 0) {
-        return (
-            <div className="p-4">
-                <h2 className="text-lg font-bold mb-2">Carrinho de Compras</h2>
-                <p className="text-gray-500">Seu carrinho está vazio.</p>
-            </div>
-        );
-    }
-
     return (
         <div className="p-4">
             <h2 className="text-lg font-bold mb-2">Carrinho de Compras</h2>
