@@ -1,9 +1,9 @@
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import type { JSX } from 'react';
 import { useEffect, useState } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { Footer, Header } from './components';
+import { Footer } from './components';
 import { privateRoutes, publicRoutes } from "./routes";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
@@ -41,7 +41,6 @@ function App() {
               path={route.path}
               element={
                 <>
-                  <Header />
                   <PrivateRoute>{route.element}</PrivateRoute>
                 </>
               }

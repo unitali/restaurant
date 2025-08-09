@@ -80,7 +80,7 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
     return (
         <div className="flex flex-col gap-4 mt-10">
             <div className="flex gap-2 mb-6 items-stretch">
-                {categories.length > 0 ? (
+                {categories.length > 0 && (
                     <div className="flex-1">
                         <Input
                             id="search-category"
@@ -90,19 +90,18 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                             onChange={e => setSearch(e.target.value)}
                         />
                     </div>
-                ) : (
-                    <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
-                        <ButtonPrimary
-                            id="new-category"
-                            className={categories.length > 0 ? "w-40" : ""}
-                            onClick={() => {
-                                setCategorySelected(null);
-                                setIsOpenModalCategory(true);
-                            }}
-                            children="Nova Categoria"
-                        />
-                    </div>
                 )}
+                <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
+                    <ButtonPrimary
+                        id="new-category"
+                        className={categories.length > 0 ? "w-40" : ""}
+                        onClick={() => {
+                            setCategorySelected(null);
+                            setIsOpenModalCategory(true);
+                        }}
+                        children="Nova Categoria"
+                    />
+                </div>
             </div>
             {categories.length > 0 && (
                 <table id="admin-categories-table" className="w-full text-sm">

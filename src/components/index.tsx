@@ -1,6 +1,7 @@
 export * from './button';
 export * from './footer';
-export * from './header';
+export * from './header/HeaderAdmin';
+export * from './header/HeaderMenu';
 export * from './imageUpload';
 export * from './input';
 export * from './modal';
@@ -11,3 +12,5 @@ export * from './select';
 export * from './tabs/CategoriesTab';
 export * from './tabs/ProductsTab';
 export * from './textArea';
+export * from './productCard';
+export * from './productCarousel';
