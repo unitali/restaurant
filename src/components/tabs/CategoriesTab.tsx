@@ -24,21 +24,24 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
             const restaurantId = localStorage.getItem("restaurantId")?.toString();
             if (!restaurantId) {
                 toast.error("Restaurante não encontrado");
+                setLoading(false);
                 return;
             }
             const fetchedCategories = await fetchCategoriesByRestaurantId(restaurantId);
             setCategories(fetchedCategories);
+            setLoading(false);
         }
         loadCategories();
-        setLoading(false);
     }, []);
 
 
     const reloadCategories = async () => {
+        setLoading(true);
         if (props.restaurantId) {
             const updatedCategories = await fetchCategoriesByRestaurantId(props.restaurantId);
             setCategories(updatedCategories);
         }
+        setLoading(false);
     };
 
     const handleEditCategory = (category: CategoryType) => {
@@ -70,9 +73,12 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
         }
     };
 
+    if (loading) {
+        return <LoadingPage />;
+    }
+
     return (
         <div className="flex flex-col gap-4 mt-10">
-            {loading && <LoadingPage />}
             <div className="flex gap-2 mb-6 items-stretch">
                 {categories.length > 0 ? (
                     <div className="flex-1">

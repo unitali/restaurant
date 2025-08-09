@@ -73,10 +73,12 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
         setIsOpenModalConfirm(true);
     };
 
+    if (loading) {
+        return <LoadingPage />;
+    }
+
     return (
         <>
-            {loading && <LoadingPage />}
-
             {categories.length !== 0 ? (
                 <div className="flex flex-col gap-4 mt-10">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
