@@ -28,7 +28,7 @@ export function ButtonPrimaryRemove({ ...props }: ButtonProps) {
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded w-1/3 cursor-pointer ${props.className}`}
+            className={`flex justify-center items-center bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded w-full cursor-pointer ${props.className}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
