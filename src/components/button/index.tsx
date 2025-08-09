@@ -1,13 +1,16 @@
-
+import { useState } from "react";
+import { FaMinus, FaPlus } from "react-icons/fa";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     loading?: boolean;
+    id: string;
+    quantity?: number;
 }
 
 
 export function ButtonPrimary({ ...props }: ButtonProps) {
     return (
         <button
-            id={props.id}
+            id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
             className={`flex justify-center items-center bg-teal-500 hover:bg-teal-600 text-white font-bold p-3 rounded w-full cursor-pointer ${props.className}`}
@@ -22,10 +25,10 @@ export function ButtonPrimary({ ...props }: ButtonProps) {
 export function ButtonPrimaryRemove({ ...props }: ButtonProps) {
     return (
         <button
-            id={props.id}
+            id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded w-1/3 cursor-pointer ${props.className}`}
+            className={`flex justify-center items-center bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded w-full cursor-pointer ${props.className}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
@@ -33,9 +36,54 @@ export function ButtonPrimaryRemove({ ...props }: ButtonProps) {
     )
 }
 
+export function ButtonPrimaryPlus({ ...props }: ButtonProps) {
+    const [clicked, setClicked] = useState(false);
+
+    return (
+        <button
+            type="button"
+            onClick={props.onClick}
+            onMouseDown={() => setClicked(true)}
+            onMouseUp={() => setClicked(false)}
+            onMouseLeave={() => setClicked(false)}
+            id="add-to-cart"
+            className={`w-8 h-8 rounded-full flex items-center justify-center ml-2 transition-colors duration-150
+                            ${clicked ? "bg-green-700" : "bg-green-500 hover:bg-green-600"}`}
+        >
+            {(props.quantity ?? 0) > 0 ? (
+                <span className="text-white font-bold">{props.quantity ?? 0}</span>
+            ) : (
+                <FaPlus size={14} className="text-white" />
+            )}
+        </button>
+    )
+}
+
+export function ButtonPrimaryMinus({ ...props }: ButtonProps) {
+    const [clicked, setClicked] = useState(false);
+
+    return (
+        <button
+            type="button"
+            onClick={props.onClick}
+            onMouseDown={() => setClicked(true)}
+            onMouseUp={() => setClicked(false)}
+            onMouseLeave={() => setClicked(false)}
+            id="remove-from-cart"
+            className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 transition-colors duration-150
+                            ${clicked ? "bg-red-700" : "bg-red-500 hover:bg-red-600"}`}
+        >
+            {(props.quantity ?? 0) > 0 && (
+                <FaMinus size={14} className="text-white" />
+            )}
+        </button>
+    )
+}
+
 export function ButtonOutline({ ...props }: ButtonProps) {
     return (
         <button
+            id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
             className={`border border-teal-500 text-teal-500 hover:bg-teal-600 hover:text-white font-bold p-3 rounded w-1/3 cursor-pointer ${props.className}`}
@@ -49,6 +97,7 @@ export function ButtonOutline({ ...props }: ButtonProps) {
 export function ButtonOutlineRemove({ ...props }: ButtonProps) {
     return (
         <button
+            id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
             className={`border border-red-700 text-red-700 hover:border-red-500 hover:text-red-500 font-bold p-3 rounded w-1/3 cursor-pointer ${props.className}`}

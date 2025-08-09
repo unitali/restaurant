@@ -3,3 +3,5 @@ export * from "./restaurantType";
 export * from "./productType";
 export * from "./categoryType";
 export * from "./imageType";
+export * from "./settingsType";
+

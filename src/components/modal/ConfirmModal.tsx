@@ -27,10 +27,12 @@ export function ConfirmModal({ ...props }: ConfirmModalProps) {
                     </p>
                     <div className="flex justify-end gap-4 m-4">
                         <ButtonOutlineRemove
+                            id="cancel"
                             className="button"
                             onClick={props.onCancel}
                             children="Cancelar" />
                         <ButtonPrimaryRemove
+                            id="confirm"
                             onClick={props.onConfirm}
                             disabled={props.loading}
                             children={"Confirmar"}

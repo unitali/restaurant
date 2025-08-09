@@ -17,6 +17,7 @@ export function Modal({ ...props }: ModalProps) {
         >
             <div className="bg-gray-800 text-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
                 <button
+                    id={`button-close-modal-${props.id}`}
                     onClick={props.onClose}
                     className="absolute top-4 right-4 text-gray-400 cursor-pointer hover:text-white text-2xl"
                 >

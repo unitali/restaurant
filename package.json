@@ -1,14 +1,17 @@
 {
   "name": "restaurant",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "cy:open": "cypress open"
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:headless": "cypress run --browser chrome --headless",
+    "test:e2e": "npm run build && npm run preview & npx wait-on http://localhost:5173 && npm run cy:run"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",

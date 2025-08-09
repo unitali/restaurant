@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, getDocs, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import type { RestaurantType } from "../types";
 import { today } from "../utils/date";
@@ -36,4 +36,9 @@ export async function createRestaurant(props: RestaurantType) {
   const docRef = await addDoc(collection(db, "restaurants"), data);
   localStorage.setItem("restaurantId", docRef.id);
   return docRef.id;
+}
+
+export async function updateRestaurant(restaurantId: string, data: Partial<RestaurantType>) {
+  const restaurantRef = doc(db, "restaurants", restaurantId);
+  await updateDoc(restaurantRef, data);
 }
