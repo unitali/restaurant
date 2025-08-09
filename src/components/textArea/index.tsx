@@ -11,6 +11,7 @@ export function TextArea({ id, fixed, ...props }: TextAreaProps) {
     return (
         <div className="relative flex-1">
             <label
+                id={`label-${id}`}
                 htmlFor={id}
                 className={`absolute left-3 top-0 text-gray-400 text-sm ${fixed ? "peer-placeholder-shown:top-0 peer-placeholder-shown:text-sm" : ""
                     }`}

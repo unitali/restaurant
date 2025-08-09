@@ -6,7 +6,7 @@ interface ConfirmModalProps extends ModalProps {
     isOpen: boolean;
     onConfirm: () => void;
     onCancel: () => void;
-    value: string;
+    message: string;
     loading?: boolean;
 }
 
@@ -21,10 +21,9 @@ export function ConfirmModal({ ...props }: ConfirmModalProps) {
                 <LoadingPage />
             ) : (
                 <div className=" px-6 py-4">
+                    <h2 className="text-xl font-bold mb-4">Atenção: essa ação não poderá ser desfeita!</h2>
                     <p className="pb-8">
-                        {`Tem certeza que deseja excluir o item `}
-                        <strong className="font-semibold">{props.value}</strong>
-                        {`?`}
+                        {props.message}
                     </p>
                     <div className="flex justify-end gap-4 m-4">
                         <ButtonOutlineRemove

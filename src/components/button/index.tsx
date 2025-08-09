@@ -1,4 +1,3 @@
-import { FaSpinner } from "react-icons/fa6";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     loading?: boolean;
@@ -8,6 +7,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export function ButtonPrimary({ ...props }: ButtonProps) {
     return (
         <button
+            id={props.id}
             type={props.type}
             onClick={props.onClick}
             className={`flex justify-center items-center bg-teal-500 hover:bg-teal-600 text-white font-bold p-3 rounded w-full cursor-pointer ${props.className}`}
@@ -22,6 +22,7 @@ export function ButtonPrimary({ ...props }: ButtonProps) {
 export function ButtonPrimaryRemove({ ...props }: ButtonProps) {
     return (
         <button
+            id={props.id}
             type={props.type}
             onClick={props.onClick}
             className={`bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded w-1/3 cursor-pointer ${props.className}`}

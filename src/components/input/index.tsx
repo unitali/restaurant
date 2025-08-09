@@ -40,6 +40,7 @@ export function Input({ ...props }: InputProps) {
             />
             {isPassword && (
                 <button
+                    id={`show-${props.id}`}
                     type="button"
                     tabIndex={-1}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -49,7 +50,7 @@ export function Input({ ...props }: InputProps) {
                 </button>
             )}
             {isRequiredError && (
-                <span className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">Campo obrigatório</span>
+                <span id={`error-${props.id}`} className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">Campo obrigatório</span>
             )}
         </div>
     );

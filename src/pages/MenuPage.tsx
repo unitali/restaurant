@@ -1,7 +1,7 @@
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { db } from "../firebase";
+import { db } from "../config/firebase";
 
 export function MenuPage() {
   const { restaurantId } = useParams();

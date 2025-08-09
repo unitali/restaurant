@@ -30,6 +30,7 @@ export function LoginPage() {
                     <h2 className="text-xl font-bold mb-6">Acessar a Aplicação</h2>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <Input
+                            id="email"
                             type="email"
                             label="E-mail"
                             value={user?.email || ""}
@@ -37,16 +38,25 @@ export function LoginPage() {
                             required
                         />
                         <Input
+                            id="password"
                             type="password"
                             label="Senha"
                             value={user?.password || ""}
                             onChange={e => setUser(prevUser => ({ ...prevUser, password: e.target.value } as UserType))}
                             required
                         />
-                        <ButtonPrimary type="submit">Acessar com e-mail e senha</ButtonPrimary>
+                        <ButtonPrimary
+                            id="submit"
+                            type="submit"
+                            children="Acessar com e-mail e senha"
+                        />
                     </form>
                     <hr className="my-4 text-gray-300" />
-                    <ButtonOutline className="w-full" onClick={() => handleGoogleLogin(navigate)}>Acessar com Google</ButtonOutline>
+                    <ButtonOutline
+                        id="google-login"
+                        className="w-full" onClick={() => handleGoogleLogin(navigate)}
+                        children="Acessar com Google"
+                    />
                 </div>
             )}
         </div>

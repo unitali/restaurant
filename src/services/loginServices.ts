@@ -1,7 +1,7 @@
 import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
-import { db } from "../firebase";
+import { db } from "../config/firebase";
 import { webRoutes } from '../routes';
 
 async function handleRedirect(userId: string, navigate: any) {
