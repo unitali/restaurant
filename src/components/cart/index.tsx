@@ -1,47 +1,46 @@
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useCart } from "../../contexts/CartContext";
+import { LoadingPage } from "../../pages/LoadingPage";
+import { sendWhatsAppMessage } from "../../services/whatsAppService";
 import { fetchRestaurantById } from "../../services/restaurantsService";
 import { formatCurrencyBRL } from "../../utils/currency";
 import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, ButtonPrimaryRemove } from "../button";
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
-import { LoadingPage } from "../../pages/LoadingPage";
+
 
 export function Cart() {
     const { cart, removeFromCart, clearCart, addToCart } = useCart();
     const [loading, setLoading] = useState(false);
     const location = useLocation();
 
-    const restaurantId = location.pathname.split("/menu/")[1]?.split("/")[0];
 
     const sentOrder = async () => {
         setLoading(true);
         try {
-            if (cart.length === 0) return;
+            if (!cart || cart.length === 0) {
+                setLoading(false);
+                return;
+            }
+            const restaurantId = location.pathname.split("/menu/")[1]?.split("/")[0];
+
+            if (!restaurantId) {
+                toast.error("ID do restaurante não encontrado.");
+                setLoading(false);
+                return;
+            }
             const restaurant = await fetchRestaurantById(restaurantId);
 
             if (!restaurant) {
                 toast.error("Restaurante não encontrado.");
                 return;
             }
-            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-            const itemsMsg = cart
-                .map(
-                    (item, index) =>
-                        `${index + 1}. ${item.name} (${item.quantity} x ${formatCurrencyBRL(item.price)}) = ${formatCurrencyBRL(item.price * item.quantity)}\n${"-".repeat(50)}`
-                )
-                .join("\n");
-
-            const message =
-                `Olá! Gostaria de fazer um pedido:\n\n${itemsMsg}\n\nTotal: ${formatCurrencyBRL(total)}\n\nAguardo confirmação.`;
-
-            const url = `https://wa.me/${restaurant.phone}?text=${encodeURIComponent(message)}`;
-            window.open(url, "_blank");
+            sendWhatsAppMessage(restaurant, cart);
         } catch (error) {
-            toast.error("Erro ao enviar pedido.");
+            toast.error("Erro ao enviar pedido");
         } finally {
             setLoading(false);
+            clearCart();
         }
     };
 
