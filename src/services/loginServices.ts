@@ -1,4 +1,4 @@
-import { fetchSignInMethodsForEmail, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { fetchSignInMethodsForEmail, getAuth, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, signOut, signInWithPopup } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "../config/firebase";
@@ -58,7 +58,6 @@ export async function handleGoogleLogin(navigate: any) {
     try {
         const result = await signInWithPopup(auth, provider);
         const email = result.user.email;
-
         if (!email) {
             await signOut(auth);
             toast.error("E-mail do usuário não encontrado/autorizado. Entre em contato com o administrador.");
@@ -66,13 +65,35 @@ export async function handleGoogleLogin(navigate: any) {
         }
         const methods = await fetchSignInMethodsForEmail(auth, email);
         if (methods.length === 0) {
+            try {
+                await result.user.delete();
+            } catch (e) {}
             await signOut(auth);
-            toast.error("E-mail do usuário não encontrado/autorizado. Entre em contato com o administrador.");
+            toast.error("E-mail não autorizado. Entre em contato com o administrador.");
             return;
         }
-
         await handleRedirectByEmail(email, navigate);
     } catch (error) {
         toast.error("Erro ao acessar com Google.");
+    }
+}
+
+export async function handleGoogleRedirect(navigate: any) {
+    const auth = getAuth();
+    const result = await getRedirectResult(auth);
+    if (result && result.user && result.user.email) {
+        const email = result.user.email;
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods.length === 0) {
+            try {
+                await result.user.delete();
+            } catch (e) {
+                // Se não conseguir deletar (ex: sessão expirada), ignora
+            }
+            await signOut(auth);
+            toast.error("E-mail não autorizado. Entre em contato com o administrador.");
+            return;
+        }
+        await handleRedirectByEmail(email, navigate);
     }
 }
