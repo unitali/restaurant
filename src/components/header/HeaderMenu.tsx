@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaCartShopping } from 'react-icons/fa6';
-import { Cart } from "../cart";
 import { useCart } from "../../contexts/CartContext";
+import { Cart } from "../cart";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 
-export function HeaderMenu({ children }: { children?: React.ReactNode }) {
+export function HeaderMenu() {
     const [openCart, setOpenCart] = useState(false);
     const { cart } = useCart();
+    const { restaurant } = useRestaurant();
 
-    const handleCloseCart = () => {
-        setOpenCart(false);
-    };
 
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
@@ -23,7 +22,7 @@ export function HeaderMenu({ children }: { children?: React.ReactNode }) {
         <>
             <header className="bg-gray-800 p-4 flex justify-between items-center top-0 left-0 w-full z-50 fixed">
                 <div className="text-white text-lg font-bold">
-                    Restaurante Nome
+                 {restaurant?.company.name}
                 </div>
                 {totalItems > 0 && (
                     <div className="flex items-center space-x-4 relative">
@@ -39,19 +38,9 @@ export function HeaderMenu({ children }: { children?: React.ReactNode }) {
                     </div>
                 )}
             </header>
-            <div className="pt-20">{children}</div>
+
             {openCart && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
-                    <div className="bg-white w-80 h-full shadow-lg p-4 overflow-y-auto">
-                        <button
-                            className="mb-4 text-gray-500 hover:text-gray-800"
-                            onClick={handleCloseCart}
-                        >
-                            Fechar
-                        </button>
-                        <Cart />
-                    </div>
-                </div>
+                <Cart isOpen={openCart} onClose={() => setOpenCart(false)} />
             )}
         </>
     );
