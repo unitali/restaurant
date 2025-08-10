@@ -181,4 +181,3 @@ export async function handleLogout(navigate: any) {
     navigate(webRoutes.login, { replace: true });
     toast.success("Logout efetuado.");
 }
-
