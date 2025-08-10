@@ -38,7 +38,7 @@ export function AdminPage() {
         <>
             <HeaderAdmin />
 
-            <div className="flex flex-col items-center bg-gray-50">
+            <main className="flex flex-col items-center bg-gray-50">
                 {loading ? <LoadingPage /> : (
                     <div className="bg-white rounded shadow p-40 w-full">
                         <h1 id="admin-panel-title" className="text-2xl font-bold mb-4 text-center">Painel Administrativo</h1>
@@ -87,7 +87,7 @@ export function AdminPage() {
                         )}
                     </div>
                 )}
-            </div>
+            </main>
         </>
     );
 }

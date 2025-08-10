@@ -8,7 +8,7 @@ import { handleLogout } from '../../services/loginServices';
 export function HeaderAdmin() {
 
     return (
-        <header className="bg-gray-800 p-4 flex justify-between items-center top-0 left-0 w-full z-50">
+        <header className="bg-gray-800 p-4 flex justify-between items-center top-0 left-0 w-full z-50 fixed">
             <div className="text-white text-lg font-bold">
                 Bem-vindo ao Painel Administrativo
             </div>

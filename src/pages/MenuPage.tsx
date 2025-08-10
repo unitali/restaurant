@@ -37,7 +37,7 @@ export function MenuPage() {
   return (
     <CartProvider>
       <HeaderMenu />
-      <main className="max-w-xl w-full mx-auto px-2">
+      <main className="max-w-xl w-full mx-auto px-2 pt-20">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
           <Slider

@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaCartShopping } from 'react-icons/fa6';
-import { Cart } from "../cart";
 import { useCart } from "../../contexts/CartContext";
+import { Cart } from "../cart";
 
-export function HeaderMenu({ children }: { children?: React.ReactNode }) {
+export function HeaderMenu() {
     const [openCart, setOpenCart] = useState(false);
     const { cart } = useCart();
 
-    const handleCloseCart = () => {
-        setOpenCart(false);
-    };
 
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
@@ -39,19 +36,9 @@ export function HeaderMenu({ children }: { children?: React.ReactNode }) {
                     </div>
                 )}
             </header>
-            <div className="pt-20">{children}</div>
+
             {openCart && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
-                    <div className="bg-white w-80 h-full shadow-lg p-4 overflow-y-auto">
-                        <button
-                            className="mb-4 text-gray-500 hover:text-gray-800"
-                            onClick={handleCloseCart}
-                        >
-                            Fechar
-                        </button>
-                        <Cart />
-                    </div>
-                </div>
+                <Cart isOpen={openCart} onClose={() => setOpenCart(false)} />
             )}
         </>
     );
