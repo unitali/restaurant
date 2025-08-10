@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CategoriesTab, HeaderAdmin, ProductsTab } from "../components";
 import { SettingsTab } from "../components/tabs/SettingsTab";
+import { RestaurantProvider } from "../contexts/RestaurantContext";
 import { webRoutes } from "../routes";
 import { LoadingPage } from "./LoadingPage";
-
 
 export function AdminPage() {
     const [restaurantId, setRestaurantId] = useState<string>();
@@ -35,7 +35,7 @@ export function AdminPage() {
 
 
     return (
-        <>
+        <RestaurantProvider restaurantId={restaurantId!}>
             <HeaderAdmin />
 
             <main className="flex flex-col items-center bg-gray-50">
@@ -69,25 +69,19 @@ export function AdminPage() {
 
                         {/* Conteúdo das Tabs */}
                         {activeTab === "products" && (
-                            <ProductsTab
-                                restaurantId={restaurantId!}
-                            />
+                            <ProductsTab />
                         )}
 
                         {activeTab === "categories" && (
-                            <CategoriesTab
-                                restaurantId={restaurantId!}
-                            />
+                            <CategoriesTab />
                         )}
 
                         {activeTab === "settings" && (
-                            <SettingsTab
-                                restaurantId={restaurantId!}
-                            />
+                            <SettingsTab />
                         )}
                     </div>
                 )}
             </main>
-        </>
+        </RestaurantProvider>
     );
 }

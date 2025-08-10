@@ -1,6 +1,6 @@
-import { addDoc, collection, getDocs, doc, getDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
-import type { RestaurantType } from "../types";
+import type { CompanyType } from "../types";
 import { today } from "../utils/date";
 
 export const fetchRestaurants = async () => {
@@ -15,10 +15,10 @@ export async function fetchRestaurantById(restaurantId: string) {
   if (!restaurantSnap.exists()) {
     throw new Error("Restaurant not found");
   }
-  return restaurantSnap.data().company;
+  return restaurantSnap.data();
 }
 
-export async function createRestaurant(props: RestaurantType) {
+export async function createRestaurant(props: CompanyType) {
   const data = {
     company: {
       name: props.name,
@@ -38,7 +38,13 @@ export async function createRestaurant(props: RestaurantType) {
   return docRef.id;
 }
 
-export async function updateRestaurant(restaurantId: string, data: Partial<RestaurantType>) {
+export async function updateRestaurant(restaurantId: string, data: Partial<CompanyType>) {
   const restaurantRef = doc(db, "restaurants", restaurantId);
-  await updateDoc(restaurantRef, data);
+  const newData = {
+    company: {
+      ...data,
+      updatedAt: today(),
+    },
+  };
+  await updateDoc(restaurantRef, newData);
 }

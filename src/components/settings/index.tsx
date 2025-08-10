@@ -1,37 +1,25 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
-import { fetchSettingsById, updateSettings } from "../../services/settingsService";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { updateSettings } from "../../services/settingsService";
 import type { SettingsType } from "../../types";
 
+const defaultSettings: SettingsType = {
+    primaryColor: "#2563eb",
+    primaryTextColor: "#ffffff",
+    secondaryColor: "#fbbf24",
+    secondaryTextColor: "#000000",
+};
 
-interface SettingsProps {
-    restaurantId: string;
-}
-
-export function Settings({ restaurantId }: SettingsProps) {
+export function Settings() {
+    const { restaurantId, restaurant } = useRestaurant();
     const [editSettings, setEditSettings] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [settings, setSettings] = useState<SettingsType>({
-        primaryColor: "#2563eb",
-        primaryTextColor: "#ffffff",
-        secondaryColor: "#fbbf24",
-        secondaryTextColor: "#000000",
-    });
-
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const settingsData = await fetchSettingsById(restaurantId);
-                if (settingsData) {
-                    setSettings(settingsData);
-                }
-            } catch (error) {
-                console.error("Error fetching settings data:", error);
-            }
-        }
-        fetchData();
-    }, [restaurantId]);
+    const [settings, setSettings] = useState<SettingsType>(
+        restaurant?.settings && Object.values(restaurant.settings).some(Boolean)
+            ? restaurant.settings
+            : defaultSettings
+    );
 
     const handleSettingsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSettings({ ...settings, [e.target.name]: e.target.value });

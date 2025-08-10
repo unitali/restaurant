@@ -1,125 +1,118 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { fetchRestaurantById, updateRestaurant } from "../../services/restaurantsService";
-import type { RestaurantType } from "../../types";
+import { ButtonPrimary, Input } from "..";
+import { updateRestaurant } from "../../services/restaurantsService";
+import type { CompanyType } from "../../types";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 
-interface CompanySettingsProps {
-    restaurantId: string;
-}
-
-export function CompanySettings({ restaurantId }: CompanySettingsProps) {
+export function CompanySettings() {
+    const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
     const [editCompany, setEditCompany] = useState(false);
-    const [savingCompany, setSavingCompany] = useState(false);
-    const [restaurant, setRestaurant] = useState<RestaurantType | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [formRestaurant, setFormRestaurant] = useState<CompanyType | null>(null);
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const restaurantData = await fetchRestaurantById(restaurantId);
-                if (restaurantData) {
-                    setRestaurant(restaurantData);
-                }
-            } catch (error) {
-                console.error("Error fetching restaurant data:", error);
-            }
+        if (editCompany && restaurant?.company) {
+            setFormRestaurant({
+                name: restaurant.company.name,
+                address: restaurant.company.address,
+                phone: restaurant.company.phone,
+            });
         }
-        fetchData();
-    }, [restaurantId]);
+    }, [editCompany, restaurant]);
 
-    // Company handlers
-    const handleCompanyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!restaurant) return;
-        setRestaurant({ ...restaurant, [e.target.name]: e.target.value });
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!formRestaurant) return;
+        setFormRestaurant({ ...formRestaurant, [e.target.name]: e.target.value });
     };
 
-    const handleCompanySave = async () => {
-        setSavingCompany(true);
+    const isChanged =
+        editCompany &&
+        restaurant?.company &&
+        formRestaurant &&
+        (
+            restaurant.company.name !== formRestaurant.name ||
+            restaurant.company.address !== formRestaurant.address ||
+            restaurant.company.phone !== formRestaurant.phone
+        );
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editCompany) {
+            setEditCompany(true);
+            setFormRestaurant(restaurant?.company ?? null);
+            return;
+        }
+        if (!isChanged) {
+            setEditCompany(false);
+            setFormRestaurant(restaurant?.company ?? null);
+            return;
+        }
+        setLoading(true);
         try {
-            if (restaurant) {
-                await updateRestaurant(restaurantId, restaurant);
+            if (formRestaurant) {
+                await updateRestaurant(restaurantId, formRestaurant);
+                await refresh(); // Atualiza o contexto após salvar
                 setEditCompany(false);
-                toast.success("Dados da empresa atualizados!");
+                toast.success("Dados da empresa atualizados com sucesso!");
             }
         } catch (error) {
-            toast.error("Erro ao salvar dados da empresa.");
+            toast.error("Erro ao atualizar os dados da empresa.");
         } finally {
-            setSavingCompany(false);
+            setLoading(false);
         }
     };
 
+    const buttonText = () => {
+        if (loading || restaurantLoading) return "Carregando...";
+        if (editCompany && !isChanged) return "Cancelar";
+        if (editCompany) return "Salvar";
+        return "Editar";
+    };
+
+    const company = restaurant?.company;
+
     return (
-        <div className="shadow p-6 rounded bg-white max-w-md w-full">
+        <section className="shadow p-6 rounded bg-white max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Dados da Empresa</h2>
-                {!editCompany ? (
-                    <button
-                        className="text-blue-600 hover:underline"
-                        onClick={() => setEditCompany(true)}
-                    >
-                        Editar
-                    </button>
-                ) : (
-                    <button
-                        className="text-gray-500 hover:underline"
-                        onClick={() => {
-                            setEditCompany(false);
-                            setRestaurant(restaurant);
-                        }}
-                    >
-                        Cancelar
-                    </button>
-                )}
             </div>
             <form
-                onSubmit={e => {
-                    e.preventDefault();
-                    handleCompanySave();
-                }}
+                onSubmit={handleSubmit}
                 className="flex flex-col gap-3"
             >
-                <label>
-                    <span className="font-semibold">Nome:</span>
-                    <input
-                        type="text"
-                        name="name"
-                        value={restaurant?.name || ""}
-                        onChange={handleCompanyChange}
-                        className="border rounded px-2 py-1 w-full"
-                        disabled={!editCompany}
-                    />
-                </label>
-                <label>
-                    <span className="font-semibold">Endereço:</span>
-                    <input
-                        type="text"
-                        name="address"
-                        value={restaurant?.address || ""}
-                        onChange={handleCompanyChange}
-                        className="border rounded px-2 py-1 w-full"
-                        disabled={!editCompany}
-                    />
-                </label>
-                <label>
-                    <span className="font-semibold">Telefone:</span>
-                    <input
-                        type="text"
-                        name="phone"
-                        value={restaurant?.phone || ""}
-                        onChange={handleCompanyChange}
-                        className="border rounded px-2 py-1 w-full"
-                        disabled={!editCompany}
-                    />
-                </label>
-                {editCompany && (
-                    <button
-                        type="submit"
-                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
-                        disabled={savingCompany}
-                    >
-                        {savingCompany ? "Salvando..." : "Salvar"}
-                    </button>
-                )}
+                <Input
+                    id="company-name"
+                    label="Nome:"
+                    name="name"
+                    value={editCompany ? formRestaurant?.name || "" : company?.name || ""}
+                    onChange={handleChange}
+                    disabled={!editCompany || loading || restaurantLoading}
+                />
+                <Input
+                    id="company-address"
+                    label="Endereço:"
+                    name="address"
+                    value={editCompany ? formRestaurant?.address || "" : company?.address || ""}
+                    onChange={handleChange}
+                    disabled={!editCompany || loading || restaurantLoading}
+                />
+                <Input
+                    id="company-phone"
+                    label="Telefone:"
+                    name="phone"
+                    value={editCompany ? formRestaurant?.phone || "" : company?.phone || ""}
+                    onChange={handleChange}
+                    disabled={!editCompany || loading || restaurantLoading}
+                />
+                <ButtonPrimary
+                    id={editCompany ? (isChanged ? "save-company" : "cancel-company") : "edit-company"}
+                    type="submit"
+                    disabled={loading || restaurantLoading}
+                >
+                    {buttonText()}
+                </ButtonPrimary>
             </form>
-        </div>
+        </section>
     );
 }

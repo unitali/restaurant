@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { FaCartShopping } from 'react-icons/fa6';
 import { useCart } from "../../contexts/CartContext";
 import { Cart } from "../cart";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 
 export function HeaderMenu() {
     const [openCart, setOpenCart] = useState(false);
     const { cart } = useCart();
+    const { restaurant } = useRestaurant();
 
 
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -20,7 +22,7 @@ export function HeaderMenu() {
         <>
             <header className="bg-gray-800 p-4 flex justify-between items-center top-0 left-0 w-full z-50 fixed">
                 <div className="text-white text-lg font-bold">
-                    Restaurante Nome
+                 {restaurant?.company.name}
                 </div>
                 {totalItems > 0 && (
                     <div className="flex items-center space-x-4 relative">

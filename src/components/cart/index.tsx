@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useCart } from "../../contexts/CartContext";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
 import { sendWhatsAppMessage } from "../../services/whatsAppService";
-import { fetchRestaurantById } from "../../services/restaurantsService";
 import { formatCurrencyBRL } from "../../utils/currency";
 import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, ButtonPrimaryRemove } from "../button";
 
@@ -13,11 +12,10 @@ interface CartProps {
     onClose: () => void;
 }
 
-export function Cart({ ...props}: CartProps) {
+export function Cart({ ...props }: CartProps) {
     const { cart, removeFromCart, clearCart, addToCart } = useCart();
+    const { restaurant } = useRestaurant();
     const [loading, setLoading] = useState(false);
-    const location = useLocation();
-
 
     const sentOrder = async () => {
         setLoading(true);
@@ -26,29 +24,21 @@ export function Cart({ ...props}: CartProps) {
                 setLoading(false);
                 return;
             }
-            const restaurantId = location.pathname.split("/menu/")[1]?.split("/")[0];
-
-            if (!restaurantId) {
-                toast.error("ID do restaurante não encontrado.");
+            if (!restaurant) {
+                toast.error("Restaurante não encontrado.");
                 setLoading(false);
                 return;
             }
-            const restaurant = await fetchRestaurantById(restaurantId);
-
-            if (!restaurant) {
-                toast.error("Restaurante não encontrado.");
-                return;
-            }
-            sendWhatsAppMessage(restaurant, cart);
+            sendWhatsAppMessage({ restaurant: restaurant.company, cart });
+            clearCart();
         } catch (error) {
             toast.error("Erro ao enviar pedido");
         } finally {
             setLoading(false);
-            clearCart();
         }
     };
 
-    if (loading) return <LoadingPage />
+    if (loading) return <LoadingPage />;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
@@ -64,20 +54,20 @@ export function Cart({ ...props}: CartProps) {
                     <div className="flex flex-col gap-1">
                         {cart.map(item => (
                             <div
-                                key={item.id}
+                                key={item.product.id}
                                 className="bg-white rounded-lg shadowflex p-5 flex-col gap-1 border border-gray-100 w-full"
                             >
-                                <div className="font-bold text-base mb-1">{item.name}</div>
+                                <div className="font-bold text-base mb-1">{item.product.name}</div>
                                 <div className="flex items-center gap-2 w-full">
                                     <ButtonPrimaryMinus
-                                        id={`remove-${item.id}`}
-                                        onClick={() => removeFromCart(item.id!)}
+                                        id={`remove-${item.product.id}`}
+                                        onClick={() => removeFromCart(item.product.id!)}
                                         quantity={item.quantity}
                                     />
                                     <span className="font-semibold">{item.quantity}</span>
                                     <ButtonPrimaryPlus
-                                        id={`add-${item.id}`}
-                                        onClick={() => addToCart(item)}
+                                        id={`add-${item.product.id}`}
+                                        onClick={() => addToCart(item.product)}
                                     />
                                     <span className="ml-3 text-green-700 font-bold flex-1 text-right">
                                         {formatCurrencyBRL(item.price * item.quantity)}
