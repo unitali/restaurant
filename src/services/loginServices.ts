@@ -72,6 +72,13 @@ export async function handleGoogleLogin(navigate: any) {
             toast.error("E-mail não autorizado. Entre em contato com o administrador.");
             return;
         }
+        const userDoc = await getUserDocByEmail(email);
+        if (!userDoc) {
+            // Não deleta o usuário, apenas faz logout e mostra erro
+            await signOut(auth);
+            toast.error("Usuário não encontrado no sistema. Entre em contato com o administrador.");
+            return;
+        }
         await handleRedirectByEmail(email, navigate);
     } catch (error) {
         toast.error("Erro ao acessar com Google.");
@@ -85,13 +92,21 @@ export async function handleGoogleRedirect(navigate: any) {
         const email = result.user.email;
         const methods = await fetchSignInMethodsForEmail(auth, email);
         if (methods.length === 0) {
-            try {
-                await result.user.delete();
-            } catch (e) {
-                // Se não conseguir deletar (ex: sessão expirada), ignora
+            // Só deleta se o usuário foi recém-criado (não deveria acontecer aqui)
+            if (result.user.metadata.creationTime === result.user.metadata.lastSignInTime) {
+                try {
+                    await result.user.delete();
+                } catch (e) {}
             }
             await signOut(auth);
             toast.error("E-mail não autorizado. Entre em contato com o administrador.");
+            return;
+        }
+        const userDoc = await getUserDocByEmail(email);
+        if (!userDoc) {
+            // Não deleta o usuário, apenas faz logout e mostra erro
+            await signOut(auth);
+            toast.error("Usuário não encontrado no sistema. Entre em contato com o administrador.");
             return;
         }
         await handleRedirectByEmail(email, navigate);
