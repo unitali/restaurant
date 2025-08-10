@@ -56,3 +56,13 @@ export interface SettingsType {
     secondaryColor: string;
     secondaryTextColor: string;
 }
+
+export interface UserType {
+    id: string;
+    email: string;
+    profile: "admin";
+    restaurantId: string;
+    password: string;
+    confirmPassword: string;
+    createdAt: Date;
+};
