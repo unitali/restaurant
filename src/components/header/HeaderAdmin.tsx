@@ -2,11 +2,11 @@ import { FaSignOutAlt } from 'react-icons/fa';
 import { RiRestaurantFill } from "react-icons/ri";
 import { handleLogout } from '../../services/loginServices';
 import { useRestaurant } from '../../contexts/RestaurantContext';
-
-
+import { useNavigate } from "react-router-dom";
 
 export function HeaderAdmin() {
     const { restaurantId } = useRestaurant();
+    const navigate = useNavigate();
 
     const handleMenuPage = () => {
         if (restaurantId) {
@@ -21,14 +21,14 @@ export function HeaderAdmin() {
             </div>
 
             <div className="flex items-center space-x-4">
-                   <RiRestaurantFill
+                <RiRestaurantFill
                     onClick={handleMenuPage}
                     className="text-white cursor-pointer"
                     size={24}
                     title='Ir para o Cardápio'
                 />
                 <FaSignOutAlt
-                    onClick={handleLogout}
+                    onClick={() => handleLogout(navigate)}
                     className="text-white cursor-pointer"
                     size={24}
                     title='Sair'
