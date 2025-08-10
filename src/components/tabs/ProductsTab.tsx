@@ -52,7 +52,7 @@ export function ProductsTab() {
     }
 
     return (
-        <>
+        <section>
             {categories.length !== 0 ? (
                 <div className="flex flex-col gap-4 mt-10">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -202,6 +202,6 @@ export function ProductsTab() {
                     <p id="no-category-message" className="text-gray-500">Nenhuma categoria encontrada. Cadastre uma categoria para começar a cadastrar produtos.</p>
                 </div>
             )}
-        </>
+        </section>
     );
 }

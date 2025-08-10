@@ -52,7 +52,7 @@ export function CompanySettings() {
         try {
             if (formRestaurant) {
                 await updateRestaurant(restaurantId, formRestaurant);
-                await refresh(); // Atualiza o contexto após salvar
+                await refresh();
                 setEditCompany(false);
                 toast.success("Dados da empresa atualizados com sucesso!");
             }
@@ -70,8 +70,6 @@ export function CompanySettings() {
         return "Editar";
     };
 
-    const company = restaurant?.company;
-
     return (
         <section className="shadow p-6 rounded bg-white max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
@@ -85,7 +83,7 @@ export function CompanySettings() {
                     id="company-name"
                     label="Nome:"
                     name="name"
-                    value={editCompany ? formRestaurant?.name || "" : company?.name || ""}
+                    value={editCompany ? formRestaurant?.name || "" : restaurant?.company?.name || ""}
                     onChange={handleChange}
                     disabled={!editCompany || loading || restaurantLoading}
                 />
@@ -93,7 +91,7 @@ export function CompanySettings() {
                     id="company-address"
                     label="Endereço:"
                     name="address"
-                    value={editCompany ? formRestaurant?.address || "" : company?.address || ""}
+                    value={editCompany ? formRestaurant?.address || "" : restaurant?.company?.address || ""}
                     onChange={handleChange}
                     disabled={!editCompany || loading || restaurantLoading}
                 />
@@ -101,7 +99,7 @@ export function CompanySettings() {
                     id="company-phone"
                     label="Telefone:"
                     name="phone"
-                    value={editCompany ? formRestaurant?.phone || "" : company?.phone || ""}
+                    value={editCompany ? formRestaurant?.phone || "" : restaurant?.company?.phone || ""}
                     onChange={handleChange}
                     disabled={!editCompany || loading || restaurantLoading}
                 />

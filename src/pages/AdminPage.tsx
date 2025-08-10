@@ -37,7 +37,6 @@ export function AdminPage() {
     return (
         <RestaurantProvider restaurantId={restaurantId!}>
             <HeaderAdmin />
-
             <main className="flex flex-col items-center bg-gray-50">
                 {loading ? <LoadingPage /> : (
                     <div className="bg-white rounded shadow p-40 w-full">

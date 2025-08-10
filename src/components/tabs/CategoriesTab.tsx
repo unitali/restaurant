@@ -2,10 +2,10 @@ import { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { ButtonPrimary, CategoryModal, ConfirmModal, Input } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
 import { deleteCategory } from "../../services/categoriesService";
 import type { CategoryType } from "../../types";
-import { useRestaurant } from "../../contexts/RestaurantContext";
 
 export function CategoriesTab() {
     const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
@@ -55,7 +55,7 @@ export function CategoriesTab() {
     }
 
     return (
-        <main className="flex flex-col gap-4 mt-10">
+        <section className="flex flex-col gap-4 mt-10">
             <div className="flex gap-2 mb-6 items-stretch">
                 {categories.length > 0 && (
                     <div className="flex-1">
@@ -153,6 +153,6 @@ export function CategoriesTab() {
                     loading={loading}
                 />
             )}
-        </main>
+        </section>
     );
 }

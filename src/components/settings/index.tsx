@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { InputColor } from "..";
 import { useRestaurant } from "../../contexts/RestaurantContext";
 import { updateSettings } from "../../services/settingsService";
 import type { SettingsType } from "../../types";
@@ -67,78 +68,43 @@ export function Settings() {
                 }}
                 className="flex flex-col gap-3"
             >
-                <label className="flex items-center gap-2">
-                    <span>Cor Primária:</span>
-                    <input
-                        type="color"
-                        name="primaryColor"
-                        value={settings.primaryColor}
-                        onChange={handleSettingsChange}
-                        disabled={!editSettings}
-                    />
-                    <input
-                        type="text"
-                        name="primaryColor"
-                        value={settings.primaryColor}
-                        onChange={handleSettingsChange}
-                        className="border rounded px-2 py-1 w-28"
-                        disabled={!editSettings}
-                    />
-                </label>
-                <label className="flex items-center gap-2">
-                    <span>Texto Primário:</span>
-                    <input
-                        type="color"
-                        name="primaryTextColor"
-                        value={settings.primaryTextColor}
-                        onChange={handleSettingsChange}
-                        disabled={!editSettings}
-                    />
-                    <input
-                        type="text"
-                        name="primaryTextColor"
-                        value={settings.primaryTextColor}
-                        onChange={handleSettingsChange}
-                        className="border rounded px-2 py-1 w-28"
-                        disabled={!editSettings}
-                    />
-                </label>
-                <label className="flex items-center gap-2">
-                    <span>Cor Secundária:</span>
-                    <input
-                        type="color"
-                        name="secondaryColor"
-                        value={settings.secondaryColor}
-                        onChange={handleSettingsChange}
-                        disabled={!editSettings}
-                    />
-                    <input
-                        type="text"
-                        name="secondaryColor"
-                        value={settings.secondaryColor}
-                        onChange={handleSettingsChange}
-                        className="border rounded px-2 py-1 w-28"
-                        disabled={!editSettings}
-                    />
-                </label>
-                <label className="flex items-center gap-2">
-                    <span>Texto Secundário:</span>
-                    <input
-                        type="color"
-                        name="secondaryTextColor"
-                        value={settings.secondaryTextColor}
-                        onChange={handleSettingsChange}
-                        disabled={!editSettings}
-                    />
-                    <input
-                        type="text"
-                        name="secondaryTextColor"
-                        value={settings.secondaryTextColor}
-                        onChange={handleSettingsChange}
-                        className="border rounded px-2 py-1 w-28"
-                        disabled={!editSettings}
-                    />
-                </label>
+                <InputColor
+                    label="Cor Primária:"
+                    id="primary"
+                    name="primaryColor"
+                    value={settings.primaryColor}
+                    onChange={handleSettingsChange}
+                    required
+                    disabled={!editSettings}
+                />
+                <InputColor
+                    label="Texto Primário:"
+                    id="primary-text"
+                    name="primaryTextColor"
+                    value={settings.primaryTextColor}
+                    onChange={handleSettingsChange}
+                    required
+                    disabled={!editSettings}
+                />
+                <InputColor
+                    label="Cor Secundária:"
+                    id="secondary-color"
+                    name="secondaryColor"
+                    value={settings.secondaryColor}
+                    onChange={handleSettingsChange}
+                    required
+                    disabled={!editSettings}
+                />
+                <InputColor
+                    label="Texto Secundário:"
+                    id="secondary-text-color"
+                    name="secondaryTextColor"
+                    value={settings.secondaryTextColor}
+                    onChange={handleSettingsChange}
+                    required
+                    disabled={!editSettings}
+                />
+
                 {editSettings && (
                     <button
                         type="submit"
