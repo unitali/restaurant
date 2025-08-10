@@ -7,11 +7,11 @@ import { ButtonPrimary, Input } from "../components";
 import { db } from "../config/firebase";
 import { webRoutes } from "../routes";
 import { createRestaurant } from "../services/restaurantsService";
-import type { RestaurantType, UserType } from "../types";
+import type { CompanyType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";
 
-const restaurantInitialState: RestaurantType = {
+const restaurantInitialState: CompanyType = {
     id: "",
     name: "",
     address: "",
@@ -33,7 +33,7 @@ const userInitialState: UserType = {
 
 
 export function CreateRestaurant() {
-    const [restaurant, setRestaurant] = useState<RestaurantType>(restaurantInitialState);
+    const [restaurant, setRestaurant] = useState<CompanyType>(restaurantInitialState);
     const [userAdmin, setUserAdmin] = useState<UserType>(userInitialState);
     const [loading, setLoading] = useState(false);
     const auth = getAuth();
