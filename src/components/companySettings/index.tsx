@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ButtonPrimary, Input } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 import { updateRestaurant } from "../../services/restaurantsService";
 import type { CompanyType } from "../../types";
-import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LabelCopy } from "../label";
-import { webRoutes } from "../../routes";
 
 export function CompanySettings() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
@@ -116,7 +115,7 @@ export function CompanySettings() {
                     id="link-menu"
                     label="Link do Cardapio"
                     name="menuLink"
-                    value={`${window.location.origin}${webRoutes.menu.replace(":restaurantId", restaurantId)}`}
+                    value={restaurant?.company?.shortUrlMenu || ""}
                     disabled={!editCompany || loading || restaurantLoading}
                 />
             </form>

@@ -2,6 +2,7 @@ import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from "firebase/fi
 import { db } from "../config/firebase";
 import type { CompanyType } from "../types";
 import { today } from "../utils/date";
+import { getShortUrl } from "../utils/shortUrl";
 
 export const fetchRestaurants = async () => {
   const snapshot = await getDocs(collection(db, "categories"));
@@ -35,6 +36,16 @@ export async function createRestaurant(props: CompanyType) {
 
   const docRef = await addDoc(collection(db, "restaurants"), data);
   localStorage.setItem("restaurantId", docRef.id);
+
+  const menuUrl = await getShortUrl(docRef.id);
+
+  if (menuUrl) {
+    await updateDoc(docRef, {
+      "company.shortUrlMenu": menuUrl,
+    });
+  } else {
+    console.log("Erro ao gerar URL curta");
+  }
   return docRef.id;
 }
 
