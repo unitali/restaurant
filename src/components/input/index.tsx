@@ -86,7 +86,7 @@ export function InputColor({ ...props }: InputColorProps) {
                 {props.required && <span className="mx-1">*</span>}
             </label>
             <div
-                className={`flex items-center w-full p-3 pt-5 rounded 
+                className={`flex items-center w-full p-1 pt-4 rounded 
                     ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"}
                     border border-teal-500 focus-within:ring-2 focus-within:ring-teal-500 
                     ${props.classNameInput} ${isRequiredError ? "border-red-500" : ""}`}

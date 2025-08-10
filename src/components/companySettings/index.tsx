@@ -4,6 +4,8 @@ import { ButtonPrimary, Input } from "..";
 import { updateRestaurant } from "../../services/restaurantsService";
 import type { CompanyType } from "../../types";
 import { useRestaurant } from "../../contexts/RestaurantContext";
+import { LabelCopy } from "../label";
+import { webRoutes } from "../../routes";
 
 export function CompanySettings() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
@@ -110,6 +112,13 @@ export function CompanySettings() {
                 >
                     {buttonText()}
                 </ButtonPrimary>
+                <LabelCopy
+                    id="link-menu"
+                    label="Link do Cardapio"
+                    name="menuLink"
+                    value={`${window.location.origin}${webRoutes.menu.replace(":restaurantId", restaurantId)}`}
+                    disabled={!editCompany || loading || restaurantLoading}
+                />
             </form>
         </section>
     );
