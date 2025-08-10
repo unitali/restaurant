@@ -81,7 +81,7 @@ export function CompanySettings() {
             >
                 <Input
                     id="company-name"
-                    label="Nome:"
+                    label="Nome Fantasia"
                     name="name"
                     value={editCompany ? formRestaurant?.name || "" : restaurant?.company?.name || ""}
                     onChange={handleChange}
@@ -89,7 +89,7 @@ export function CompanySettings() {
                 />
                 <Input
                     id="company-address"
-                    label="Endereço:"
+                    label="Endereço"
                     name="address"
                     value={editCompany ? formRestaurant?.address || "" : restaurant?.company?.address || ""}
                     onChange={handleChange}
@@ -97,7 +97,7 @@ export function CompanySettings() {
                 />
                 <Input
                     id="company-phone"
-                    label="Telefone:"
+                    label="WhatsApp"
                     name="phone"
                     value={editCompany ? formRestaurant?.phone || "" : restaurant?.company?.phone || ""}
                     onChange={handleChange}

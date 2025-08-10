@@ -34,7 +34,7 @@ export function Input({ ...props }: InputProps) {
                 {...props}
                 id={`input-${props.id}`}
                 type={inputType}
-                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 text-white"} border border-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500 ${props.classNameInput} ${isPassword ? "pr-10" : ""} ${isRequiredError ? "border-red-500" : ""}`}
+                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"} border border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 ${props.classNameInput} ${isPassword ? "pr-10" : ""} ${isRequiredError ? "border-red-500" : ""}`}
                 onBlur={(e) => {
                     setTouched(true);
                     props.onBlur && props.onBlur(e);
@@ -87,8 +87,8 @@ export function InputColor({ ...props }: InputColorProps) {
             </label>
             <div
                 className={`flex items-center w-full p-3 pt-5 rounded 
-                    ${!props.disabled ? "bg-white text-gray-700" : "bg-gray-700 text-white"} 
-                    border border-gray-500 focus-within:ring-2 focus-within:ring-teal-500 
+                    ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"}
+                    border border-teal-500 focus-within:ring-2 focus-within:ring-teal-500 
                     ${props.classNameInput} ${isRequiredError ? "border-red-500" : ""}`}
             >
                 <input
@@ -97,7 +97,7 @@ export function InputColor({ ...props }: InputColorProps) {
                     name={props.name}
                     onChange={handleChange}
                     disabled={props.disabled}
-                    className={"w-10 h-10 rounded border border-gray-500 mr-3 bg-transparent"}
+                    className={`w-10 h-10 rounded mr-3 bg-transparent ${props.disabled ? "hover:cursor-not-allowed" : "cursor-pointer"}`}
                     style={{ minWidth: 40 }}
                     tabIndex={-1}
                 />
@@ -109,7 +109,7 @@ export function InputColor({ ...props }: InputColorProps) {
                     name={props.name}
                     onChange={handleChange}
                     disabled={props.disabled}
-                    className={`flex-1 bg-transparent outline-none border-none p-0 m-0 ${props.disabled ? "text-gray-400 cursor-not-allowed" : "text-gray-700 "}`}
+                    className={`flex-1 bg-transparent outline-none border-none p-0 m-0 ${props.disabled ? "hover:cursor-not-allowed" : "cursor-text"} ${isRequiredError ? "border-red-500" : ""}`}
                     onBlur={(e) => {
                         setTouched(true);
                         props.onBlur && props.onBlur(e);
