@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import type { ModalProps } from "..";
 import { ButtonPrimary, ImageUpload, Input, Modal, Select } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
 import { removeImage, updateImage, uploadImage } from '../../services/imagesServices';
 import { addProduct, fetchProductById, updateProduct } from "../../services/productsService";
@@ -29,6 +30,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
     const initializedRef = useRef(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [product, setProduct] = useState<ProductType>(initialProductState);
+    const { restaurantId } = useRestaurant();
 
     useEffect(() => {
         async function loadProductData() {
@@ -106,13 +108,13 @@ export function ProductModal({ ...props }: ProductModalProps) {
         if (isEditing) {
             return await updateImage({
                 file,
-                folder: 'products',
-                oldImagePath: props.product!.image!.path
+                oldImagePath: props.product!.image!.path,
+                restaurantId
             });
         } else {
             return await uploadImage({
                 file,
-                folder: 'products'
+                restaurantId
             });
         }
     };
