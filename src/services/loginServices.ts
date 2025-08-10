@@ -1,4 +1,4 @@
-import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, fetchSignInMethodsForEmail } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "../config/firebase";
@@ -42,6 +42,21 @@ export async function handleGoogleLogin(navigate: any) {
     const auth = getAuth();
     try {
         const result = await signInWithPopup(auth, provider);
+        const email = result.user.email;
+
+        if (!email) {
+            await signOut(auth);
+            toast.error("E-mail do usuário não encontrado/autorizado. Entre em contato com o administrador.");
+            return;
+        }
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods.length === 0) {
+
+            await signOut(auth);
+            toast.error("E-mail do usuário não encontrado/autorizado. Entre em contato com o administrador.");
+            return;
+        }
+
         await handleRedirect(result.user.uid, navigate);
     } catch (error) {
         toast.error("Erro ao acessar com Google.");
