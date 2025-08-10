@@ -22,7 +22,7 @@ export async function uploadImage({ file }: ImageParams) {
     try {
         validateRestaurantId(restaurantId);
         const processedFile = await processFileForUpload(file);
-        const imagePath = buildPath(restaurantId); // ignorando nome original
+        const imagePath = buildPath(restaurantId);
         const downloadURL = await uploadToStorage(processedFile, imagePath);
         return { url: downloadURL, path: imagePath };
     } catch (error) {
@@ -36,6 +36,7 @@ export async function updateImage({ file, oldImagePath }: ImageParams) {
     try {
         validateRestaurantId(restaurantId);
         const processedFile = await processFileForUpload(file);
+
         const [, uploadResult] = await Promise.allSettled([
             oldImagePath ? removeImage(oldImagePath) : Promise.resolve(),
             (async () => {
@@ -44,6 +45,7 @@ export async function updateImage({ file, oldImagePath }: ImageParams) {
                 return { url: downloadURL, path: imagePath };
             })()
         ]);
+
         if (uploadResult.status === "rejected") throw uploadResult.reason;
         return uploadResult.value;
     } catch (error) {

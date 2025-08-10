@@ -18,7 +18,7 @@ export interface CompanyType {
 
 export interface ImageParams {
     file: File;
-    folder: string;
+    folder?: string;
     oldImagePath?: string;
 }
 
