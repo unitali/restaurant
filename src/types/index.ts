@@ -11,6 +11,8 @@ export interface CompanyType {
     phone: string;
     createdAt?: Date;
     expiredAt?: Date;
+    updatedAt?: Date;
+    shortUrlMenu?: string;
     status?: "active" | "inactive";
 }
 
