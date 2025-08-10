@@ -100,7 +100,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
         }
     };
 
-    const processImageUpload = async (file: File): Promise<{ url: string; path: string; imageId: string }> => {
+    const processImageUpload = async (file: File): Promise<{ url: string; path: string; imageId?: string }> => {
         const isEditing = Boolean(props.product?.image?.path);
 
         if (isEditing) {
