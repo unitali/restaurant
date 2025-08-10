@@ -1,6 +1,5 @@
 import type { User } from "firebase/auth";
 import {
-    EmailAuthProvider,
     getAuth,
     GoogleAuthProvider,
     linkWithCredential,
@@ -33,12 +32,10 @@ function normalizeEmail(email: string | null | undefined) {
 async function findUserDoc(uid: string, rawEmail: string | null | undefined) {
     const emailNorm = normalizeEmail(rawEmail);
 
-
     if (uid) {
         const byUidRef = doc(db, "users", uid);
         const byUidSnap = await getDoc(byUidRef);
         if (byUidSnap.exists()) {
-            // adiciona emailLower se faltar
             const data = byUidSnap.data();
             if (emailNorm && !data.emailLower) {
                 try { await updateDoc(byUidRef, { emailLower: emailNorm }); } catch { }
@@ -47,12 +44,10 @@ async function findUserDoc(uid: string, rawEmail: string | null | undefined) {
         }
     }
 
-
     if (emailNorm) {
         const qLower = query(collection(db, "users"), where("emailLower", "==", emailNorm));
         const snapLower = await getDocs(qLower);
         if (!snapLower.empty) {
-            // garante campo
             const docSnap = snapLower.docs[0];
             if (!docSnap.data().emailLower) {
                 try { await updateDoc(docSnap.ref, { emailLower: emailNorm }); } catch { }
@@ -102,24 +97,6 @@ async function tryLinkPendingGoogle(user: User) {
     }
 }
 
-export async function linkPasswordToCurrentUser(password: string) {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user || !user.email) {
-        toast.error("Usuário não autenticado.");
-        return;
-    }
-    try {
-        const cred = EmailAuthProvider.credential(user.email, password);
-        await linkWithCredential(user, cred);
-        toast.success("Senha vinculada com sucesso.");
-    } catch (e: any) {
-        if (e.code === "auth/provider-already-linked") toast.info("Senha já vinculada.");
-        else toast.error("Erro ao vincular senha.");
-    }
-}
-
-
 export async function handleEmailLogin(
     { email, password }: { email: string; password: string },
     navigate: any
@@ -129,20 +106,14 @@ export async function handleEmailLogin(
         const res = await signInWithEmailAndPassword(auth, email, password);
         const userDoc = await findUserDoc(res.user.uid, res.user.email);
         if (!userDoc) {
-            if (isNew(res.user)) {
-                // opcional: remover
-                // try { await res.user.delete(); } catch {}
-            }
             await signOut(auth);
-            toast.error("Acesso negado. Usuário não cadastrado em users.");
+            toast.error("Acesso negado. Contate o administrador.");
             return;
         }
         await tryLinkPendingGoogle(res.user);
         redirect(userDoc, navigate);
     } catch (e: any) {
-        if (e.code === "auth/user-not-found") toast.error("Usuário não encontrado.");
-        else if (e.code === "auth/wrong-password") toast.error("Senha incorreta.");
-        else toast.error("Falha no login.");
+        toast.error("Usuário e/ou senha incorreta.");
     }
 }
 
@@ -158,18 +129,12 @@ export async function handleGoogleLogin(navigate: any) {
                 try { await res.user.delete(); } catch { }
             }
             await signOut(auth);
-            toast.error("Acesso negado. Usuário não cadastrado em users.");
+            toast.error("Erro ao fazer login com Google.");
             return;
         }
         redirect(userDoc, navigate);
     } catch (e: any) {
-        if (e.code === "auth/account-exists-with-different-credential") {
-            const cred = GoogleAuthProvider.credentialFromError(e);
-            if (cred) pendingGoogleCredential = cred;
-            toast.info("Entre com e-mail e senha para vincular Google.");
-        } else {
-            toast.error("Erro no login Google.");
-        }
+        toast.error("Erro ao fazer login com Google.");
     }
 }
 
@@ -179,5 +144,5 @@ export async function handleLogout(navigate: any) {
     await signOut(auth);
     localStorage.removeItem("restaurantId");
     navigate(webRoutes.login, { replace: true });
-    toast.success("Logout efetuado.");
+    toast.success("Logout efetuado com sucesso.");
 }
