@@ -1,50 +1,31 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaEdit, FaFileImage, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ConfirmModal, Input, Select } from "..";
+import { ButtonPrimary, ConfirmModal, Input, Select, ProductModal } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
-import { fetchCategoriesByRestaurantId } from "../../services/categoriesService";
-import { deleteProduct, fetchProductsByRestaurantId } from "../../services/productsService";
+import { deleteProduct } from "../../services/productsService";
 import type { CategoryType, ProductType } from "../../types";
 import { formatCurrencyBRL } from "../../utils/currency";
-import { ProductModal } from "../modal/ProductModal";
 
-interface ProductsTabProps {
-    restaurantId: string;
-}
-
-export function ProductsTab({ ...props }: ProductsTabProps) {
-    const [products, setProducts] = useState<ProductType[]>([]);
+export function ProductsTab() {
+    const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
     const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false);
     const [productSelected, setProductSelected] = useState<string | null>(null);
-    const [categories, setCategories] = useState<CategoryType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState("");
 
-    useEffect(() => {
-        async function loadData() {
-            try {
-                if (!props.restaurantId) return;
-                setLoading(true);
-                setProducts(await fetchProductsByRestaurantId(props.restaurantId));
-                setCategories(await fetchCategoriesByRestaurantId(props.restaurantId));
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadData();
-    }, [props.restaurantId]);
+    const products: ProductType[] = Array.isArray(restaurant?.products) ? restaurant.products : [];
+    const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
 
     const confirmDelete = async () => {
         setLoading(true);
-        if (!productSelected || !props.restaurantId) return;
+        if (!productSelected || !restaurantId) return;
         try {
-            await deleteProduct(props.restaurantId, productSelected);
-            await reloadProducts();
+            await deleteProduct(restaurantId, productSelected);
+            await refresh();
             toast.success("Produto excluído com sucesso!");
         } catch (error) {
             toast.error("Erro ao excluir o produto");
@@ -53,13 +34,6 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
             setIsOpenModalConfirm(false);
             setProductSelected(null);
             setLoading(false);
-        }
-    };
-
-    const reloadProducts = async () => {
-        if (props.restaurantId) {
-            const updatedProducts = await fetchProductsByRestaurantId(props.restaurantId);
-            setProducts(updatedProducts);
         }
     };
 
@@ -73,7 +47,7 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
         setIsOpenModalConfirm(true);
     };
 
-    if (loading) {
+    if (restaurantLoading || loading) {
         return <LoadingPage />;
     }
 
@@ -204,9 +178,9 @@ export function ProductsTab({ ...props }: ProductsTabProps) {
                             id="product-modal"
                             isOpen={isOpenModalProduct}
                             onClose={() => setIsOpenModalProduct(false)}
-                            restaurantId={props.restaurantId}
+                            restaurantId={restaurantId}
                             categories={categories}
-                            onProductChanged={reloadProducts}
+                            onProductChanged={refresh}
                             productId={productSelected}
                         />
                     )}
