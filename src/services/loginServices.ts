@@ -1,12 +1,22 @@
-import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, fetchSignInMethodsForEmail } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { fetchSignInMethodsForEmail, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "../config/firebase";
 import { webRoutes } from '../routes';
 
-async function handleRedirect(userId: string, navigate: any) {
-    const userDoc = await getDoc(doc(db, "users", userId));
-    if (userDoc.exists()) {
+async function getUserDocByEmail(email: string) {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+        return querySnapshot.docs[0];
+    }
+    return null;
+}
+
+async function handleRedirectByEmail(email: string, navigate: any) {
+    const userDoc = await getUserDocByEmail(email);
+    if (userDoc) {
         const { profile, restaurantId } = userDoc.data() as { profile: string; restaurantId: string };
         localStorage.setItem("restaurantId", restaurantId);
         if (profile === "admin") {
@@ -30,8 +40,13 @@ export async function handleLogout(navigate: any) {
 export async function handleEmailLogin({ email, password }: { email: string; password: string }, navigate: any) {
     const auth = getAuth();
     try {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        await handleRedirect(result.user.uid, navigate);
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods.length === 0) {
+            toast.error("E-mail não autorizado. Entre em contato com o administrador.");
+            return;
+        }
+        await signInWithEmailAndPassword(auth, email, password);
+        await handleRedirectByEmail(email, navigate);
     } catch (error) {
         toast.error("E-mail ou senha inválidos.");
     }
@@ -51,13 +66,12 @@ export async function handleGoogleLogin(navigate: any) {
         }
         const methods = await fetchSignInMethodsForEmail(auth, email);
         if (methods.length === 0) {
-
             await signOut(auth);
             toast.error("E-mail do usuário não encontrado/autorizado. Entre em contato com o administrador.");
             return;
         }
 
-        await handleRedirect(result.user.uid, navigate);
+        await handleRedirectByEmail(email, navigate);
     } catch (error) {
         toast.error("Erro ao acessar com Google.");
     }
