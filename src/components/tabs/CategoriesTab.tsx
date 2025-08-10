@@ -1,46 +1,25 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { ButtonPrimary, CategoryModal, ConfirmModal, Input } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
-import { deleteCategory, fetchCategoriesByRestaurantId } from "../../services/categoriesService";
+import { deleteCategory } from "../../services/categoriesService";
 import type { CategoryType } from "../../types";
 
-interface CategoriesTabProps {
-    restaurantId: string;
-}
-
-export function CategoriesTab({ ...props }: CategoriesTabProps) {
-    const [categories, setCategories] = useState<CategoryType[]>([]);
+export function CategoriesTab() {
+    const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
     const [isOpenModalCategory, setIsOpenModalCategory] = useState(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false);
     const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [categorySelected, setCategorySelected] = useState<CategoryType | null>(null);
 
-    useEffect(() => {
-        setLoading(true);
-        async function loadCategories() {
-            const restaurantId = localStorage.getItem("restaurantId")?.toString();
-            if (!restaurantId) {
-                toast.error("Restaurante não encontrado");
-                setLoading(false);
-                return;
-            }
-            const fetchedCategories = await fetchCategoriesByRestaurantId(restaurantId);
-            setCategories(fetchedCategories);
-            setLoading(false);
-        }
-        loadCategories();
-    }, []);
-
+    const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
 
     const reloadCategories = async () => {
         setLoading(true);
-        if (props.restaurantId) {
-            const updatedCategories = await fetchCategoriesByRestaurantId(props.restaurantId);
-            setCategories(updatedCategories);
-        }
+        await refresh();
         setLoading(false);
     };
 
@@ -57,8 +36,6 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
     const confirmDelete = async () => {
         setLoading(true);
         if (!categorySelected) return;
-        const restaurantId = props.restaurantId;
-        if (!restaurantId) return;
         try {
             await deleteCategory(restaurantId, categorySelected.id || "");
             await reloadCategories();
@@ -73,12 +50,12 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
         }
     };
 
-    if (loading) {
+    if (restaurantLoading || loading) {
         return <LoadingPage />;
     }
 
     return (
-        <div className="flex flex-col gap-4 mt-10">
+        <section className="flex flex-col gap-4 mt-10">
             <div className="flex gap-2 mb-6 items-stretch">
                 {categories.length > 0 && (
                     <div className="flex-1">
@@ -159,7 +136,7 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                     id="category-modal"
                     isOpen={isOpenModalCategory}
                     onClose={() => setIsOpenModalCategory(false)}
-                    restaurantId={props.restaurantId}
+                    restaurantId={restaurantId}
                     onCategoryChanged={reloadCategories}
                     category={categorySelected ?? null}
                 />
@@ -176,6 +153,6 @@ export function CategoriesTab({ ...props }: CategoriesTabProps) {
                     loading={loading}
                 />
             )}
-        </div>
+        </section>
     );
 }

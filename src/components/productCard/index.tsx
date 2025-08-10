@@ -8,7 +8,7 @@ import { ButtonPrimaryMinus, ButtonPrimaryPlus } from "../button";
 export function ProductCard({ product }: { product: ProductType }) {
     const { addToCart, removeFromCart, cart } = useCart();
 
-    const cartItem = cart.find(item => item.id === product.id);
+    const cartItem = cart.find(item => item.product.id === product.id);
     const quantity = cartItem ? cartItem.quantity : 0;
 
     return (

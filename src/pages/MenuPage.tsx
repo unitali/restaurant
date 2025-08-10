@@ -1,43 +1,42 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { HeaderMenu, ProductCarousel, Slider } from "../components";
-import { fetchCategoriesByRestaurantId } from "../services/categoriesService";
-import { fetchProductsByRestaurantId } from "../services/productsService";
+import { CartProvider } from "../contexts/CartContext";
+import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
 import { LoadingPage } from "./LoadingPage";
-import { CartProvider } from "../contexts/CartContext";
+import { useState, useEffect } from "react";
 
 export function MenuPage() {
   const { restaurantId } = useParams();
+
+  return (
+    <RestaurantProvider restaurantId={restaurantId!}>
+      <CartProvider>
+        <MenuContent />
+      </CartProvider>
+    </RestaurantProvider>
+  );
+}
+
+function MenuContent() {
+  const { restaurant, loading } = useRestaurant();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      if (restaurantId) {
-        const [products, categories] = await Promise.all([
-          fetchProductsByRestaurantId(restaurantId),
-          fetchCategoriesByRestaurantId(restaurantId),
-        ]);
-        setProducts(products);
-        setCategories(categories);
-      }
-      setLoading(false);
-    }
-    if (restaurantId) fetchData();
-  }, [restaurantId]);
+    setProducts(Array.isArray(restaurant?.products) ? restaurant!.products : []);
+    setCategories(Array.isArray(restaurant?.categories) ? restaurant!.categories : []);
+  }, [restaurant]);
 
   if (loading) return <LoadingPage />;
+  if (!restaurant) return null;
 
-  // Destaques: os 3 primeiros produtos (ajuste conforme sua lógica de destaque)
   const featuredProducts = products.slice(0, 3);
 
   return (
-    <CartProvider>
+    <>
       <HeaderMenu />
-      <main className="max-w-xl w-full mx-auto px-2">
+      <main className="max-w-xl w-full mx-auto px-2 pt-20">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
           <Slider
@@ -59,6 +58,6 @@ export function MenuPage() {
           );
         })}
       </main>
-    </CartProvider>
+    </>
   );
 }

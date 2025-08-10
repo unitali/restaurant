@@ -1,7 +1,56 @@
-export * from "./userType";
-export * from "./restaurantType";
-export * from "./productType";
-export * from "./categoryType";
-export * from "./imageType";
-export * from "./settingsType";
+export interface CategoryType {
+    id?: string;
+    name: string;
+    description: string;
+}
 
+export interface CompanyType {
+    id?: string;
+    name: string;
+    address: string;
+    phone: string;
+    createdAt?: Date;
+    expiredAt?: Date;
+    status?: "active" | "inactive";
+}
+
+export interface ImageParams {
+    file: File;
+    folder: string;
+    oldImagePath?: string;
+}
+
+export interface ImageType {
+    path: string;
+    url: string;
+    imageId: string;
+}
+
+export interface CartItem {
+    product: ProductType;
+    quantity: number;
+    price: number;
+}
+
+export interface ProductType {
+    id?: string;
+    name: string;
+    price: number;
+    categoryId: string;
+    description?: string;
+    image?: ImageType | null;
+}
+
+export interface RestaurantType {
+    company: CompanyType;
+    categories: CategoryType;
+    settings: SettingsType;
+    products: ProductType;
+}
+
+export interface SettingsType {
+    primaryColor: string;
+    primaryTextColor: string;
+    secondaryColor: string;
+    secondaryTextColor: string;
+}
