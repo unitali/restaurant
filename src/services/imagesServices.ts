@@ -8,51 +8,43 @@ function validateRestaurantId(id: string) {
     if (/[\/\\]/.test(id)) throw new Error("restaurantId inválido");
 }
 
-function sanitizeSegment(seg?: string) {
-    if (!seg) return "";
-    return seg.replace(/[^a-zA-Z0-9_\-]/g, "_");
+function buildFileName() {
+    return `${Date.now()}.jpg`;
 }
 
-function createImagePath(restaurantId: string, folder: string | undefined, imageId: string) {
-    const base = `products/${restaurantId}`;
-    const cleanFolder = sanitizeSegment(folder);
-    return cleanFolder ? `${base}/${cleanFolder}/${imageId}` : `${base}/${imageId}`;
+function buildPath(restaurantId: string) {
+    const fileName = buildFileName();
+    return `products/${restaurantId}/${fileName}`;
 }
 
-export async function uploadImage({ file, folder }: ImageParams) {
+export async function uploadImage({ file }: ImageParams) {
     const { restaurantId } = useRestaurant();
     try {
         validateRestaurantId(restaurantId);
         const processedFile = await processFileForUpload(file);
-        const imageId = generateUniqueFileName();
-        const imagePath = createImagePath(restaurantId, folder, imageId);
+        const imagePath = buildPath(restaurantId); // ignorando nome original
         const downloadURL = await uploadToStorage(processedFile, imagePath);
-        return { url: downloadURL, path: imagePath, imageId };
+        return { url: downloadURL, path: imagePath };
     } catch (error) {
         console.error("Erro ao fazer upload da imagem: ", error);
         throw new Error("Falha no upload da imagem");
     }
 }
 
-export async function updateImage({ ...props }: ImageParams) {
+export async function updateImage({ file, oldImagePath }: ImageParams) {
     const { restaurantId } = useRestaurant();
     try {
         validateRestaurantId(restaurantId);
-        const processedFile = await processFileForUpload(props.file);
-
+        const processedFile = await processFileForUpload(file);
         const [, uploadResult] = await Promise.allSettled([
-            props.oldImagePath ? removeImage(props.oldImagePath) : Promise.resolve(),
+            oldImagePath ? removeImage(oldImagePath) : Promise.resolve(),
             (async () => {
-                const imageId = generateUniqueFileName();
-                const imagePath = createImagePath(restaurantId, props.folder, imageId);
+                const imagePath = buildPath(restaurantId);
                 const downloadURL = await uploadToStorage(processedFile, imagePath);
-                return { url: downloadURL, path: imagePath, imageId };
+                return { url: downloadURL, path: imagePath };
             })()
         ]);
-
-        if (uploadResult.status === 'rejected') {
-            throw uploadResult.reason;
-        }
+        if (uploadResult.status === "rejected") throw uploadResult.reason;
         return uploadResult.value;
     } catch (error) {
         console.error("Erro ao atualizar imagem: ", error);
@@ -71,8 +63,8 @@ export async function removeImage(imagePath: string) {
 }
 
 export function validateImageFile(file: File, maxSizeInMB: number = 5): boolean {
-    if (!file.type.startsWith('image/')) {
-        throw new Error('Por favor, selecione apenas arquivos de imagem.');
+    if (!file.type.startsWith("image/")) {
+        throw new Error("Por favor, selecione apenas arquivos de imagem.");
     }
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
     if (file.size > maxSizeInBytes) {
@@ -89,18 +81,17 @@ const uploadToStorage = async (file: File, imagePath: string): Promise<string> =
 
 async function compressImage(
     file: File,
-    options: { maxWidth?: number; maxHeight?: number; quality?: number; outputFormat?: string; } = {}
+    options: { maxWidth?: number; maxHeight?: number; quality?: number } = {}
 ): Promise<File> {
     const {
         maxWidth = 1200,
         maxHeight = 1200,
-        quality = 0.8,
-        outputFormat = 'image/jpeg'
+        quality = 0.8
     } = options;
 
     return new Promise((resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
         const img = new Image();
         img.onload = () => {
             let { width, height } = img;
@@ -111,51 +102,42 @@ async function compressImage(
             }
             canvas.width = width;
             canvas.height = height;
-            if (ctx) {
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(img, 0, 0, width, height);
-            }
+            ctx?.drawImage(img, 0, 0, width, height);
             canvas.toBlob(
                 (blob) => {
-                    if (!blob) return reject(new Error('Falha na compressão da imagem'));
-                    const originalName = file.name;
-                    const nameWithoutExt = originalName.includes('.')
-                        ? originalName.substring(0, originalName.lastIndexOf('.'))
-                        : originalName;
-                    const newExtension =
-                        outputFormat === 'image/png' ? '.png' :
-                        outputFormat === 'image/jpeg' ? '.jpg' : '.jpg';
-                    const compressedFile = new File(
+                    if (!blob) return reject(new Error("Falha na compressão da imagem"));
+                    const newFile = new File(
                         [blob],
-                        `${nameWithoutExt}_compressed${newExtension}`,
-                        { type: outputFormat, lastModified: Date.now() }
+                        "compressed.jpg",
+                        { type: "image/jpeg", lastModified: Date.now() }
                     );
-                    resolve(compressedFile);
+                    resolve(newFile);
                 },
-                outputFormat,
+                "image/jpeg",
                 quality
             );
         };
-        img.onerror = () => reject(new Error('Falha ao carregar imagem para compressão'));
+        img.onerror = () => reject(new Error("Falha ao carregar imagem para compressão"));
         img.src = URL.createObjectURL(file);
     });
 }
 
 async function processFileForUpload(file: File): Promise<File> {
     validateImageFile(file);
-    const shouldCompress = file.size > 500 * 1024;
+    const shouldCompress = file.size > 300 * 1024; // compressão leve
     if (shouldCompress) {
         const compressionOptions = {
-            maxWidth: file.size > 5 * 1024 * 1024 ? 1000 : 1200,
-            maxHeight: file.size > 5 * 1024 * 1024 ? 1000 : 1200,
-            quality: file.size > 2 * 1024 * 1024 ? 0.7 : 0.8,
-            outputFormat: file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+            maxWidth: file.size > 4 * 1024 * 1024 ? 1000 : 1200,
+            maxHeight: file.size > 4 * 1024 * 1024 ? 1000 : 1200,
+            quality: file.size > 2 * 1024 * 1024 ? 0.7 : 0.8
         };
         return await compressImage(file, compressionOptions);
     }
+
+    // Se não for comprimir e não for jpeg, converte para jpeg garantindo extensão final .jpg
+    if (file.type !== "image/jpeg") {
+        return await compressImage(file, { maxWidth: 2000, maxHeight: 2000, quality: 0.85 });
+    }
+
     return file;
 }
-
-const generateUniqueFileName = (): string =>
-    `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
