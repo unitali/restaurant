@@ -13,7 +13,7 @@ function ensureRestaurantId(id?: string) {
 }
 
 function uniqueFileName() {
-  return `${Date.now()}_${Math.random().toString(36).slice(2,8)}.jpg`;
+  return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
 }
 
 function buildPath(restaurantId: string) {
@@ -51,9 +51,55 @@ export async function removeImage(imagePath: string) {
   }
 }
 
-function validateImageFile(file: File, maxMB = 5) {
-  if (!file.type.startsWith("image/")) throw new Error("Arquivo não é imagem.");
-  if (file.size > maxMB * 1024 * 1024) throw new Error(`Máximo ${maxMB}MB.`);
+export async function validateImageFile(
+  file: File,
+  options: {
+    maxMB?: number;
+    allowedTypes?: string[];
+    minWidth?: number;
+    minHeight?: number;
+  } = {}
+): Promise<void> {
+  const {
+    maxMB = 5,
+    allowedTypes = ["image/jpeg", "image/png", "image/webp"],
+    minWidth,
+    minHeight
+  } = options;
+
+  if (!file) throw new Error("Nenhum arquivo selecionado.");
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error(
+      `Tipo inválido. Permitidos: ${allowedTypes
+        .map(t => t.split("/")[1])
+        .join(", ")}.`
+    );
+  }
+
+  const maxBytes = maxMB * 1024 * 1024;
+  if (file.size > maxBytes) {
+    throw new Error(`Arquivo excede ${maxMB}MB.`);
+  }
+
+  if (minWidth || minHeight) {
+    const dims = await getImageDimensions(file);
+    if (minWidth && dims.width < minWidth) {
+      throw new Error(`Largura mínima é ${minWidth}px (recebido ${dims.width}px).`);
+    }
+    if (minHeight && dims.height < minHeight) {
+      throw new Error(`Altura mínima é ${minHeight}px (recebido ${dims.height}px).`);
+    }
+  }
+}
+
+async function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = () => reject(new Error("Não foi possível ler a imagem."));
+    img.src = URL.createObjectURL(file);
+  });
 }
 
 async function processFileForUpload(file: File): Promise<File> {
@@ -88,7 +134,7 @@ async function compressImage(
       canvas.toBlob(
         b => {
           if (!b) return reject(new Error("Falha compressão"));
-            resolve(new File([b], "image.jpg", { type: "image/jpeg", lastModified: Date.now() }));
+          resolve(new File([b], "image.jpg", { type: "image/jpeg", lastModified: Date.now() }));
         },
         "image/jpeg",
         quality
