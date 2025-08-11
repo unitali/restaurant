@@ -1,122 +1,101 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import type { ModalProps } from "..";
 import { ButtonPrimary, ImageUpload, Input, Modal, Select } from "..";
 import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
-import { removeImage, updateImage, uploadImage } from '../../services/imagesServices';
-import { addProduct, fetchProductById, updateProduct } from "../../services/productsService";
-import type { CategoryType, ImageType, ProductType } from "../../types";
+import { updateImage } from '../../services/imagesServices';
+import { addProduct, updateProduct } from "../../services/productsService";
+import type { CategoryType, ImageState, ImageType, ProductType } from '../../types';
 import { formatCurrencyBRL } from "../../utils/currency";
-
-interface ProductModalProps extends ModalProps {
-    product?: ProductType;
-    restaurantId: string;
-    categories: CategoryType[];
-    onProductChanged?: () => Promise<void>;
-    productId?: string | null;
-}
 
 const initialProductState: ProductType = {
     id: "",
     name: "",
+    description: "",
     price: 0,
     categoryId: "",
     image: null,
 };
 
-export function ProductModal({ ...props }: ProductModalProps) {
-    const [loading, setLoading] = useState(false);
+const initialImageState: ImageState = {
+    file: null,
+    removed: false,
+    dirty: false,
+    previewUrl: null
+};
+
+export function ProductModal(props: {
+    product?: ProductType;
+    productId?: string | null;
+    onProductChanged?: () => Promise<void>;
+} & React.ComponentProps<typeof Modal>) {
+    const { restaurantId, restaurant } = useRestaurant();
     const initializedRef = useRef(false);
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+
+    const [loading, setLoading] = useState(false);
     const [product, setProduct] = useState<ProductType>(initialProductState);
-    const { restaurantId } = useRestaurant();
+    const [products, setProducts] = useState<ProductType[]>(Array.isArray(restaurant?.products) ? restaurant.products : []);
+    const [originalImage, setOriginalImage] = useState<ImageType | null>(null);
+    const [imageState, setImageState] = useState<ImageState>(initialImageState);
+
+    const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
+
+    const resetForm = useCallback(() => {
+        setProduct({
+            ...initialProductState,
+            categoryId: Array.isArray(categories) && categories.length > 0 ? categories[0]?.id ?? "" : ""
+        });
+        setOriginalImage(null);
+        setImageState(initialImageState);
+    }, [categories]);
 
     useEffect(() => {
-        async function loadProductData() {
-            if (props.productId) {
+        const loadData = async () => {
+            try {
                 setLoading(true);
-                try {
-                    const productData = await fetchProductById(props.restaurantId, props.productId);
+                setProducts(Array.isArray(restaurant?.products) ? restaurant.products : []);
+                if (!props.isOpen) {
+                    initializedRef.current = false;
+                    return;
+                }
+                if (props.productId) {
+                    const productData = products.length > 0
+                        ? products.find(p => p.id === props.productId) || null
+                        : null;
                     if (productData) {
                         setProduct(productData);
+                        setOriginalImage(productData.image || null);
+                        setImageState({
+                            file: null,
+                            removed: false,
+                            dirty: false,
+                            previewUrl: productData.image?.url || null
+                        });
                     } else {
                         toast.error("Produto não encontrado.");
                     }
-                } catch (error) {
-                    console.error("Erro ao buscar produto:", error);
-                    toast.error("Erro ao buscar produto.");
-                } finally {
-                    setLoading(false);
+                } else {
+                    resetForm();
                 }
-            } else if (props.isOpen) {
-                setProduct({
-                    ...initialProductState,
-                    categoryId: props.categories[0]?.id || "",
-                });
-                setSelectedImage(null);
+            } catch (error) {
+                console.error("Erro ao carregar produto:", error);
+            } finally {
+                setLoading(false);
             }
-        }
+        };
 
-        loadProductData();
+        loadData();
+    }, [props.isOpen, props.productId, products, categories, resetForm]);
 
-        if (!props.isOpen) {
-            initializedRef.current = false;
-        }
-    }, [props.isOpen, props.productId, props.restaurantId]);
-
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-
-        setProduct(prev => {
-            if (!prev) return prev;
-            let updatedValue: string = value;
-
-            if (name === "price" && value) {
-                const numericString = value.replace(/\D/g, "");
-                const numeric = Number(numericString) / 100;
-                updatedValue = numeric.toFixed(2);
-            }
-            return { ...prev, [name]: updatedValue };
-        });
-    };
-
-    const handleImageChange = async (file: File | null) => {
-        if (file) {
-            setSelectedImage(file);
-        } else {
-            if (product?.image?.path) {
-                try {
-                    await removeImage(product.image.path);
-                } catch (error) {
-                    console.error("Erro ao remover imagem do storage:", error);
-                }
-            }
-            setSelectedImage(null);
-            setProduct(prev => ({
-                ...prev,
-                image: null
-            }));
-        }
-    };
-
-    const processImageUpload = async (file: File): Promise<ImageType> => {
-        const isEditing = Boolean(props.product?.image?.path);
-
-        if (isEditing) {
-            return await updateImage({
-                file,
-                oldPath: props.product!.image!.path,
-                restaurantId
-            });
-        } else {
-            return await uploadImage({
-                file,
-                restaurantId
-            });
-        }
+        setProduct(prev => ({
+            ...prev,
+            [name]: name === "price"
+                ? (Number(value.replace(/\D/g, "")) / 100).toFixed(2)
+                : value
+        }));
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -124,48 +103,50 @@ export function ProductModal({ ...props }: ProductModalProps) {
         setLoading(true);
         try {
             let productToSave = { ...product };
-
-            if (selectedImage) {
-                try {
-                    const imageResult = await processImageUpload(selectedImage);
-                    productToSave.image = {
-                        url: imageResult.url,
-                        path: imageResult.path,
-                        imageId: imageResult.imageId || props.product?.image?.imageId || ""
-                    };
-                } catch (imageError) {
-                    console.error("Erro no upload da imagem:", imageError);
-                    toast.error("Erro ao fazer upload da imagem");
-                    return;
+            if (imageState.dirty) {
+                if (imageState.file) {
+                    const imageResult = await updateImage({
+                        file: imageState.file,
+                        oldImagePath: originalImage?.path,
+                        restaurantId
+                    });
+                    productToSave.image = { ...imageResult };
+                } else if (imageState.removed && originalImage?.path) {
+                    await updateImage({ oldImagePath: originalImage.path, restaurantId, file: new File([""], "dummy.txt") });
+                    productToSave.image = null;
                 }
             }
-
             if (props.productId) {
-                await updateProduct(props.restaurantId, productToSave);
+                await updateProduct(restaurantId, productToSave);
                 toast.success("Produto atualizado com sucesso!");
                 props.onClose();
             } else {
-                await addProduct(props.restaurantId, productToSave);
+                await addProduct(restaurantId, productToSave);
                 toast.success("Produto cadastrado com sucesso!");
             }
-
-            if (props.onProductChanged) {
-                await props.onProductChanged();
-            }
+            if (props.onProductChanged) await props.onProductChanged();
+            props.productId ? setOriginalImage(productToSave.image || null) : resetForm();
+            setImageState({
+                file: null,
+                removed: false,
+                dirty: false,
+                previewUrl: productToSave.image?.url || null
+            });
         } catch (error) {
             toast.error("Erro ao salvar produto.");
             console.error("Erro ao salvar produto:", error);
         } finally {
             setLoading(false);
-            setProduct(initialProductState);
         }
     };
 
     return (
-        <Modal id={props.id}
-            onClose={props.onClose}
-            isOpen={props.isOpen}>
-            {loading ? <LoadingPage /> : (
+        <Modal id={props.id} onClose={props.onClose} isOpen={props.isOpen}>
+            {loading ? (
+                <div className="flex items-center justify-center min-h-[300px]">
+                    <LoadingPage />
+                </div>
+            ) : (
                 <>
                     <h2 className="text-lg font-semibold text-center mb-4">
                         {props.productId ? "Editar Produto" : "Criar Produto"}
@@ -174,9 +155,10 @@ export function ProductModal({ ...props }: ProductModalProps) {
                         <ImageUpload
                             id="product-image"
                             label="Imagem do Produto"
-                            value={product?.image?.url}
-                            onChange={handleImageChange}
                             disabled={loading}
+                            required={false}
+                            initialUrl={originalImage?.url || null}
+                            onStateChange={setImageState}
                         />
                         <Input
                             id="product-name"
@@ -212,7 +194,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
                                     value={product.categoryId}
                                     onChange={handleChange}
                                     required
-                                    options={props.categories.map(category => ({
+                                    options={categories.map(category => ({
                                         value: category.id ?? "",
                                         label: category.name,
                                     }))}
@@ -222,13 +204,13 @@ export function ProductModal({ ...props }: ProductModalProps) {
                         <ButtonPrimary
                             id="product-submit"
                             type="submit"
-                            children={
-                                props.productId ? "Salvar Alterações" : "Criar Produto"
-                            }
-                        />
+                            disabled={loading}
+                        >
+                            {props.productId ? "Salvar Alterações" : "Criar Produto"}
+                        </ButtonPrimary>
                     </form>
                 </>
             )}
         </Modal>
-    )
+    );
 }
