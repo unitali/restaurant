@@ -178,8 +178,6 @@ export function ProductsTab() {
                             id="product-modal"
                             isOpen={isOpenModalProduct}
                             onClose={() => setIsOpenModalProduct(false)}
-                            restaurantId={restaurantId}
-                            categories={categories}
                             onProductChanged={refresh}
                             productId={productSelected}
                         />
