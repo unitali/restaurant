@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "unitali-restaurants",
+    "prod": "unitali-restaurant-prd",
+    "development": "unitali-restaurants"
+  },
+  "targets": {},
+  "etags": {}
+}
