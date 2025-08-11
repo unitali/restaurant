@@ -11,7 +11,6 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
 admin.initializeApp();
-const REGION = "southamerica-east1";
 
 /**
  * Copia restaurantId do doc users/{uid} para a custom claim.
