@@ -6,7 +6,7 @@ import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
 import { removeImage, updateImage, uploadImage } from '../../services/imagesServices';
 import { addProduct, fetchProductById, updateProduct } from "../../services/productsService";
-import type { CategoryType, ProductType } from "../../types";
+import type { CategoryType, ImageType, ProductType } from "../../types";
 import { formatCurrencyBRL } from "../../utils/currency";
 
 interface ProductModalProps extends ModalProps {
@@ -102,13 +102,13 @@ export function ProductModal({ ...props }: ProductModalProps) {
         }
     };
 
-    const processImageUpload = async (file: File): Promise<{ url: string; path: string; imageId?: string }> => {
+    const processImageUpload = async (file: File): Promise<ImageType> => {
         const isEditing = Boolean(props.product?.image?.path);
 
         if (isEditing) {
             return await updateImage({
                 file,
-                oldImagePath: props.product!.image!.path,
+                oldPath: props.product!.image!.path,
                 restaurantId
             });
         } else {
@@ -143,6 +143,7 @@ export function ProductModal({ ...props }: ProductModalProps) {
             if (props.productId) {
                 await updateProduct(props.restaurantId, productToSave);
                 toast.success("Produto atualizado com sucesso!");
+                props.onClose();
             } else {
                 await addProduct(props.restaurantId, productToSave);
                 toast.success("Produto cadastrado com sucesso!");
