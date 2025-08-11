@@ -17,6 +17,7 @@ export interface CompanyType {
 }
 
 export interface ImageParams {
+    restaurantId: string;
     file: File;
     folder?: string;
     oldImagePath?: string;
