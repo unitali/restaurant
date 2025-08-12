@@ -1,8 +1,7 @@
-import { FaSignOutAlt } from 'react-icons/fa';
-import { RiRestaurantFill } from "react-icons/ri";
-import { handleLogout } from '../../services/loginServices';
-import { useRestaurant } from '../../contexts/RestaurantContext';
+import { FaSignOutAlt, FaUtensils } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { handleLogout } from '../../services/loginServices';
 
 export function HeaderAdmin() {
     const { restaurantId } = useRestaurant();
@@ -21,7 +20,7 @@ export function HeaderAdmin() {
             </div>
 
             <div className="flex items-center space-x-4">
-                <RiRestaurantFill
+                <FaUtensils
                     onClick={handleMenuPage}
                     className="text-white cursor-pointer"
                     size={24}

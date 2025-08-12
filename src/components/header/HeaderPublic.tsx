@@ -1,4 +1,4 @@
-import { FaArrowLeft, FaCog, FaPlusCircle, FaUtensils } from "react-icons/fa";
+import { FaArrowLeft, FaPlusCircle, FaSignInAlt, FaUtensils } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router";
 import { webRoutes } from "../../routes";
 
@@ -6,6 +6,7 @@ export function HeaderPublic() {
     const navigate = useNavigate();
     const location = useLocation();
     const isCreateRestaurant = location.pathname.includes(webRoutes.createRestaurant);
+    const isLoginPage = location.pathname.includes(webRoutes.login);
     const isHomePage = location.pathname === webRoutes.home;
 
     return (
@@ -31,27 +32,27 @@ export function HeaderPublic() {
                         onClick={() => navigate(webRoutes.createRestaurant)}
                     >
                         <span className="p-2 flex items-center gap-1 relative">
-                            <FaUtensils className="text-white"
-                                size={24}
-                                title="Adicionar Restaurante" />
+                            <FaUtensils className="text-white" size={24} />
                             <FaPlusCircle
-                                className="text-white absolute left-0 -top-2"
+                                className="text-white absolute"
                                 size={14}
-                                title="Adicionar Restaurante"
-                                style={{ left: 30, top: 0 }}
+                                title="Criar Restaurante"
+                                style={{ left: 30, top: -2 }}
                             />
                         </span>
                     </button>
                 )}
-                <button
-                    className="text-white flex flex-row items-center cursor-pointer"
-                    type="button"
-                    onClick={() => navigate(webRoutes.admin)}
-                >
-                    <span className="p-2 flex items-center">
-                        <FaCog className="text-white" size={24} title="Pagina Admin" />
-                    </span>
-                </button>
+                {!isLoginPage && (
+                    <button
+                        className="text-white flex flex-row items-center cursor-pointer"
+                        type="button"
+                        onClick={() => navigate(webRoutes.admin)}
+                    >
+                        <span className="p-2 flex items-center">
+                            <FaSignInAlt className="text-white" size={24} title="Fazer Login" />
+                        </span>
+                    </button>
+                )}
             </div>
         </header>
     );

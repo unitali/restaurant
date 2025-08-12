@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { FaEdit, FaFileImage, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ConfirmModal, Input, ProductModal, Select } from "..";
+import { ButtonPrimary, ConfirmModal, Input, ProductModal, Select, ProductTable } from "..";
 import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
 import { deleteProduct } from "../../services/productsService";
 import type { CategoryType, ProductType } from "../../types";
-import { formatCurrencyBRL } from "../../utils/currency";
 
 export function ProductsTab() {
     const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
@@ -99,78 +97,13 @@ export function ProductsTab() {
                     {products.length === 0 ? (
                         <p id="no-products-message" className="text-gray-500 text-center">Nenhum produto encontrado.</p>
                     ) : (
-                        <table id="admin-products-table" className="w-full text-sm">
-                            {products.filter(product =>
-                                product.name.toLowerCase().includes(search.toLowerCase()) &&
-                                (selectedCategory === "" || product.categoryId === selectedCategory)
-                            ).length > 0 && (
-                                    <thead>
-                                        <tr className="bg-gray-700 text-white">
-                                            <th id="product-image" className="p-4" style={{ width: 32, height: 32 }}></th>
-                                            <th id="product-name" className="p-2 text-center">Nome</th>
-                                            <th id="product-description" className="p-2 text-left">Descrição</th>
-                                            <th id="product-price" className="p-2 text-center">Preço</th>
-                                            <th id="product-actions" className="p-2">Ações</th>
-                                        </tr>
-                                    </thead>
-                                )}
-                            <tbody>
-                                {products
-                                    .filter(product =>
-                                        product.name.toLowerCase().includes(search.toLowerCase()) &&
-                                        (selectedCategory === "" || product.categoryId === selectedCategory)
-                                    )
-                                    .map((product, idx) => (
-                                        <tr
-                                            id={`product-${idx}`}
-                                            key={product.id}
-                                            className={
-                                                idx % 2 === 0
-                                                    ? "bg-gray-50"
-                                                    : "bg-gray-200"
-                                            }
-                                        >
-                                            <td id={`product-image-${idx}`}
-                                                className="p-2" style={{ width: 80 }}>
-                                                {product.image?.url ? (
-                                                    <img
-                                                        src={product.image.url}
-                                                        alt={product.name}
-                                                        className="w-full object-cover rounded"
-                                                    />
-                                                ) : (
-                                                    <FaFileImage size={30}
-                                                        className="w-full object-cover rounded text-gray-400"
-                                                    />
-                                                )}
-                                            </td>
-                                            <td id={`product-name-${idx}`} className="p-2 text-left">{product.name}</td>
-                                            <td id={`product-description-${idx}`} className="p-2 text-left">{product.description}</td>
-                                            <td id={`product-price-${idx}`} className="p-2 w-32 text-center font-bold">{formatCurrencyBRL(product.price)}</td>
-                                            <td id={`product-actions-${idx}`} className="p-2 w-16 align-middle">
-                                                <div className="flex items-center justify-center gap-4 h-full">
-                                                    <FaEdit
-                                                        id={`product-edit-${idx}`}
-                                                        type="button"
-                                                        size={18}
-                                                        className="text-teal-600 hover:text-teal-800 hover:cursor-pointer"
-                                                        onClick={() => handleEditProduct(product.id!)}
-                                                        title="Editar produto"
-                                                    />
-                                                    <FaTrash
-                                                        id={`product-delete-${idx}`}
-                                                        type="button"
-                                                        size={18}
-                                                        className="text-red-600 hover:text-red-800 hover:cursor-pointer"
-                                                        onClick={() => handleDeleteProduct(product.id!)}
-                                                        title="Excluir produto"
-                                                    />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </table>
+                        <ProductTable
+                            products={products}
+                            search={search}
+                            selectedCategory={selectedCategory}
+                            onEdit={handleEditProduct}
+                            onDelete={handleDeleteProduct}
+                        />
                     )}
 
                     {isOpenModalProduct && (
@@ -197,7 +130,9 @@ export function ProductsTab() {
                 </div>
             ) : (
                 <div className="flex items-center justify-center h-full">
-                    <p id="no-category-message" className="text-gray-500">Nenhuma categoria encontrada. Cadastre uma categoria para começar a cadastrar produtos.</p>
+                    <p id="no-category-message" className="text-gray-500">
+                        Nenhuma categoria encontrada. Cadastre uma categoria para começar a cadastrar produtos.
+                    </p>
                 </div>
             )}
         </section>

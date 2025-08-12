@@ -24,7 +24,7 @@ export function Input({ ...props }: InputProps) {
             <label
                 id={`label-${props.id}`}
                 htmlFor={`input-${props.id}`}
-                className={`absolute left-3 top-0 text-gray-400 text-sm ${props.classNameLabel}`}
+                className={`absolute p-1 left-3 top-0 text-teal-500 text-sm ${props.classNameLabel}`}
             >
                 {props.label}
                 {props.required && <span className="mx-1">*</span>}
@@ -34,7 +34,7 @@ export function Input({ ...props }: InputProps) {
                 {...props}
                 id={`input-${props.id}`}
                 type={inputType}
-                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"} border border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 ${props.classNameInput} ${isPassword ? "pr-10" : ""} ${isRequiredError ? "border-red-500" : ""}`}
+                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-teal-500 focus:ring-teal-500"}`}
                 onBlur={(e) => {
                     setTouched(true);
                     props.onBlur && props.onBlur(e);
@@ -50,9 +50,6 @@ export function Input({ ...props }: InputProps) {
                 >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
-            )}
-            {isRequiredError && (
-                <span id={`error-${props.id}`} className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">Campo obrigatório</span>
             )}
         </div>
     );
@@ -80,13 +77,13 @@ export function InputColor({ ...props }: InputColorProps) {
             <label
                 id={`label-${props.id}`}
                 htmlFor={`input-${props.id}`}
-                className={`absolute left-3 top-0 text-gray-400 text-sm ${props.classNameLabel}`}
+                className={`absolute left-3 top-0 text-teal-500 text-sm p-1 ${props.classNameLabel}`}
             >
                 {props.label}
                 {props.required && <span className="mx-1">*</span>}
             </label>
             <div
-                className={`flex items-center w-full p-1 pt-4 rounded 
+                className={`flex items-center w-full ps-3 pt-5 rounded 
                     ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"}
                     border border-teal-500 focus-within:ring-2 focus-within:ring-teal-500 
                     ${props.classNameInput} ${isRequiredError ? "border-red-500" : ""}`}
@@ -97,7 +94,7 @@ export function InputColor({ ...props }: InputColorProps) {
                     name={props.name}
                     onChange={handleChange}
                     disabled={props.disabled}
-                    className={`w-10 h-10 rounded mr-3 bg-transparent ${props.disabled ? "hover:cursor-not-allowed" : "cursor-pointer"}`}
+                    className={`w-10 h-10 rounded pb-1 mr-3 bg-transparent ${props.disabled ? "hover:cursor-not-allowed" : "cursor-pointer"}`}
                     style={{ minWidth: 40 }}
                     tabIndex={-1}
                 />
@@ -116,9 +113,6 @@ export function InputColor({ ...props }: InputColorProps) {
                     }}
                 />
             </div>
-            {isRequiredError && (
-                <span id={`error-${props.id}`} className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">Campo obrigatório</span>
-            )}
         </div>
     );
 }
