@@ -4,6 +4,7 @@ import { ButtonPrimary, Input, Modal, TextArea, type ModalProps } from "..";
 import { LoadingPage } from "../../pages/LoadingPage";
 import { addCategory, updateCategory } from "../../services/categoriesService";
 import type { CategoryType } from "../../types";
+import { useRestaurant } from "../../contexts/RestaurantContext";
 
 interface CategoryModalProps extends ModalProps {
     restaurantId: string;
@@ -19,14 +20,19 @@ const initialCategoryState: CategoryType = {
 export function CategoryModal({ ...props }: CategoryModalProps) {
     const [category, setCategory] = useState<CategoryType>(initialCategoryState);
     const [loading, setLoading] = useState(false);
+    const { refresh } = useRestaurant();
 
     useEffect(() => {
-        if (props.category) {
-            setCategory({
-                id: props.category?.id,
-                name: props.category?.name,
-                description: props.category?.description,
-            });
+        if (props.isOpen) {
+            if (props.category) {
+                setCategory({
+                    id: props.category.id,
+                    name: props.category.name,
+                    description: props.category.description,
+                });
+            } else {
+                setCategory(initialCategoryState);
+            }
         }
     }, [props.category, props.isOpen]);
 
@@ -46,15 +52,19 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
         setLoading(true);
         try {
             if (props.category) {
-                await updateCategory(props.restaurantId, {
-                    id: props.category.id,
-                    name: props.category.name,
-                    description: props.category.description,
-                });
+                let newCategory = {
+                    id: category.id,
+                    name: category.name,
+                    description: category.description,
+                };
+                await updateCategory(props.restaurantId, newCategory);
                 toast.success("Categoria atualizada com sucesso!");
+                setCategory(newCategory);
+                props.onClose();
             } else if (category) {
                 await addCategory(props.restaurantId, category);
                 toast.success("Categoria cadastrada com sucesso!");
+                setCategory(initialCategoryState);
             } else {
                 throw new Error("Categoria inválida");
             }
@@ -66,7 +76,9 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
             toast.error("Erro ao salvar categoria");
         } finally {
             setLoading(false);
-            setCategory(initialCategoryState);
+            refresh();
+
+
         }
     };
 
