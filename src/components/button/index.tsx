@@ -93,7 +93,7 @@ export function ButtonOutline({ ...props }: ButtonProps) {
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`border border-teal-500 text-teal-500 hover:bg-teal-600 hover:text-white font-bold p-3 rounded w-1/3 cursor-pointer ${props.className} ${disabledStyle}`}
+            className={`w-full rounded cursor-pointer border border-teal-500 text-teal-500 hover:bg-teal-600 hover:text-white font-bold p-3 ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
