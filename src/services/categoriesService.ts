@@ -70,6 +70,7 @@ export const deleteCategory = async (restaurantId: string, categoryId: string) =
 };
 
 export const updateCategory = async (restaurantId: string, category: CategoryType) => {
+  if (!restaurantId) throw new Error("restaurantId não informado!");
   if (!category.id) throw new Error("category.id não informado!");
 
   const restaurantRef = doc(db, "restaurants", restaurantId);
@@ -80,12 +81,17 @@ export const updateCategory = async (restaurantId: string, category: CategoryTyp
   }
 
   const data = restaurantSnap.data();
-  const categories = data.categories || [];
+  const categories = Array.isArray(data.categories) ? data.categories : [];
+
   const updatedCategories = categories.map((c: CategoryType) =>
-    c.id === category.id ? { ...c, ...category } : c
+    c.id === category.id
+      ? { ...c, name: category.name, description: category.description }
+      : c
   );
 
   await updateDoc(restaurantRef, {
     categories: updatedCategories,
   });
+
+  return category.id;
 };
