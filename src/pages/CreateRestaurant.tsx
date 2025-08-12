@@ -68,6 +68,7 @@ export function CreateRestaurant() {
             const userExists = await fetchSignInMethodsForEmail(auth, userAdmin.email);
             if (userExists.length > 0) {
                 toast.error("E-mail já cadastrado");
+                setLoading(false);
                 return;
             }
 
@@ -88,7 +89,7 @@ export function CreateRestaurant() {
                 restaurantId,
             });
 
-            toast.success("Restaurante e admin criados com sucesso!");
+            toast.success("Restaurante e usuário criados com sucesso!");
             setRestaurant(restaurantInitialState);
             setUserAdmin(userInitialState);
             navigate(webRoutes.admin, { replace: true });

@@ -23,6 +23,7 @@ export function LabelCopy({ ...props }: LabelCopyProps) {
 
     return (
         <button
+            id={`button-${props.id}`}
             type="button"
             className="relative flex-1 mb-2 w-full text-left focus:outline-none cursor-pointer"
             onClick={handleCopy}
@@ -38,7 +39,7 @@ export function LabelCopy({ ...props }: LabelCopyProps) {
             </label>
             <input
                 {...props}
-                id={props.id}
+                id={`input-${props.id}`}
                 type="text"
                 disabled
                 tabIndex={-1}
@@ -48,6 +49,7 @@ export function LabelCopy({ ...props }: LabelCopyProps) {
                 }}
             />
             <FaCopy
+                id={`icon-${props.id}`}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-teal-500 pointer-events-none"
                 size={18}
             />
