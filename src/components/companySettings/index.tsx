@@ -84,6 +84,7 @@ export function CompanySettings() {
                     id="company-name"
                     label="Nome Fantasia"
                     name="name"
+                    required
                     value={editCompany ? formRestaurant?.name || "" : restaurant?.company?.name || ""}
                     onChange={handleChange}
                     disabled={!editCompany || loading || restaurantLoading}
@@ -92,6 +93,7 @@ export function CompanySettings() {
                     id="company-address"
                     label="Endereço"
                     name="address"
+                    required
                     value={editCompany ? formRestaurant?.address || "" : restaurant?.company?.address || ""}
                     onChange={handleChange}
                     disabled={!editCompany || loading || restaurantLoading}
@@ -100,6 +102,7 @@ export function CompanySettings() {
                     id="company-phone"
                     label="WhatsApp"
                     name="phone"
+                    required
                     value={editCompany ? formRestaurant?.phone || "" : restaurant?.company?.phone || ""}
                     onChange={handleChange}
                     disabled={!editCompany || loading || restaurantLoading}

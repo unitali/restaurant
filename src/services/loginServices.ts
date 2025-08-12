@@ -125,7 +125,7 @@ export async function handleEmailLogin(
     redirect(userDoc, navigate);
     ensureRestaurantClaim(res.user); // assíncrono
   } catch {
-    toast.error("Usuário e/ou senha incorreta.");
+    toast.error("E-mail ou senha inválidos.");
   }
 }
 
@@ -142,7 +142,7 @@ export async function handleGoogleLogin(navigate: any) {
       return;
     }
     redirect(userDoc, navigate);
-    ensureRestaurantClaim(res.user); // assíncrono
+    ensureRestaurantClaim(res.user);
   } catch {
     toast.error("Erro ao fazer login com Google.");
   }

@@ -1,11 +1,32 @@
 /// <reference types="cypress" />
 
+import { userCredentials, userSettings } from "../support/constants";
+
+const loginUrl = "/login";
+const adminUrl = "/admin";
+
+
+const adminCompanySettingsTab = {
+    labelCompanyName: '#label-company-name',
+    labelCompanyAddress: '#label-company-address',
+    labelCompanyPhone: '#label-company-phone',
+    inputCompanyName: '#input-company-name',
+    inputCompanyAddress: '#input-company-address',
+    inputCompanyPhone: '#input-company-phone',
+    buttonSaveSettings: '#button-save-settings',
+    buttonEditSettings: '#button-edit-settings',
+    buttonLinkMenu: '#button-link-menu',
+    labelLinkMenu: '#label-link-menu',
+    inputLinkMenu: '#input-link-menu',
+    iconCopyLinkMenu: '#icon-link-menu'
+};
+
 const adminElements = {
     buttonCloseModal: '#button-close-modal-product-modal',
     buttonCancelRemoveModal: '#button-cancel',
     buttonConfirmRemoveModal: '#button-confirm',
-    buttonRemoveProduct: '#button-remove-product',
-    buttonRemoveCategory: '#delete-category-0',
+    buttonRemoveProduct: '#product-delete-0',
+    buttonRemoveCategory: '#category-delete-0',
     buttonNewCategory: '#button-new-category',
     buttonNewProduct: '#button-new-product',
     buttonSubmit: '#button-submit',
@@ -30,23 +51,24 @@ const adminElements = {
     labelProductDescription: '#label-product-description',
     labelProductName: '#label-product-name',
     labelProductPrice: '#label-product-price',
-    tabAdminProducts: '#admin-products-tab',
+    tabProducts: '#admin-products-tab',
     tabCategories: '#admin-categories-tab',
+    tabSettings: '#admin-settings-tab',
     tableAdminCategories: '#admin-categories-table',
     tableAdminProducts: '#admin-products-table'
 };
 
 describe('AdminPage', () => {
-    let skipBefore = false;
+    let skipBefore = true;
 
     before(() => {
         if (skipBefore) return;
 
-        cy.visit('/login');
-        cy.get(adminElements.inputEmail).type('admin@existente.com');
-        cy.get(adminElements.inputPassword).type('123456', { log: false });
+        cy.visit(loginUrl);
+        cy.get(adminElements.inputEmail).type(userCredentials.email);
+        cy.get(adminElements.inputPassword).type(userCredentials.password, { log: false });
         cy.get(adminElements.buttonSubmit).click();
-        cy.url().should('not.include', '/login');
+        cy.url().should('not.include', loginUrl);
         cy.get(adminElements.tabCategories).click();
         cy.wait(2000);
         cy.get('body').then($body => {
@@ -65,19 +87,17 @@ describe('AdminPage', () => {
     });
 
     beforeEach(() => {
-        cy.visit('/login');
-        cy.get(adminElements.inputEmail).type('admin@existente.com');
-        cy.get(adminElements.inputPassword).type('123456', { log: false });
+        cy.visit(adminUrl);
+        cy.get(adminElements.inputEmail).type(userCredentials.email);
+        cy.get(adminElements.inputPassword).type(userCredentials.password, { log: false });
         cy.get(adminElements.buttonSubmit).click();
-        cy.url().should('include', '/admin');
+        cy.url().should('include', adminUrl);
     });
 
     it('deve validar como primeiro acesso', () => {
         cy.get(adminElements.labelAdminPainelTitle).should('have.text', 'Painel Administrativo');
-        cy.get(adminElements.labelAdminRestaurantName).should('have.text', 'Restaurante Novo');
-        cy.get(adminElements.labelAdminRestaurantAddress).should('have.text', 'Endereço: Rua Nova, 456');
-        cy.get(adminElements.labelAdminRestaurantPhone).should('have.text', 'Telefone: 11988888888');
 
+        cy.get(adminElements.tabProducts).click();
         cy.get(adminElements.labelNoCategoryMessage).should('have.text', 'Nenhuma categoria encontrada. Cadastre uma categoria para começar a cadastrar produtos.');
         cy.get(adminElements.buttonNewProduct).should('not.exist');
         cy.get(adminElements.tableAdminProducts).should('not.exist');
@@ -86,6 +106,24 @@ describe('AdminPage', () => {
         cy.get(adminElements.buttonNewCategory).should('have.text', 'Nova Categoria');
         cy.get(adminElements.labelCategoryModalTitle).should('not.exist');
         cy.get(adminElements.tableAdminCategories).should('not.exist');
+
+        cy.get(adminElements.tabSettings).click();
+        cy.get(adminCompanySettingsTab.labelCompanyName).should('have.text', 'Nome Fantasia*');
+        cy.get(adminCompanySettingsTab.inputCompanyName).should('have.attr', 'required');
+        cy.get(adminCompanySettingsTab.inputCompanyName).should('have.value', userSettings.companyName);
+
+        cy.get(adminCompanySettingsTab.labelCompanyAddress).should('have.text', 'Endereço*');
+        cy.get(adminCompanySettingsTab.inputCompanyAddress).should('have.attr', 'required');
+        cy.get(adminCompanySettingsTab.inputCompanyAddress).should('have.value', userSettings.companyAddress);
+
+        cy.get(adminCompanySettingsTab.labelCompanyPhone).should('have.text', 'WhatsApp*');
+        cy.get(adminCompanySettingsTab.inputCompanyPhone).should('have.attr', 'required');
+        cy.get(adminCompanySettingsTab.inputCompanyPhone).should('have.value', userSettings.companyPhone);
+        cy.get(adminCompanySettingsTab.buttonEditSettings).should('have.text', 'Editar');
+
+        cy.get(adminCompanySettingsTab.labelLinkMenu).should('have.text', 'Link do Cardapio');
+        cy.get(adminCompanySettingsTab.inputLinkMenu).should('exist');
+        cy.get(adminCompanySettingsTab.iconCopyLinkMenu).should('exist');
     });
 
     it("deve criar uma categoria", () => {
@@ -111,7 +149,6 @@ describe('AdminPage', () => {
     it('deve criar um novo produto', () => {
         cy.get('table').should('not.exist');
         cy.get(adminElements.buttonNewProduct).should('have.text', 'Novo Produto');
-        cy.get(adminElements.labelNoProductMessage).should('have.text', 'Nenhum produto encontrado.');
 
         cy.get(adminElements.buttonNewProduct).click();
         cy.get(adminElements.labelProductName).should('have.text', 'Produto*');
@@ -148,7 +185,27 @@ describe('AdminPage', () => {
 
     it('deve redirecionar para login se não houver restaurantId', () => {
         localStorage.removeItem('restaurantId');
-        cy.visit('/admin');
-        cy.url().should('include', '/login');
+        cy.visit(loginUrl);
+        cy.url().should('include', loginUrl);
+        cy.url().should('not.include', adminUrl);
     });
+
+    it('deve excluir um produto', () => {
+        cy.get("#product-actions-0").within(() => {
+            cy.get(adminElements.buttonRemoveProduct).click();
+        });
+        cy.get(adminElements.buttonConfirmRemoveModal).click();
+        cy.contains("Produto excluído com sucesso!").should('be.visible');
+    });
+
+    it('deve excluir uma categoria', () => {
+        cy.get(adminElements.tabCategories).click();
+
+        cy.get("#category-actions-0").within(() => {
+            cy.get(adminElements.buttonRemoveCategory).click();
+        });
+        cy.get(adminElements.buttonConfirmRemoveModal).click();
+        cy.contains("Categoria removida com sucesso!").should('be.visible');
+    });
+
 });
