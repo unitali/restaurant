@@ -70,15 +70,10 @@ export const deleteCategory = async (restaurantId: string, categoryId: string) =
 };
 
 export const updateCategory = async (restaurantId: string, category: CategoryType) => {
-  if (!restaurantId) throw new Error("restaurantId não informado!");
-  if (!category.id) throw new Error("category.id não informado!");
-
   const restaurantRef = doc(db, "restaurants", restaurantId);
   const restaurantSnap = await getDoc(restaurantRef);
 
-  if (!restaurantSnap.exists()) {
-    throw new Error("Restaurante não encontrado");
-  }
+  if (!restaurantSnap.exists()) throw new Error("Restaurante não encontrado");
 
   const data = restaurantSnap.data();
   const categories = Array.isArray(data.categories) ? data.categories : [];
@@ -89,9 +84,5 @@ export const updateCategory = async (restaurantId: string, category: CategoryTyp
       : c
   );
 
-  await updateDoc(restaurantRef, {
-    categories: updatedCategories,
-  });
-
-  return category.id;
+  await updateDoc(restaurantRef, { categories: updatedCategories });
 };
