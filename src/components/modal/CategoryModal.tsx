@@ -23,12 +23,16 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
     const { refresh } = useRestaurant();
 
     useEffect(() => {
-        if (props.category) {
-            setCategory({
-                id: props.category?.id,
-                name: props.category?.name,
-                description: props.category?.description,
-            });
+        if (props.isOpen) {
+            if (props.category) {
+                setCategory({
+                    id: props.category.id,
+                    name: props.category.name,
+                    description: props.category.description,
+                });
+            } else {
+                setCategory(initialCategoryState);
+            }
         }
     }, [props.category, props.isOpen]);
 
