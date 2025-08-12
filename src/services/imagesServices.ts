@@ -1,34 +1,12 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { storage } from "../config/firebase";
 import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "../config/firebase";
+import type { ImageParams, ImageType } from "../types";
 
-export interface ImageUploadParams {
-  file: File;
-  restaurantId: string;
-  oldPath?: string;
-}
-export interface ImageResult {
-  url: string;
-  path: string;
-  imageId: string;
-}
-
-function ensureRestaurantId(id: string) {
-  if (!id) throw new Error("restaurantId ausente");
-  if (/[\\/]/.test(id)) throw new Error("restaurantId inválido");
-}
-
-function generateFileName() { return `${Date.now()}.jpg`; }
 function buildPath(restaurantId: string) {
-  return `products/${restaurantId}/${generateFileName()}`;
-}
-
-async function fetchRestaurantIdFromDoc(uid: string) {
-  const snap = await getDoc(doc(getFirestore(), "users", uid));
-  if (!snap.exists()) return undefined;
-  return (snap.data() as any).restaurantId as string | undefined;
+  return `products/${restaurantId}/${Date.now()}.jpg`;
 }
 
 async function attemptClaimRefresh() {
@@ -36,26 +14,27 @@ async function attemptClaimRefresh() {
     const fns = getFunctions(undefined, "southamerica-east1");
     const refresh = httpsCallable(fns, "refreshRestaurantClaim");
     await refresh({});
-  } catch {}
+  } catch { }
+}
+
+async function fetchRestaurantIdFromUser(uid: string) {
+  const snap = await getDoc(doc(getFirestore(), "users", uid));
+  if (!snap.exists()) return undefined;
+  return (snap.data() as any).restaurantId as string | undefined;
 }
 
 async function ensureRestaurantAccess(restaurantId: string) {
   const user = getAuth().currentUser;
   if (!user) throw new Error("Usuário não autenticado.");
 
-  // tenta claim
   let token = await user.getIdTokenResult(true);
   let claim = token.claims.restaurantId as string | undefined;
   if (claim === restaurantId) return;
   if (claim && claim !== restaurantId) {
     throw new Error("Sem permissão.");
   }
-
-  // fallback via Firestore
-  const docRestaurant = await fetchRestaurantIdFromDoc(user.uid);
+  const docRestaurant = await fetchRestaurantIdFromUser(user.uid);
   if (docRestaurant !== restaurantId) throw new Error("Sem permissão.");
-
-  // tenta atualizar claim (não bloqueia)
   attemptClaimRefresh();
 }
 
@@ -107,34 +86,36 @@ async function compressImage(
   });
 }
 
-async function put(file: File, path: string): Promise<string> {
+export async function uploadImage({ file, restaurantId }: ImageParams): Promise<ImageType> {
+  await ensureRestaurantAccess(restaurantId);
+  const fileProcessed = await processFileForUpload(file);
+  const path = buildPath(restaurantId);
   const r = ref(storage, path);
-  const snap = await uploadBytes(r, file);
-  return await getDownloadURL(snap.ref);
-}
-
-export async function uploadImage({ file, restaurantId }: ImageUploadParams): Promise<ImageResult> {
-  ensureRestaurantId(restaurantId);
-  await ensureRestaurantAccess(restaurantId);
-  const processed = await processFileForUpload(file);
-  const path = buildPath(restaurantId);
-  const url = await put(processed, path);
+  const snap = await uploadBytes(r, fileProcessed);
+  const url = await getDownloadURL(snap.ref);
   return { url, path, imageId: path.split("/").pop()!.replace(".jpg", "") };
 }
 
-export async function updateImage({ file, oldPath, restaurantId }: ImageUploadParams): Promise<ImageResult> {
-  ensureRestaurantId(restaurantId);
-  await ensureRestaurantAccess(restaurantId);
-  if (oldPath) { try { await deleteObject(ref(storage, oldPath)); } catch {} }
-  const processed = await processFileForUpload(file);
-  const path = buildPath(restaurantId);
-  const url = await put(processed, path);
-  return { url, path, imageId: path.split("/").pop()!.replace(".jpg", "") };
+export async function updateImage(props: ImageParams): Promise<ImageType> {
+  await ensureRestaurantAccess(props.restaurantId);
+  if (props.oldImagePath) {
+    try {
+      removeImage(props.oldImagePath, props.restaurantId);
+    } catch {
+      throw new Error("Falha ao excluir imagem anterior.");
+    }
+  }
+  return await uploadImage({ file: props.file, restaurantId: props.restaurantId });
 }
 
-export async function removeImage(path: string) {
-  const match = /^products\/([^/]+)\//.exec(path);
-  const restaurantId = match?.[1];
-  if (restaurantId) await ensureRestaurantAccess(restaurantId);
-  await deleteObject(ref(storage, path));
+export async function removeImage(pathOrId: string, restaurantId?: string) {
+
+  let storagePath = pathOrId;
+  if (restaurantId && !pathOrId.includes("/")) {
+    storagePath = `products/${restaurantId}/${pathOrId}.jpg`;
+  }
+  const match = /^products\/([^/]+)\//.exec(storagePath);
+  const restId = match?.[1] || restaurantId;
+  if (restId) await ensureRestaurantAccess(restId);
+  return await deleteObject(ref(storage, storagePath));
 }

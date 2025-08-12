@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaEdit, FaFileImage, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ConfirmModal, Input, Select, ProductModal } from "..";
+import { ButtonPrimary, ConfirmModal, Input, ProductModal, Select } from "..";
 import { useRestaurant } from "../../contexts/RestaurantContext";
 import { LoadingPage } from "../../pages/LoadingPage";
 import { deleteProduct } from "../../services/productsService";
@@ -178,8 +178,6 @@ export function ProductsTab() {
                             id="product-modal"
                             isOpen={isOpenModalProduct}
                             onClose={() => setIsOpenModalProduct(false)}
-                            restaurantId={restaurantId}
-                            categories={categories}
                             onProductChanged={refresh}
                             productId={productSelected}
                         />

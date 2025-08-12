@@ -29,6 +29,13 @@ export interface ImageType {
     imageId: string;
 }
 
+export interface ImageState {
+    file: File | null;
+    removed: boolean;
+    dirty: boolean;
+    previewUrl: string | null;
+}
+
 export interface CartItem {
     product: ProductType;
     quantity: number;
