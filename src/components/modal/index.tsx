@@ -15,11 +15,11 @@ export function Modal({ ...props }: ModalProps) {
             id={props.id}
             className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
         >
-            <div className="bg-gray-800 text-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
+            <div className="bg-teal-50 text-gray-900 rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
                 <button
                     id={`button-close-modal-${props.id}`}
                     onClick={props.onClose}
-                    className="absolute top-4 right-4 text-gray-400 cursor-pointer hover:text-white text-2xl"
+                    className="absolute top-4 right-4 text-red-500 cursor-pointer hover:text-red-700 text-2xl"
                 >
                     &times;
                 </button>

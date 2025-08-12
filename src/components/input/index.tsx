@@ -34,7 +34,7 @@ export function Input({ ...props }: InputProps) {
                 {...props}
                 id={`input-${props.id}`}
                 type={inputType}
-                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500`}
+                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-teal-500 focus:ring-teal-500"}`}
                 onBlur={(e) => {
                     setTouched(true);
                     props.onBlur && props.onBlur(e);
@@ -50,9 +50,6 @@ export function Input({ ...props }: InputProps) {
                 >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
-            )}
-            {isRequiredError && (
-                <span id={`error-${props.id}`} className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">Campo obrigatório</span>
             )}
         </div>
     );
@@ -116,9 +113,6 @@ export function InputColor({ ...props }: InputColorProps) {
                     }}
                 />
             </div>
-            {isRequiredError && (
-                <span id={`error-${props.id}`} className="text-red-500 text-xs absolute left-0 -bottom-5 px-4 font-bold">Campo obrigatório</span>
-            )}
         </div>
     );
 }

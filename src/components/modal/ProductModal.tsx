@@ -154,7 +154,6 @@ export function ProductModal(props: {
                     <form onSubmit={handleSubmit}>
                         <ImageUpload
                             id="product-image"
-                            label="Imagem do Produto"
                             disabled={loading}
                             required={false}
                             initialUrl={originalImage?.url || null}
