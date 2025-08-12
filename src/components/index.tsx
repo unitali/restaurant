@@ -12,8 +12,12 @@ export * from './modal/ProductModal';
 export * from './productCard';
 export * from './productCarousel';
 export * from './select';
+export * from './settings';
 export * from './slider';
+export * from './table/ProductTable';
+export * from './table/CategoryTable';
 export * from './tabs/CategoriesTab';
 export * from './tabs/ProductsTab';
 export * from './tabs/SettingsTab';
 export * from './textArea';
+
