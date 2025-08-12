@@ -89,7 +89,7 @@ export function Settings() {
                 className="flex flex-col gap-3"
             >
                 <InputColor
-                    label="Cor Primária:"
+                    label="Cor Primária"
                     id="primary"
                     name="primaryColor"
                     value={settings.primaryColor}
@@ -98,7 +98,7 @@ export function Settings() {
                     disabled={!editSettings}
                 />
                 <InputColor
-                    label="Texto Primário:"
+                    label="Texto Primário"
                     id="primary-text"
                     name="primaryTextColor"
                     value={settings.primaryTextColor}
@@ -107,7 +107,7 @@ export function Settings() {
                     disabled={!editSettings}
                 />
                 <InputColor
-                    label="Cor Secundária:"
+                    label="Cor Secundária"
                     id="secondary-color"
                     name="secondaryColor"
                     value={settings.secondaryColor}
@@ -116,7 +116,7 @@ export function Settings() {
                     disabled={!editSettings}
                 />
                 <InputColor
-                    label="Texto Secundário:"
+                    label="Texto Secundário"
                     id="secondary-text-color"
                     name="secondaryTextColor"
                     value={settings.secondaryTextColor}

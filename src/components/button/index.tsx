@@ -8,13 +8,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 
 export function ButtonPrimary({ ...props }: ButtonProps) {
-    const disabledStyle = props.disabled || props.loading ? "opacity-60 !bg-gray-300 !text-gray-400 cursor-not-allowed" : "";
+    const disabledStyle = props.disabled || props.loading ? "opacity-60 !bg-gray-200 !text-gray-400 cursor-not-allowed" : "";
     return (
         <button
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`flex justify-center items-center bg-teal-500 hover:bg-teal-600 text-white font-bold p-3 rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
+            className={`flex justify-center items-center bg-teal-500 hover:bg-teal-600 text-white font-bold p-4 rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
@@ -24,13 +24,13 @@ export function ButtonPrimary({ ...props }: ButtonProps) {
 }
 
 export function ButtonPrimaryRemove({ ...props }: ButtonProps) {
-    const disabledStyle = props.disabled || props.loading ? "opacity-60 !bg-gray-300 !text-gray-400 cursor-not-allowed" : "";
+    const disabledStyle = props.disabled || props.loading ? "opacity-60 !bg-gray-200 !text-gray-400 cursor-not-allowed" : "";
     return (
         <button
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`flex justify-center items-center bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
+            className={`flex justify-center items-center bg-red-500 hover:bg-red-600 text-white font-bold p-4 rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
@@ -65,7 +65,7 @@ export function ButtonPrimaryPlus({ ...props }: ButtonProps) {
 
 export function ButtonPrimaryMinus({ ...props }: ButtonProps) {
     const [clicked, setClicked] = useState(false);
-    const disabledStyle = props.disabled || props.loading ? "opacity-60 !bg-gray-300 !text-gray-400 cursor-not-allowed" : "";
+    const disabledStyle = props.disabled || props.loading ? "opacity-60 !bg-gray-200 !text-gray-400 cursor-not-allowed" : "";
 
     return (
         <button
@@ -93,7 +93,7 @@ export function ButtonOutline({ ...props }: ButtonProps) {
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`w-full rounded cursor-pointer border border-teal-500 text-teal-500 hover:bg-teal-600 hover:text-white font-bold p-3 ${props.className} ${disabledStyle}`}
+            className={`w-full rounded cursor-pointer border border-teal-500 text-teal-500 hover:bg-teal-600 hover:text-white font-bold p-4 ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
@@ -108,7 +108,7 @@ export function ButtonOutlineRemove({ ...props }: ButtonProps) {
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`border border-red-700 text-red-700 hover:border-red-500 hover:text-red-500 font-bold p-3 rounded w-1/3 cursor-pointer ${props.className} ${disabledStyle}`}
+            className={`border border-red-700 text-red-700 hover:border-red-500 hover:text-red-500 font-bold p-3 rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
