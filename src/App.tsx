@@ -26,7 +26,7 @@ function PrivateRoute({ children }: { children: React.ReactElement }) {
 function App() {
   return (
     <BrowserRouter>
-      <div className="app-container max-w-2xl md:max-w-none mx-auto">
+      <div className="w-full mx-auto min-h-screen flex flex-col max-w-full lg:max-w-6xl">
         <Routes>
           {/* Rotas públicas */}
           {publicRoutes.map(route => (

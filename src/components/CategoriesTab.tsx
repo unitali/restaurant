@@ -55,40 +55,38 @@ export function CategoriesTab() {
 
     return (
         <div className="flex flex-col gap-4 w-full items-center">
-            <div className="w-full max-w-2xl md:max-w-2xl mx-auto px-2">
+            <div className="w-full max-w-2xl md:max-w-none mx-auto px-2">
                 {categories.length > 0 && (
-                    <div className="mb-2">
+                    <div className="mb-2 md:mb-4 flex flex-col md:flex-row gap-2 w-full">
                         <Input
                             id="search-category"
                             type="text"
                             label="Buscar categoria"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full"
+                            className="w-full md:max-w-xs"
+                        />
+                        <ButtonPrimary
+                            id="new-category"
+                            className="w-full md:w-auto md:px-8 md:py-3"
+                            onClick={() => {
+                                setCategorySelected(null);
+                                setIsOpenModalCategory(true);
+                            }}
+                            children="Nova Categoria"
                         />
                     </div>
                 )}
                 <div className="flex w-full items-stretch mb-4">
-                    <ButtonPrimary
-                        id="new-category"
-                        className="w-full"
-                        onClick={() => {
-                            setCategorySelected(null);
-                            setIsOpenModalCategory(true);
-                        }}
-                        children="Nova Categoria"
-                    />
                 </div>
             </div>
             {categories.length > 0 && (
-                <div className="w-full max-w-[350px] md:max-w-2xl mx-auto px-2 overflow-x-auto">
-                    <CategoryTable
-                        categories={categories}
-                        search={search}
-                        onEdit={handleEditCategory}
-                        onDelete={handleDeleteCategory}
-                    />
-                </div>
+                <CategoryTable
+                    categories={categories}
+                    search={search}
+                    onEdit={handleEditCategory}
+                    onDelete={handleDeleteCategory}
+                />
             )}
 
             {/* Modal de Categoria */}

@@ -27,7 +27,8 @@ export function CategoryTable({
   }
 
   return (
-    <table id="admin-categories-table" className="w-full text-sm">
+    <table id="admin-categories-table"
+      className="w-full max-w-2xl md:max-w-none mx-auto px-2 overflow-x-auto">
       <thead>
         <tr className="bg-teal-600 text-white">
           <th id="category-name-header" className="p-2 text-left">Nome</th>
