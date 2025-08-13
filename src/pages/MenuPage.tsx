@@ -12,11 +12,9 @@ export function MenuPage() {
   return (
     <RestaurantProvider restaurantId={restaurantId!}>
       <CartProvider>
-        <div id="menu-page" className="relative max-w-[300px] w-full mx-auto">
-          <HeaderMenu />
-          <MenuContent />
-          <Footer />
-        </div>
+        <HeaderMenu />
+        <MenuContent />
+        <Footer />
       </CartProvider>
     </RestaurantProvider>
   );
