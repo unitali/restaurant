@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary, Input } from "../components";
-import { HeaderPublic } from "../components/header/HeaderPublic";
+import { HeaderPublic } from "../components/PublicHeader";
 import { handleEmailLogin, handleGoogleLogin } from "../services/loginServices";
 import type { UserType } from "../types";
 import { LoadingPage } from "./LoadingPage";

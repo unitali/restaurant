@@ -38,13 +38,16 @@ async function ensureRestaurantAccess(restaurantId: string) {
   attemptClaimRefresh();
 }
 
-export async function validateImageFile(
-  file: File,
-  opts: { maxMB?: number; allowedTypes?: string[] } = {}
-) {
-  const { maxMB = 5, allowedTypes = ["image/jpeg", "image/png", "image/webp"] } = opts;
-  if (!allowedTypes.includes(file.type)) throw new Error("Tipo de imagem inválido.");
-  if (file.size > maxMB * 1024 * 1024) throw new Error(`Máximo ${maxMB}MB.`);
+export function validateImageFile(file: File): void {
+  const validTypes = ["image/jpeg", "image/png", "image/webp"];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+
+  if (!validTypes.includes(file.type)) {
+    throw new Error("Tipo de imagem inválido. Use JPG, PNG ou WEBP.");
+  }
+  if (file.size > maxSize) {
+    throw new Error("Imagem muito grande. Máximo permitido: 5MB.");
+  }
 }
 
 async function processFileForUpload(file: File): Promise<File> {

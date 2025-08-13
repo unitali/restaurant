@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, Input } from "..";
-import { useRestaurant } from "../../contexts/RestaurantContext";
-import { updateRestaurant } from "../../services/restaurantsService";
-import type { CompanyType } from "../../types";
-import { LabelCopy } from "../label";
+import { ButtonPrimary, Input, LabelCopy } from ".";
+import { useRestaurant } from "../contexts/RestaurantContext";
+import { updateRestaurant } from "../services/restaurantsService";
+import type { CompanyType } from "../types";
 
 export function CompanySettings() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();

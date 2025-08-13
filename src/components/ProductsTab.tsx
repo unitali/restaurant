@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ConfirmModal, Input, ProductModal, Select, ProductTable } from "..";
-import { useRestaurant } from "../../contexts/RestaurantContext";
-import { LoadingPage } from "../../pages/LoadingPage";
-import { deleteProduct } from "../../services/productsService";
-import type { CategoryType, ProductType } from "../../types";
+import { ButtonPrimary, ConfirmModal, Input, ProductModal, ProductTable, Select } from ".";
+import { useRestaurant } from "../contexts/RestaurantContext";
+import { LoadingPage } from "../pages/LoadingPage";
+import { deleteProduct } from "../services/productsService";
+import type { CategoryType, ProductType } from "../types";
 
 export function ProductsTab() {
     const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();

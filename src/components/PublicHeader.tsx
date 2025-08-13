@@ -1,6 +1,6 @@
 import { FaArrowLeft, FaPlusCircle, FaSignInAlt, FaUtensils } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router";
-import { webRoutes } from "../../routes";
+import { webRoutes } from "../routes";
 
 export function HeaderPublic() {
     const navigate = useNavigate();

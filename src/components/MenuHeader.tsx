@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { FaCartShopping } from 'react-icons/fa6';
-import { useCart } from "../../contexts/CartContext";
-import { Cart } from "../cart";
-import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useCart } from "../contexts/CartContext";
+import { Cart } from "./Cart";
+import { useRestaurant } from "../contexts/RestaurantContext";
 
 export function HeaderMenu() {
     const [openCart, setOpenCart] = useState(false);

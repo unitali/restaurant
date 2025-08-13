@@ -1,5 +1,5 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
-import type { CategoryType } from "../../types";
+import type { CategoryType } from "../types";
 
 interface CategoryTableProps {
   categories: CategoryType[];
@@ -39,7 +39,7 @@ export function CategoryTable({
         {filteredCategories.map((category, idx) => (
           <tr
             key={category.id}
-            className={idx % 2 === 0 ? "bg-gray-50" : "bg-teal-600"}
+            className={idx % 2 === 0 ? "bg-gray-100" : "bg-teal-100"}
           >
             <td id={`category-name-${idx}`} className="p-2 text-left">{category.name}</td>
             <td id={`category-description-${idx}`} className="p-2 text-left">{category.description}</td>

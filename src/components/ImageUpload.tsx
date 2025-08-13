@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCamera, FaTrash } from 'react-icons/fa';
-import { validateImageFile } from '../../services/imagesServices';
-import type { ImageState } from '../../types';
+import { validateImageFile } from '../services/imagesServices';
+import type { ImageState } from '../types';
+import { toast } from 'react-toastify';
 interface ImageUploadProps {
     id: string;
     disabled?: boolean;
@@ -14,24 +15,19 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload(props: ImageUploadProps) {
-
-
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [originalPreview, setOriginalPreview] = useState<string | null>(props.initialUrl || props.value || null);
     const [preview, setPreview] = useState<string | null>(props.initialUrl || props.value || null);
     const [touched, setTouched] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [removed, setRemoved] = useState(false);
 
     useEffect(() => {
-        if (props.initialUrl) {
-            setPreview(props.initialUrl);
-            setFile(null);
-            setRemoved(false);
-        } else if (!props.initialUrl && !file) {
-            setPreview(null);
-            setRemoved(false);
-        }
-    }, [props.initialUrl]);
+        setOriginalPreview(props.initialUrl || props.value || null);
+        setPreview(props.initialUrl || props.value || null);
+        setFile(null);
+        setRemoved(false);
+    }, [props.initialUrl, props.value]);
 
     useEffect(() => {
         if (props.onStateChange) {
@@ -52,7 +48,21 @@ export function ImageUpload(props: ImageUploadProps) {
         try {
             await validateImageFile(f);
         } catch (err) {
+            const errorMsg =
+                err instanceof Error
+                    ? err.message
+                    : typeof err === "string"
+                    ? err
+                    : "Erro desconhecido ao validar imagem";
+            toast.error(errorMsg);
             console.error("Validação da imagem falhou:", err);
+
+            setPreview(originalPreview);
+            setFile(null);
+            setRemoved(false);
+
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            if (props.onChange) props.onChange(null);
             return;
         }
 
