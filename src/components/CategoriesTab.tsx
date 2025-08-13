@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, CategoryModal, ConfirmModal, Input, CategoryTable } from ".";
+import { ButtonPrimary, CategoryModal, CategoryTable, ConfirmModal, Input } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { LoadingPage } from "../pages/LoadingPage";
 import { deleteCategory } from "../services/categoriesService";
@@ -54,23 +54,24 @@ export function CategoriesTab() {
     }
 
     return (
-        <section className="flex flex-col gap-4 mt-10">
-            <div className="flex gap-2 mb-6 items-stretch">
+        <div className="flex flex-col gap-4 w-full items-center">
+            <div className="w-full max-w-2xl md:max-w-2xl mx-auto px-2">
                 {categories.length > 0 && (
-                    <div className="flex-1">
+                    <div className="mb-2">
                         <Input
                             id="search-category"
                             type="text"
                             label="Buscar categoria"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
+                            className="w-full"
                         />
                     </div>
                 )}
-                <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
+                <div className="flex w-full items-stretch mb-4">
                     <ButtonPrimary
                         id="new-category"
-                        className={categories.length > 0 ? "w-40" : ""}
+                        className="w-full"
                         onClick={() => {
                             setCategorySelected(null);
                             setIsOpenModalCategory(true);
@@ -80,12 +81,14 @@ export function CategoriesTab() {
                 </div>
             </div>
             {categories.length > 0 && (
-                <CategoryTable
-                    categories={categories}
-                    search={search}
-                    onEdit={handleEditCategory}
-                    onDelete={handleDeleteCategory}
-                />
+                <div className="w-full max-w-[350px] md:max-w-2xl mx-auto px-2 overflow-x-auto">
+                    <CategoryTable
+                        categories={categories}
+                        search={search}
+                        onEdit={handleEditCategory}
+                        onDelete={handleDeleteCategory}
+                    />
+                </div>
             )}
 
             {/* Modal de Categoria */}
@@ -111,6 +114,6 @@ export function CategoriesTab() {
                     loading={loading}
                 />
             )}
-        </section>
+        </div>
     );
 }
