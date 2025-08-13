@@ -1,10 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Footer, HeaderMenu, ProductCarousel, Slider } from "../components";
+import { HeaderMenu, ProductCarousel, Slider } from "../components";
 import { CartProvider } from "../contexts/CartContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
 import { LoadingPage } from "./LoadingPage";
-import { useState, useEffect, useRef } from "react";
 
 export function MenuPage() {
   const { restaurantId } = useParams();
@@ -14,7 +14,6 @@ export function MenuPage() {
       <CartProvider>
         <HeaderMenu />
         <MenuContent />
-        <Footer />
       </CartProvider>
     </RestaurantProvider>
   );

@@ -6,7 +6,7 @@ import { storage } from "../config/firebase";
 import type { ImageParams, ImageType } from "../types";
 
 function buildPath(restaurantId: string) {
-  return `products/${restaurantId}/${Date.now()}.jpg`;
+  return `${restaurantId}/${Date.now()}.jpg`;
 }
 
 async function attemptClaimRefresh() {
@@ -111,14 +111,7 @@ export async function updateImage(props: ImageParams): Promise<ImageType> {
   return await uploadImage({ file: props.file, restaurantId: props.restaurantId });
 }
 
-export async function removeImage(pathOrId: string, restaurantId?: string) {
-
-  let storagePath = pathOrId;
-  if (restaurantId && !pathOrId.includes("/")) {
-    storagePath = `products/${restaurantId}/${pathOrId}.jpg`;
-  }
-  const match = /^products\/([^/]+)\//.exec(storagePath);
-  const restId = match?.[1] || restaurantId;
-  if (restId) await ensureRestaurantAccess(restId);
-  return await deleteObject(ref(storage, storagePath));
+export async function removeImage(imagePath: string, restaurantId: string) {
+  if (restaurantId) await ensureRestaurantAccess(restaurantId);
+  return await deleteObject(ref(storage, imagePath));
 }

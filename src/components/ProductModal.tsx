@@ -15,6 +15,8 @@ const initialProductState: ProductType = {
     price: 0,
     categoryId: "",
     image: null,
+    createdAt: new Date(),
+    updatedAt: new Date()
 };
 
 const initialImageState: ImageState = {

@@ -84,9 +84,9 @@ export const deleteProduct = async (restaurantId: string, productId: string) => 
     const data = restaurantSnap.data();
     const products = data.products || [];
     const productToDelete = products.find((p: ProductType) => p.id === productId);
-    if (productToDelete?.image?.id) {
+    if (productToDelete?.image?.path) {
         try {
-            await removeImage(productToDelete.image.id);
+            await removeImage(productToDelete.image.path, restaurantId);
         } catch (imageError) {
             console.error("Erro ao remover imagem do Storage:", imageError);
         }
@@ -120,10 +120,10 @@ export const updateProduct = async (restaurantId: string, product: ProductType) 
         } else {
             acc[key] = value;
         }
-
         return acc;
     }, {} as Record<string, any>);
 
+    cleanProduct.updatedAt = new Date();
     products[productIndex] = { ...products[productIndex], ...cleanProduct };
 
     await updateDoc(restaurantRef, { products });

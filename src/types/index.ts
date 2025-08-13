@@ -49,8 +49,10 @@ export interface ProductType {
     categoryId: string;
     description?: string;
     image?: ImageType | null;
+    createdAt: Date;
+    updatedAt: Date;
+    options?: { name: string; addPrice: number }[];
 }
-
 export interface PlanType {
     name: string;
     price: string;

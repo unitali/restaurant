@@ -14,11 +14,10 @@ export function ButtonPrimary({ ...props }: ButtonProps) {
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`flex justify-center items-center bg-teal-500 hover:bg-teal-600 text-white font-bold p-4 rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
+            className={`flex justify-center p-4 items-center bg-teal-500 hover:bg-teal-600 text-white font-bold rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
-
         </button>
     )
 }
