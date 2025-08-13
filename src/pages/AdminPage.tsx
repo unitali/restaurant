@@ -36,12 +36,12 @@ export function AdminPage() {
     return (
         <RestaurantProvider restaurantId={restaurantId!}>
             <HeaderAdmin />
-            <main className="flex flex-col items-center bg-gray-50">
+            <main className="flex flex-col items-center bg-gray-50 min-h-screen py-10 md:py-18">
                 {loading ? <LoadingPage /> : (
-                    <div className="bg-white rounded shadow p-40 w-full">
+                    <div className="bg-white rounded shadow p-4 w-full max-w-2xl md:max-w-none mx-auto">
                         <h1 id="admin-panel-title" className="text-2xl font-bold mb-4 text-center">Painel Administrativo</h1>
                         {/* Tabs */}
-                        <div className="flex gap-2 mb-6 border-b border-gray-200">
+                        <div className="flex gap-2 mb-6 border-b border-gray-200 overflow-x-auto">
                             <button
                                 id="admin-products-tab"
                                 className={`px-4 py-2 font-semibold hover:cursor-pointer ${activeTab === "products" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
@@ -66,17 +66,21 @@ export function AdminPage() {
                         </div>
 
                         {/* Conteúdo das Tabs */}
-                        {activeTab === "products" && (
-                            <ProductsTab />
-                        )}
+                        <div className="w-full">
+                            {activeTab === "products" && (
+                                <div className="overflow-x-auto w-full">
+                                    <ProductsTab />
+                                </div>
+                            )}
 
-                        {activeTab === "categories" && (
-                            <CategoriesTab />
-                        )}
+                            {activeTab === "categories" && (
+                                <CategoriesTab />
+                            )}
 
-                        {activeTab === "settings" && (
-                            <SettingsTab />
-                        )}
+                            {activeTab === "settings" && (
+                                <SettingsTab />
+                            )}
+                        </div>
                     </div>
                 )}
             </main>

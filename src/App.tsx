@@ -1,12 +1,11 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import type { JSX } from 'react';
 import { useEffect, useState } from "react";
-import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Footer } from './components';
 import { privateRoutes, publicRoutes } from "./routes";
 
 
-function PrivateRoute({ children }: { children: JSX.Element }) {
+function PrivateRoute({ children }: { children: React.ReactElement }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -26,8 +25,8 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 
 function App() {
   return (
-    <>
-      <Router>
+    <BrowserRouter>
+      <div className="w-full mx-auto min-h-screen flex flex-col max-w-full lg:max-w-6xl">
         <Routes>
           {/* Rotas públicas */}
           {publicRoutes.map(route => (
@@ -40,16 +39,14 @@ function App() {
               key={route.path}
               path={route.path}
               element={
-                <>
-                  <PrivateRoute>{route.element}</PrivateRoute>
-                </>
+                <PrivateRoute>{route.element}</PrivateRoute>
               }
             />
           ))}
         </Routes>
-      </Router>
-      <Footer />
-    </>
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 
