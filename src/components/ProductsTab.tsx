@@ -52,7 +52,7 @@ export function ProductsTab() {
     return (
         <section>
             {categories.length !== 0 ? (
-                <div className="flex flex-col gap-4 mt-10">
+                <div className="flex flex-col gap-4">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         {products.length !== 0 && (
                             <>
