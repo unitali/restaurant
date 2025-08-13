@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, CategoryModal, ConfirmModal, Input, CategoryTable } from ".";
+import { ButtonPrimary, CategoryModal, CategoryTable, ConfirmModal, Input } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { LoadingPage } from "../pages/LoadingPage";
 import { deleteCategory } from "../services/categoriesService";
@@ -54,29 +54,30 @@ export function CategoriesTab() {
     }
 
     return (
-        <section className="flex flex-col gap-4 mt-10">
-            <div className="flex gap-2 mb-6 items-stretch">
+        <div className="flex flex-col gap-4 w-full items-center">
+            <div className="w-full max-w-2xl md:max-w-none mx-auto px-2">
                 {categories.length > 0 && (
-                    <div className="flex-1">
+                    <div className="mb-2 md:mb-4 flex flex-col md:flex-row gap-2 w-full">
                         <Input
                             id="search-category"
                             type="text"
                             label="Buscar categoria"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
+                            className="w-full md:max-w-xs"
+                        />
+                        <ButtonPrimary
+                            id="new-category"
+                            className="w-full md:w-auto md:px-8 md:py-3"
+                            onClick={() => {
+                                setCategorySelected(null);
+                                setIsOpenModalCategory(true);
+                            }}
+                            children="Nova Categoria"
                         />
                     </div>
                 )}
-                <div className={categories.length > 0 ? "flex items-stretch" : "flex w-full items-stretch"}>
-                    <ButtonPrimary
-                        id="new-category"
-                        className={categories.length > 0 ? "w-40" : ""}
-                        onClick={() => {
-                            setCategorySelected(null);
-                            setIsOpenModalCategory(true);
-                        }}
-                        children="Nova Categoria"
-                    />
+                <div className="flex w-full items-stretch mb-4">
                 </div>
             </div>
             {categories.length > 0 && (
@@ -111,6 +112,6 @@ export function CategoriesTab() {
                     loading={loading}
                 />
             )}
-        </section>
+        </div>
     );
 }
