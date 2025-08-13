@@ -70,19 +70,32 @@ export const deleteCategory = async (restaurantId: string, categoryId: string) =
 };
 
 export const updateCategory = async (restaurantId: string, category: CategoryType) => {
-  const restaurantRef = doc(db, "restaurants", restaurantId);
-  const restaurantSnap = await getDoc(restaurantRef);
+    if (!restaurantId || !category.id) throw new Error("restaurantId ou categoryId não informado!");
 
-  if (!restaurantSnap.exists()) throw new Error("Restaurante não encontrado");
+    const restaurantRef = doc(db, "restaurants", restaurantId);
+    const restaurantSnap = await getDoc(restaurantRef);
 
-  const data = restaurantSnap.data();
-  const categories = Array.isArray(data.categories) ? data.categories : [];
+    if (!restaurantSnap.exists()) {
+        throw new Error("Restaurante não encontrado");
+    }
 
-  const updatedCategories = categories.map((c: CategoryType) =>
-    c.id === category.id
-      ? { ...c, name: category.name, description: category.description }
-      : c
-  );
+    const data = restaurantSnap.data();
+    const categories = data.categories || [];
+    const categoryIndex = categories.findIndex((c: CategoryType) => c.id === category.id);
 
-  await updateDoc(restaurantRef, { categories: updatedCategories });
+    if (categoryIndex === -1) {
+        throw new Error("Categoria não encontrada");
+    }
+
+    const cleanCategory = Object.entries(category).reduce((acc, [key, value]) => {
+        if (value === undefined) return acc;
+        acc[key] = value;
+        return acc;
+    }, {} as Record<string, any>);
+
+    categories[categoryIndex] = { ...categories[categoryIndex], ...cleanCategory };
+
+    await updateDoc(restaurantRef, { categories });
+
+    return categories[categoryIndex];
 };
