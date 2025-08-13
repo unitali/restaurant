@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, InputColor } from "..";
-import { useRestaurant } from "../../contexts/RestaurantContext";
-import { updateSettings } from "../../services/settingsService";
-import type { SettingsType } from "../../types";
+import { ButtonPrimary, InputColor } from ".";
+import { useRestaurant } from "../contexts/RestaurantContext";
+import { updateSettings } from "../services/settingsService";
+import type { SettingsType } from "../types";
 
 const defaultSettings: SettingsType = {
     primaryColor: "#2563eb",

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ImageUpload, Input, Modal, Select } from "..";
-import { useRestaurant } from "../../contexts/RestaurantContext";
-import { LoadingPage } from "../../pages/LoadingPage";
-import { updateImage } from '../../services/imagesServices';
-import { addProduct, updateProduct } from "../../services/productsService";
-import type { CategoryType, ImageState, ImageType, ProductType } from '../../types';
-import { formatCurrencyBRL } from "../../utils/currency";
+import { ButtonPrimary, ImageUpload, Input, Modal, Select } from ".";
+import { useRestaurant } from "../contexts/RestaurantContext";
+import { LoadingPage } from "../pages/LoadingPage";
+import { updateImage } from '../services/imagesServices';
+import { addProduct, updateProduct } from "../services/productsService";
+import type { CategoryType, ImageState, ImageType, ProductType } from '../types';
+import { formatCurrencyBRL } from "../utils/currency";
 
 const initialProductState: ProductType = {
     id: "",

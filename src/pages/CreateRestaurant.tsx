@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ButtonPrimary, Input } from "../components";
-import { HeaderPublic } from "../components/header/HeaderPublic";
+import { HeaderPublic } from "../components/PublicHeader";
 import { db } from "../config/firebase";
 import { webRoutes } from "../routes";
 import { createRestaurant } from "../services/restaurantsService";

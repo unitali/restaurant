@@ -51,6 +51,12 @@ export interface ProductType {
     image?: ImageType | null;
 }
 
+export interface PlanType {
+    name: string;
+    price: string;
+    features: Record<string, boolean>;
+}
+
 export interface RestaurantType {
     company: CompanyType;
     categories: CategoryType;

@@ -1,8 +1,8 @@
 import { FaFileImage } from "react-icons/fa";
-import { useCart } from "../../contexts/CartContext";
-import type { ProductType } from "../../types";
-import { formatCurrencyBRL } from "../../utils/currency";
-import { ButtonPrimaryMinus, ButtonPrimaryPlus } from "../button";
+import { useCart } from "../contexts/CartContext";
+import type { ProductType } from "../types";
+import { formatCurrencyBRL } from "../utils/currency";
+import { ButtonPrimaryMinus, ButtonPrimaryPlus } from "./Button";
 
 
 export function ProductCard({ product }: { product: ProductType }) {
@@ -16,7 +16,7 @@ export function ProductCard({ product }: { product: ProductType }) {
             {product.image?.url ? (
                 <img src={product.image?.url}
                     alt={product.name}
-                    className="w-24 h-24 object-cover rounded mb-2" />
+                    className="h-24 object-cover rounded mb-2" />
             ) : (
                 <FaFileImage className="w-12 h-12 text-gray-200 rounded mb-2" />
             )}

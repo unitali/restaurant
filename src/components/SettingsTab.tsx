@@ -1,5 +1,4 @@
-import { CompanySettings } from "../companySettings";
-import { Settings } from "../settings";
+import { CompanySettings, Settings } from ".";
 
 export function SettingsTab() {
     return (

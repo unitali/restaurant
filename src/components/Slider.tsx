@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { ProductCard } from "..";
-import type { ProductType } from "../../types";
+import { ProductCard } from ".";
+import type { ProductType } from "../types";
 
 export function Slider({ products, autoSlide = false, slideInterval = 3000 }: { products: ProductType[], autoSlide?: boolean, slideInterval?: number }) {
     const [current, setCurrent] = useState(0);
