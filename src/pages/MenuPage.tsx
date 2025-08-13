@@ -64,7 +64,7 @@ function MenuContent() {
             </button>
           ))}
       </nav>
-      <main className="max-w-[300px] w-full mx-auto px-2 py-28">
+      <main className="w-full mx-auto px-2 pt-28 pb-2 md:pb-12">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
           <Slider
