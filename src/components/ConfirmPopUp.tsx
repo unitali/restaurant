@@ -1,5 +1,5 @@
-import { ButtonOutlineRemove, ButtonPrimaryRemove, Modal, type ModalProps } from "..";
-import { LoadingPage } from "../../pages/LoadingPage";
+import { ButtonOutlineRemove, ButtonPrimaryRemove, Modal, type ModalProps } from ".";
+import { LoadingPage } from "../pages/LoadingPage";
 
 
 interface ConfirmModalProps extends ModalProps {

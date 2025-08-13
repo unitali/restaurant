@@ -1,7 +1,7 @@
 import { FaSignOutAlt, FaUtensils } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
-import { useRestaurant } from '../../contexts/RestaurantContext';
-import { handleLogout } from '../../services/loginServices';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { handleLogout } from '../services/loginServices';
 
 export function HeaderAdmin() {
     const { restaurantId } = useRestaurant();

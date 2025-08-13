@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
-import { HeaderMenu, ProductCarousel, Slider } from "../components";
+import { Footer, HeaderMenu, ProductCarousel, Slider } from "../components";
 import { CartProvider } from "../contexts/CartContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
 import { LoadingPage } from "./LoadingPage";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export function MenuPage() {
   const { restaurantId } = useParams();
@@ -12,7 +12,11 @@ export function MenuPage() {
   return (
     <RestaurantProvider restaurantId={restaurantId!}>
       <CartProvider>
-        <MenuContent />
+        <div id="menu-page" className="relative max-w-[300px] w-full mx-auto">
+          <HeaderMenu />
+          <MenuContent />
+          <Footer />
+        </div>
       </CartProvider>
     </RestaurantProvider>
   );
@@ -22,6 +26,9 @@ function MenuContent() {
   const { restaurant, loading } = useRestaurant();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
+
+  // Cria refs para cada categoria
+  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     setProducts(Array.isArray(restaurant?.products) ? restaurant!.products : []);
@@ -33,10 +40,31 @@ function MenuContent() {
 
   const featuredProducts = products.slice(0, 3);
 
+  const scrollToCategory = (id: string) => {
+    const ref = categoryRefs.current[id];
+    if (ref) {
+      ref.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <>
-      <HeaderMenu />
-      <main className="max-w-xl w-full mx-auto px-2 pt-20">
+      <nav className="fixed top-15 left-1/2 -translate-x-1/2 w-full bg-white z-40 shadow p-2 flex gap-4 overflow-x-auto">
+        {categories
+          .filter(category =>
+            products.some(product => product.categoryId === category.id)
+          )
+          .map((category) => (
+            <button
+              key={category.id}
+              className="text-teal-700 font-semibold px-3 py-1 rounded hover:bg-teal-50 transition cursor-pointer"
+              onClick={() => category.id && scrollToCategory(category.id)}
+            >
+              {category.name}
+            </button>
+          ))}
+      </nav>
+      <main className="max-w-[300px] w-full mx-auto px-2 py-28">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
           <Slider
@@ -52,7 +80,16 @@ function MenuContent() {
           if (productsOfCategory.length === 0) return null;
           return (
             <section key={category.id} className="my-8">
-              <h3 className="text-lg font-semibold mb-2">{category.name}</h3>
+              <h3
+                className="text-lg font-semibold mb-2 scroll-mt-30"
+                ref={(el: HTMLHeadingElement | null) => {
+                  if (category.id !== undefined) {
+                    categoryRefs.current[category.id as string] = el;
+                  }
+                }}
+              >
+                {category.name}
+              </h3>
               <ProductCarousel products={productsOfCategory} />
             </section>
           );

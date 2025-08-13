@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CategoriesTab, HeaderAdmin, ProductsTab } from "../components";
-import { SettingsTab } from "../components/tabs/SettingsTab";
+import { CategoriesTab, HeaderAdmin, ProductsTab, SettingsTab } from "../components";
 import { RestaurantProvider } from "../contexts/RestaurantContext";
 import { webRoutes } from "../routes";
 import { LoadingPage } from "./LoadingPage";

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { useCart } from "../../contexts/CartContext";
-import { useRestaurant } from "../../contexts/RestaurantContext";
-import { LoadingPage } from "../../pages/LoadingPage";
-import { sendWhatsAppMessage } from "../../services/whatsAppService";
-import { formatCurrencyBRL } from "../../utils/currency";
-import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, ButtonPrimaryRemove } from "../button";
+import { useCart } from "../contexts/CartContext";
+import { useRestaurant } from "../contexts/RestaurantContext";
+import { LoadingPage } from "../pages/LoadingPage";
+import { sendWhatsAppMessage } from "../services/whatsAppService";
+import { formatCurrencyBRL } from "../utils/currency";
+import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, ButtonPrimaryRemove } from "./Button";
 
 interface CartProps {
     isOpen: boolean;
@@ -41,13 +41,14 @@ export function Cart({ ...props }: CartProps) {
     if (loading) return <LoadingPage />;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
-            <div className="bg-white w-80 h-full shadow-lg p-4 overflow-y-auto">
+        <div className="fixed inset-0 w-screen h-screen bg-[rgba(0,0,0,0.5)] flex justify-end z-50 transition-all duration-300">
+            <div className="bg-white w-80 h-full shadow-lg p-4 overflow-y-auto transition-all duration-300">
                 <button
-                    className="mb-4 text-gray-500 hover:text-gray-800"
+                    id="button-close-modal-cart"
                     onClick={props.onClose}
+                    className="absolute top-4 right-4 text-red-500 cursor-pointer hover:text-red-700 text-2xl"
                 >
-                    Fechar
+                    &times;
                 </button>
                 <div className="p-1">
                     <h2 className="text-lg font-bold mb-4">Carrinho de Compras</h2>
