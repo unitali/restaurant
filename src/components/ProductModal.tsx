@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ImageUpload, Input, Modal, Select } from ".";
+import { ButtonOutline, ButtonPrimary, ImageUpload, Input, Modal, Select, Switch } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { LoadingPage } from "../pages/LoadingPage";
 import { updateImage } from '../services/imagesServices';
@@ -16,6 +16,7 @@ const initialProductState: ProductType = {
     price: 0,
     categoryId: "",
     image: null,
+    observationDisplay: false,
     createdAt: new Date(),
     updatedAt: new Date()
 };
@@ -43,6 +44,14 @@ export function ProductModal(props: {
     const [imageState, setImageState] = useState<ImageState>(initialImageState);
     const [newOption, setNewOption] = useState<ProductOptionsType>({ name: "", addPrice: 0 });
     const [showOptionInputs, setShowOptionInputs] = useState(false);
+    const [isActive, setIsActive] = useState(product.observationDisplay ?? false);
+
+    useEffect(() => {
+        setProduct(prev => ({
+            ...prev,
+            observationDisplay: isActive
+        }));
+    }, [isActive]);
 
     const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
 
@@ -95,23 +104,39 @@ export function ProductModal(props: {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
+        if (name === "optionName") {
+            setNewOption(prev => ({ ...prev, name: value }));
+        } else if (name === "optionPrice") {
+            const numeric = Number(value.replace(/\D/g, "")) / 100;
+            setNewOption(prev => ({ ...prev, addPrice: isNaN(numeric) ? 0 : numeric }));
+        } else {
+            setProduct(prev => ({
+                ...prev,
+                [name]: name === "price"
+                    ? (Number(value.replace(/\D/g, "")) / 100)
+                    : value
+            }));
+        }
+    };
+
+    const handleRemoveOption = (index: number) => {
         setProduct(prev => ({
             ...prev,
-            [name]: name === "price"
-                ? (Number(value.replace(/\D/g, "")) / 100).toFixed(2)
-                : value
+            options: prev.options?.filter((_, idx) => idx !== index) || []
         }));
     };
 
     const handleAddOption = () => {
-        if (newOption.name && newOption.addPrice) {
-            setProduct(prev => ({
-                ...prev,
-                options: [...(prev.options || []), newOption]
-            }));
-            setNewOption({ name: "", addPrice: 0 });
-            setShowOptionInputs(false);
+        if (!newOption.name.trim()) {
+            toast.error("Informe o nome do opcional.");
+            return;
         }
+        setProduct(prev => ({
+            ...prev,
+            options: [...(prev.options || []), { ...newOption, addPrice: Number(newOption.addPrice) }]
+        }));
+        setNewOption({ name: "", addPrice: 0 });
+        setShowOptionInputs(false);
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -216,9 +241,17 @@ export function ProductModal(props: {
                                 />
                             </div>
                         </div>
+                        <div className="flex items-center justify-between my-4 p-4 border bg-white rounded border-teal-500">
+                            <span className="text-teal-500 mr-2">
+                                Adicionar campo Observação?
+                            </span>
+                            <Switch
+                                value={isActive}
+                                onChange={setIsActive}
+                            />
+                        </div>
                         {showOptionInputs && (
                             <div className="border rounded-md p-3 mb-2 border-teal-600 shadow">
-                                {/* Primeira linha: nome */}
                                 <div className="flex flex-col md:flex-row gap-2 mb-2">
                                     <Input
                                         id="product-option-name"
@@ -230,16 +263,14 @@ export function ProductModal(props: {
                                         className="w-full"
                                     />
                                 </div>
-                                {/* Segunda linha: preço + salvar */}
                                 <div className="flex gap-2 items-end">
                                     <Input
                                         id="option-price"
                                         label="Preço"
                                         type="number"
                                         name="optionPrice"
-                                        value={newOption.addPrice === 0 ? "" : newOption.addPrice}
+                                        value={formatCurrencyBRL(newOption.addPrice)}
                                         onChange={handleChange}
-                                        required
                                     />
                                     <button
                                         type="button"
@@ -252,25 +283,34 @@ export function ProductModal(props: {
                                 </div>
                             </div>
                         )}
-                        {product.options && newOption && (
+                        {product.options && product.options.length > 0 && (
                             <div className="mb-2">
-                                <span className="font-semibold">Opcionais:</span>
-                                <ul className="list-disc ml-5">
+                                <span className="font-semibold">Opcionais Adicionados:</span>
+                                <ul className="list-disc space-y-2">
                                     {product.options.map((opt, idx) => (
-                                        <li key={idx} className="flex items-center">
-                                            {opt.name} <span className="ml-2">{formatCurrencyBRL(opt.addPrice)}</span>
+                                        <li key={idx} className="flex items-center w-full p-4 pt-5 rounded left-3 top-0 bg-white text-teal-500 border border-teal-500">
+                                            <span>{opt.name} - {formatCurrencyBRL(opt.addPrice)}</span>
+                                            <FaTrash className="ml-auto text-red-500 cursor-pointer"
+                                                onClick={() => handleRemoveOption(idx)} />
                                         </li>
                                     ))}
                                 </ul>
                             </div>
                         )}
-                        <ButtonPrimary
-                            id="product-submit"
-                            type="submit"
-                            disabled={loading}
-                        >
-                            {props.productId ? "Salvar Alterações" : "Criar Produto"}
-                        </ButtonPrimary>
+                        <div className="flex gap-2">
+                            <ButtonOutline
+                                id="product-option-cancel"
+                                onClick={() => setShowOptionInputs(true)}
+                                children="Adicionar Opcional"
+                            />
+                            <ButtonPrimary
+                                id="product-submit"
+                                type="submit"
+                                disabled={loading}
+                            >
+                                {props.productId ? "Salvar Alterações" : "Criar Produto"}
+                            </ButtonPrimary>
+                        </div>
                     </form>
                 </>
             )}

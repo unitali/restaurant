@@ -47,11 +47,17 @@ export interface ProductType {
     name: string;
     price: number;
     categoryId: string;
-    description?: string;
-    image?: ImageType | null;
     createdAt: Date;
     updatedAt: Date;
-    options?: { name: string; addPrice: number }[];
+    observationDisplay: boolean;
+    observation?: string;
+    description?: string;
+    image?: ImageType | null;
+    options?: ProductOptionsType[];
+}
+export interface ProductOptionsType {
+    name: string;
+    addPrice: number;
 }
 export interface PlanType {
     name: string;
