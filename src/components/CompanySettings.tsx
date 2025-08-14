@@ -1,15 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, Input, LabelCopy } from ".";
+import { ButtonPrimary, ImageUpload, Input, LabelCopy } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
+import { updateImage } from "../services/imagesServices";
 import { updateRestaurant } from "../services/restaurantsService";
-import type { CompanyType } from "../types";
+import type { CompanyType, ImageState } from "../types";
 
 export function CompanySettings() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
     const [editCompany, setEditCompany] = useState(false);
     const [loading, setLoading] = useState(false);
     const [formRestaurant, setFormRestaurant] = useState<CompanyType | null>(null);
+    const [bannerImageState, setBannerImageState] = useState<ImageState>({
+        file: null,
+        removed: false,
+        dirty: false,
+        previewUrl: null,
+    });
+    const [logoImageState, setLogoImageState] = useState<ImageState>({
+        file: null,
+        removed: false,
+        dirty: false,
+        previewUrl: null,
+    });
 
     useEffect(() => {
         if (editCompany && restaurant?.company) {
@@ -17,6 +30,8 @@ export function CompanySettings() {
                 name: restaurant.company.name,
                 address: restaurant.company.address,
                 phone: restaurant.company.phone,
+                banner: restaurant.company.banner,
+                logo: restaurant.company.logo,
             });
         }
     }, [editCompany, restaurant]);
@@ -33,7 +48,9 @@ export function CompanySettings() {
         (
             restaurant.company.name !== formRestaurant.name ||
             restaurant.company.address !== formRestaurant.address ||
-            restaurant.company.phone !== formRestaurant.phone
+            restaurant.company.phone !== formRestaurant.phone ||
+            bannerImageState.dirty ||
+            logoImageState.dirty
         );
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -43,20 +60,55 @@ export function CompanySettings() {
             setFormRestaurant(restaurant?.company ?? null);
             return;
         }
-        if (!isChanged) {
+        if (!(isChanged || bannerImageState.dirty || logoImageState.dirty)) {
             setEditCompany(false);
             setFormRestaurant(restaurant?.company ?? null);
             return;
         }
         setLoading(true);
         try {
-            if (formRestaurant) {
-                await updateRestaurant(restaurantId, formRestaurant);
-                await refresh();
-                setEditCompany(false);
-                toast.success("Dados da empresa atualizados com sucesso!");
+            let updatedCompany: CompanyType = { ...(formRestaurant as CompanyType) };
+
+            if (bannerImageState.dirty) {
+                if (bannerImageState.file) {
+                    const bannerImage = await updateImage({
+                        file: bannerImageState.file,
+                        oldImagePath: restaurant?.company.banner?.path,
+                        restaurantId,
+                    });
+                    updatedCompany.banner = bannerImage ?? null;
+                } else if (bannerImageState.removed) {
+                    updatedCompany.banner = null;
+                }
             }
+
+            // Logo
+            if (logoImageState.dirty) {
+                if (logoImageState.file) {
+                    const logoImage = await updateImage({
+                        file: logoImageState.file,
+                        oldImagePath: restaurant?.company.logo?.path,
+                        restaurantId,
+                    });
+                    updatedCompany.logo = logoImage ?? null;
+                } else if (logoImageState.removed) {
+                    updatedCompany.logo = null;
+                }
+            }
+
+            // Remove undefined fields (garantia extra)
+            (Object.keys(updatedCompany) as (keyof CompanyType)[]).forEach(key => {
+                if (updatedCompany[key] === undefined) {
+                    delete updatedCompany[key];
+                }
+            });
+
+            await updateRestaurant(restaurantId, updatedCompany);
+            await refresh();
+            setEditCompany(false);
+            toast.success("Dados da empresa atualizados com sucesso!");
         } catch (error) {
+            console.error("Erro ao atualizar os dados da empresa:", error);
             toast.error("Erro ao atualizar os dados da empresa.");
         } finally {
             setLoading(false);
@@ -65,7 +117,7 @@ export function CompanySettings() {
 
     const buttonText = () => {
         if (loading || restaurantLoading) return "Carregando...";
-        if (editCompany && !isChanged) return "Cancelar";
+        if (editCompany && !(isChanged || bannerImageState.dirty || logoImageState.dirty)) return "Cancelar";
         if (editCompany) return "Salvar";
         return "Editar";
     };
@@ -104,6 +156,22 @@ export function CompanySettings() {
                     required
                     value={editCompany ? formRestaurant?.phone || "" : restaurant?.company?.phone || ""}
                     onChange={handleChange}
+                    disabled={!editCompany || loading || restaurantLoading}
+                />
+                <ImageUpload
+                    id="banner-image"
+                    label="Banner da Empresa"
+                    required={false}
+                    initialUrl={restaurant?.company.banner?.url || null}
+                    onStateChange={setBannerImageState}
+                    disabled={!editCompany || loading || restaurantLoading}
+                />
+                <ImageUpload
+                    id="logo-image"
+                    label="Logo da Empresa"
+                    required={false}
+                    initialUrl={restaurant?.company.logo?.url || null}
+                    onStateChange={setLogoImageState}
                     disabled={!editCompany || loading || restaurantLoading}
                 />
                 <ButtonPrimary

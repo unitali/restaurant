@@ -184,11 +184,11 @@ export function ProductModal(props: {
     return (
         <Modal id={props.id} onClose={props.onClose} isOpen={props.isOpen}>
             {loading ? (
-                <div className="flex items-center justify-center min-h-[300px]">
+                <div className="flex items-center justify-center min-h-2xl">
                     <LoadingPage />
                 </div>
             ) : (
-                <>
+                <div className="max-h-[80vh] overflow-y-auto px-1">
                     <h2 className="text-lg font-semibold text-center mb-4">
                         {props.productId ? "Editar Produto" : "Criar Produto"}
                     </h2>
@@ -243,7 +243,7 @@ export function ProductModal(props: {
                         </div>
                         <div className="flex items-center justify-between my-4 p-4 border bg-white rounded border-teal-500">
                             <span className="text-teal-500 mr-2">
-                                Adicionar campo Observação?
+                                Adicionar Campo Observação?
                             </span>
                             <Switch
                                 value={isActive}
@@ -312,7 +312,7 @@ export function ProductModal(props: {
                             </ButtonPrimary>
                         </div>
                     </form>
-                </>
+                </div>
             )}
         </Modal>
     );

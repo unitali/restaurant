@@ -1,4 +1,5 @@
 export * from './AdminHeader';
+export * from './BannerMenu';
 export * from './Button';
 export * from './Cart';
 export * from './CategoriesTab';
@@ -24,7 +25,6 @@ export * from './PublicHeader';
 export * from './Select';
 export * from './Settings';
 export * from './SettingsTab';
-export * from './Slider';
 export * from './Switch';
 export * from './TextArea';
 
