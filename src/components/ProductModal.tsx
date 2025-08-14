@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { FaSave } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { ButtonPrimary, ImageUpload, Input, Modal, Select } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { LoadingPage } from "../pages/LoadingPage";
 import { updateImage } from '../services/imagesServices';
 import { addProduct, updateProduct } from "../services/productsService";
-import type { CategoryType, ImageState, ImageType, ProductType } from '../types';
+import type { CategoryType, ImageState, ImageType, ProductOptionsType, ProductType } from '../types';
 import { formatCurrencyBRL } from "../utils/currency";
 
 const initialProductState: ProductType = {
@@ -40,6 +41,8 @@ export function ProductModal(props: {
     const [products, setProducts] = useState<ProductType[]>(Array.isArray(restaurant?.products) ? restaurant.products : []);
     const [originalImage, setOriginalImage] = useState<ImageType | null>(null);
     const [imageState, setImageState] = useState<ImageState>(initialImageState);
+    const [newOption, setNewOption] = useState<ProductOptionsType>({ name: "", addPrice: 0 });
+    const [showOptionInputs, setShowOptionInputs] = useState(false);
 
     const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
 
@@ -98,6 +101,17 @@ export function ProductModal(props: {
                 ? (Number(value.replace(/\D/g, "")) / 100).toFixed(2)
                 : value
         }));
+    };
+
+    const handleAddOption = () => {
+        if (newOption.name && newOption.addPrice) {
+            setProduct(prev => ({
+                ...prev,
+                options: [...(prev.options || []), newOption]
+            }));
+            setNewOption({ name: "", addPrice: 0 });
+            setShowOptionInputs(false);
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -202,6 +216,54 @@ export function ProductModal(props: {
                                 />
                             </div>
                         </div>
+                        {showOptionInputs && (
+                            <div className="border rounded-md p-3 mb-2 border-teal-600 shadow">
+                                {/* Primeira linha: nome */}
+                                <div className="flex flex-col md:flex-row gap-2 mb-2">
+                                    <Input
+                                        id="product-option-name"
+                                        label="Nome do opcional"
+                                        name="optionName"
+                                        value={newOption.name}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full"
+                                    />
+                                </div>
+                                {/* Segunda linha: preço + salvar */}
+                                <div className="flex gap-2 items-end">
+                                    <Input
+                                        id="option-price"
+                                        label="Preço"
+                                        type="number"
+                                        name="optionPrice"
+                                        value={newOption.addPrice === 0 ? "" : newOption.addPrice}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="bg-teal-600 text-white px-4 py-2 rounded flex items-center hover:bg-teal-700"
+                                        onClick={handleAddOption}
+                                        title="Salvar opcional"
+                                    >
+                                        <FaSave />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {product.options && newOption && (
+                            <div className="mb-2">
+                                <span className="font-semibold">Opcionais:</span>
+                                <ul className="list-disc ml-5">
+                                    {product.options.map((opt, idx) => (
+                                        <li key={idx} className="flex items-center">
+                                            {opt.name} <span className="ml-2">{formatCurrencyBRL(opt.addPrice)}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                         <ButtonPrimary
                             id="product-submit"
                             type="submit"
