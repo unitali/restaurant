@@ -1,29 +1,189 @@
+import { useMemo, useState } from "react";
 import { FaFileImage } from "react-icons/fa";
+import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, Input, Modal } from ".";
+import { useCart } from "../contexts/CartContext";
 import type { ProductType } from "../types";
 import { formatCurrencyBRL } from "../utils/currency";
+interface ProductCardProps {
+    product: ProductType;
+    setIsAnyProductModalOpen: (isOpen: boolean) => void;
+}
+
+export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [quantity, setQuantity] = useState(0);
+    const [observation, setObservation] = useState("");
+
+    const { addToCart } = useCart();
+
+    const [optionQuantities, setOptionQuantities] = useState(
+        Array.isArray(product.options) ? product.options.map(() => 0) : []
+    );
+
+    const currentItemTotal = useMemo(() => {
+        if (quantity <= 0) return 0;
+        const mainProductTotal = product.price * quantity;
+
+        const optionsTotal = Array.isArray(product.options)
+            ? product.options.reduce((acc, option, idx) => {
+                const optionQuantity = optionQuantities[idx] || 0;
+                return acc + (option.price * optionQuantity);
+            }, 0)
+            : 0;
+
+        return mainProductTotal + optionsTotal;
+    }, [quantity, optionQuantities, product.price, product.options]);
 
 
-export function ProductCard({ product }: { product: ProductType }) {
+    const handlePlus = () => setQuantity(q => q + 1);
+    const handleMinus = () => setQuantity(q => (q > 0 ? q - 1 : 0));
+
+    const handleOptionPlus = (idx: number) => {
+        setOptionQuantities(qs => qs.map((q, i) => i === idx ? q + 1 : q));
+    };
+    const handleOptionMinus = (idx: number) => {
+        setOptionQuantities(qs => qs.map((q, i) => i === idx ? (q > 0 ? q - 1 : 0) : q));
+    };
+
+    const openModal = () => {
+        setQuantity(1);
+        setOptionQuantities(Array.isArray(product.options) ? product.options.map(() => 0) : []);
+        setObservation("");
+        setIsModalOpen(true);
+        setIsAnyProductModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setIsAnyProductModalOpen(false);
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const selectedOptions = Array.isArray(product.options)
+            ? product.options
+                .map((opt, idx) => ({
+                    ...opt,
+                    quantity: optionQuantities[idx]
+                }))
+                .filter(opt => opt.quantity > 0)
+            : [];
+        const cartItemId = `${product.id}-${Date.now()}`;
+
+        const cartItem = {
+            ...product,
+            id: cartItemId,
+            productId: product.id,
+            quantity,
+            observation,
+            selectedOptions,
+        };
+
+        addToCart(cartItem);
+        closeModal();
+    };
+
     return (
-        <div className="bg-white rounded shadow p-3 flex flex-row items-center w-full min-h-[110px] mb-3">
-            <div className="flex-1 flex flex-col justify-center">
-                <h3 className="font-bold text-base">{product.name}</h3>
-                <p className="text-gray-600 text-xs">{product.description}</p>
-                <span className="font-semibold text-green-700 text-base mt-2">
-                    {formatCurrencyBRL(product.price)}
-                </span>
-            </div>
-            <div className="ml-4 flex-shrink-0 flex items-center justify-center h-24 w-24">
-                {product.image?.url ? (
-                    <img
-                        src={product.image?.url}
-                        alt={product.name}
-                        className="object-cover rounded h-24 w-24"
-                    />
-                ) : (
-                    <FaFileImage className="w-16 h-16 text-gray-200 rounded" />
-                )}
-            </div>
-        </div>
+        <>
+            <button
+                type="button"
+                className="bg-white rounded shadow p-3 flex flex-row items-center w-full min-h-[110px] mb-3 transition-all duration-300 outline-none hover:scale-102"
+                onClick={openModal}
+            >
+                <div className="flex-1 flex flex-col justify-center">
+                    <h3 className="font-bold text-base">{product.name}</h3>
+                    <p className="text-gray-600 text-xs">{product.description}</p>
+                    <span className="font-semibold text-green-700 text-base mt-2">
+                        {formatCurrencyBRL(product.price)}
+                    </span>
+                </div>
+                <div className="ml-4 flex-shrink-0 flex items-center justify-center h-24 w-24">
+                    {product.image?.url ? (
+                        <img
+                            src={product.image?.url}
+                            alt={product.name}
+                            className="object-cover rounded h-24 w-24"
+                        />
+                    ) : (
+                        <FaFileImage className="w-16 h-16 text-gray-200 rounded" />
+                    )}
+                </div>
+            </button>
+            <Modal isOpen={isModalOpen} onClose={closeModal} id={`product-modal-${product.id}`}>
+                <form className="max-h-xl overflow-y-auto bg-white" onSubmit={handleSubmit}>
+                    <div className="flex flex-col items-center p-2">
+                        <h2 className="text-lg font-semibold text-center mb-4">{product.name}</h2>
+                        <div className="mb-4">
+                            {product.image?.url ? (
+                                <img
+                                    src={product.image?.url}
+                                    alt={product.name}
+                                    className="object-cover rounded mx-auto"
+                                />
+                            ) : (
+                                <FaFileImage className="w-24 h-24 text-gray-200 rounded mx-auto" />
+                            )}
+                        </div>
+                        <p className="text-gray-600 text-sm mb-2">{product.description}</p>
+                        <span className="font-semibold text-green-700 text-xl mb-4">
+                            {formatCurrencyBRL(product.price)}
+                        </span>
+                        <div className="flex items-center gap-2 mb-4">
+                            <ButtonPrimaryMinus
+                                id={`product-quantity-minus-${product.id}`}
+                                onClick={handleMinus}
+                            />
+                            <span className="font-bold text-lg">{quantity}</span>
+                            <ButtonPrimaryPlus
+                                id={`product-quantity-plus-${product.id}`}
+                                onClick={handlePlus}
+                            />
+                        </div>
+                        {Array.isArray(product.options) && product.options.length > 0 && (
+                            <div id="adicional-options" className="w-full">
+                                <h4 className="font-semibold text-gray-700">Adicionais</h4>
+                                <ul className="flex flex-col">
+                                    {product.options.map((option, idx) => (
+                                        <li key={idx} className="flex items-center">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <ButtonPrimaryMinus
+                                                    id={`optional-quantity-minus-${idx}`}
+                                                    onClick={() => handleOptionMinus(idx)}
+                                                />
+                                                <span className="font-bold text-lg">{optionQuantities[idx]}</span>
+                                                <ButtonPrimaryPlus
+                                                    id={`optional-quantity-plus-${idx}`}
+                                                    onClick={() => handleOptionPlus(idx)}
+                                                />
+                                            </div>
+                                            <label htmlFor={`optional-${idx}`} className="ms-4 text-gray-800 text-xl">
+                                                {option.name} (+{formatCurrencyBRL(option.price)})
+                                            </label>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {product.observationDisplay && (
+                            <Input
+                                id={`product-observation-${product.id}`}
+                                label="Observação"
+                                value={observation}
+                                onChange={e => setObservation(e.target.value)}
+                                className="w-full mb-4"
+                            />
+                        )}
+                        <ButtonPrimary
+                            type="submit"
+                            id={`add-product-${product.id}`}
+                            className="w-full"
+                            disabled={quantity <= 0}
+                        >
+                            {`Adicionar ao carrinho - ${formatCurrencyBRL(currentItemTotal)}`}
+                        </ButtonPrimary>
+                    </div>
+                </form>
+            </Modal>
+        </>
     );
 }

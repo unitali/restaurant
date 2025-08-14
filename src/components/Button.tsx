@@ -68,19 +68,17 @@ export function ButtonPrimaryMinus({ ...props }: ButtonProps) {
 
     return (
         <button
+            id="remove-from-cart"
             type="button"
             onClick={props.onClick}
             onMouseDown={() => setClicked(true)}
             onMouseUp={() => setClicked(false)}
             onMouseLeave={() => setClicked(false)}
-            id="remove-from-cart"
             className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 transition-colors duration-150
                 ${clicked ? "bg-red-700" : "bg-red-500 hover:bg-red-600"} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
-            {(props.quantity ?? 0) > 0 && (
-                <FaMinus size={14} className="text-white" />
-            )}
+            <FaMinus size={14} className="text-white" />
         </button>
     )
 }

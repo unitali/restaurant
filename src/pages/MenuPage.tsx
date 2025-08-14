@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ProductCard, ProductCarousel, BannerMenu } from "../components";
-import { CartProvider } from "../contexts/CartContext";
+import { BannerMenu, Cart, ProductCard, ProductCarousel } from "../components";
+import { CartProvider, useCart } from "../contexts/CartContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
+import { formatCurrencyBRL } from "../utils/currency";
 import { LoadingPage } from "./LoadingPage";
+import { FaShoppingBasket } from "react-icons/fa";
 
+// 1. Mantenha o MenuPage como o container principal dos providers
 export function MenuPage() {
   const { restaurantId } = useParams();
 
@@ -13,8 +16,6 @@ export function MenuPage() {
     <RestaurantProvider restaurantId={restaurantId!}>
       <CartProvider>
         <div className="w-full max-w-2xl mx-auto">
-          <BannerMenu />
-          <Nav />
           <MenuContent />
         </div>
       </CartProvider>
@@ -22,16 +23,17 @@ export function MenuPage() {
   );
 }
 
-function Nav() {
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-  const [products, setProducts] = useState<ProductType[]>([]);
-  const { restaurant } = useRestaurant();
+// 2. Centralize toda a lógica de exibição no MenuContent
+function MenuContent() {
+  const { restaurant, loading } = useRestaurant();
+  const { cart } = useCart(); // O cart vem do contexto
+  const [isOpenCart, setIsOpenCart] = useState(false);
+  const [isAnyProductModalOpen, setIsAnyProductModalOpen] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  useEffect(() => {
-    setProducts(Array.isArray(restaurant?.products) ? restaurant!.products : []);
-    setCategories(Array.isArray(restaurant?.categories) ? restaurant!.categories : []);
-  }, [restaurant]);
+  // Simplifique o estado local
+  const products: ProductType[] = Array.isArray(restaurant?.products) ? restaurant!.products : [];
+  const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant!.categories : [];
 
   const scrollToCategory = (id: string) => {
     const ref = categoryRefs.current[id];
@@ -40,72 +42,90 @@ function Nav() {
     }
   };
 
-  return (
-    <nav className="w-full max-w-2xl mx-auto bg-white z-40 shadow p-2 flex gap-4 overflow-x-auto sticky top-0">
-      {categories
-        .filter(category =>
-          products.some(product => product.categoryId === category.id)
-        )
-        .map((category) => (
-          <button
-            key={category.id}
-            className="text-teal-700 font-semibold px-3 py-1 rounded hover:bg-teal-50 transition cursor-pointer"
-            onClick={() => category.id && scrollToCategory(category.id)}
-          >
-            {category.name}
-          </button>
-        ))}
-    </nav>
-  );
-}
-
-function MenuContent() {
-  const { restaurant, loading } = useRestaurant();
-  const [products, setProducts] = useState<ProductType[]>([]);
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  useEffect(() => {
-    setProducts(Array.isArray(restaurant?.products) ? restaurant!.products : []);
-    setCategories(Array.isArray(restaurant?.categories) ? restaurant!.categories : []);
-  }, [restaurant]);
-
   if (loading) return <LoadingPage />;
   if (!restaurant) return null;
 
   const featuredProducts = products.slice(0, 3);
 
-
+  const handleOpenCart = () => {
+    setIsOpenCart(true);
+    setIsAnyProductModalOpen(false);
+  };
 
   return (
-    <main className="w-full mx-auto p-2 max-w-2xl bg-gray-50">
-      <section className="my-6">
-        <h2 className="text-xl font-bold mb-2">Destaques</h2>
-        <ProductCarousel products={featuredProducts} />
+    <>
+      <BannerMenu />
 
-      </section>
-      {categories.map((category) => {
-        const productsOfCategory = products.filter(
-          (p) => p.categoryId === category.id
-        );
-        if (productsOfCategory.length === 0) return null;
-        return (
-          <section key={category.id} className="my-8">
-            <h3
-              className="text-lg font-semibold mb-2 scroll-mt-30"
-              ref={(el: HTMLHeadingElement | null) => {
-                if (category.id !== undefined) {
-                  categoryRefs.current[category.id as string] = el;
-                }
-              }}
+      {/* Nav bar */}
+      <nav className="w-full max-w-2xl mx-auto bg-white z-40 shadow p-2 flex gap-4 overflow-x-auto sticky top-0">
+        {categories
+          .filter(category =>
+            products.some(product => product.categoryId === category.id)
+          )
+          .map((category) => (
+            <button
+              key={category.id}
+              className="text-teal-700 font-semibold px-3 py-1 rounded hover:bg-teal-50 transition cursor-pointer"
+              onClick={() => category.id && scrollToCategory(category.id)}
             >
               {category.name}
-            </h3>
-            {products.length === 0 && <p className="text-gray-500">Nenhum produto cadastrado</p>}
-            {products.length > 0 && products.map((product) => <ProductCard key={product.id} product={product} />)}
-          </section>
-        );
-      })}
-    </main>
+            </button>
+          ))}
+      </nav>
+
+      {/* Conteúdo principal */}
+      <main className="w-full mx-auto p-2 max-w-2xl bg-gray-50 relative">
+        <section className="my-6">
+          <h2 className="text-xl font-bold mb-2">Destaques</h2>
+          <ProductCarousel
+            products={featuredProducts}
+            setIsAnyProductModalOpen={setIsAnyProductModalOpen}
+          />
+        </section>
+
+        {categories.map((category) => {
+          const productsOfCategory = products.filter(
+            (p) => p.categoryId === category.id
+          );
+          if (productsOfCategory.length === 0) return null;
+          return (
+            <section key={category.id} className="my-8">
+              <h3
+                className="text-lg font-semibold mb-2 scroll-mt-30"
+                ref={(el: HTMLHeadingElement | null) => {
+                  if (category.id) categoryRefs.current[category.id] = el;
+                }}
+              >
+                {category.name}
+              </h3>
+              {productsOfCategory.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  setIsAnyProductModalOpen={setIsAnyProductModalOpen}
+                />
+              ))}
+            </section>
+          );
+        })}
+
+        <Cart isOpen={isOpenCart} onClose={() => setIsOpenCart(false)} />
+
+        {cart && cart.length > 0 && !isAnyProductModalOpen && !isOpenCart && (
+          <nav
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md flex justify-center"
+            style={{ pointerEvents: "auto" }}
+          >
+            <button
+              className="bg-red-600 text-white font-bold px-6 py-3 shadow-lg transition hover:bg-red-700 w-full flex items-center justify-center gap-2"
+              onClick={handleOpenCart}
+            >
+              <FaShoppingBasket className="text-xl mx-2" />
+              <span>{`Ver Carrinho (${formatCurrencyBRL(cart.reduce((acc, item) => acc + (item.price * item.quantity), 0))})`}</span>
+            </button>
+          </nav>
+        )}
+      </main>
+    </>
   );
 }

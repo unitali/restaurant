@@ -39,11 +39,13 @@ export interface ImageState {
 }
 
 export interface CartItem {
-    product: ProductType;
-    quantity: number;
+    id: string;
+    name: string;
     price: number;
+    quantity: number;
+    observation?: string;
+    selectedOptions?: ProductOptionsType[];
 }
-
 export interface ProductType {
     id?: string;
     name: string;
@@ -58,8 +60,10 @@ export interface ProductType {
     options?: ProductOptionsType[];
 }
 export interface ProductOptionsType {
+    id: string;
     name: string;
-    addPrice: number;
+    price: number;
+    quantity?: number;
 }
 export interface PlanType {
     name: string;

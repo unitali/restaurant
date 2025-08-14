@@ -42,7 +42,7 @@ export function ProductModal(props: {
     const [products, setProducts] = useState<ProductType[]>(Array.isArray(restaurant?.products) ? restaurant.products : []);
     const [originalImage, setOriginalImage] = useState<ImageType | null>(null);
     const [imageState, setImageState] = useState<ImageState>(initialImageState);
-    const [newOption, setNewOption] = useState<ProductOptionsType>({ name: "", addPrice: 0 });
+    const [newOption, setNewOption] = useState<ProductOptionsType>({ id: "", name: "", price: 0 });
     const [showOptionInputs, setShowOptionInputs] = useState(false);
     const [isActive, setIsActive] = useState(product.observationDisplay ?? false);
 
@@ -133,9 +133,9 @@ export function ProductModal(props: {
         }
         setProduct(prev => ({
             ...prev,
-            options: [...(prev.options || []), { ...newOption, addPrice: Number(newOption.addPrice) }]
+            options: [...(prev.options || []), { ...newOption, price: Number(newOption.price) }]
         }));
-        setNewOption({ name: "", addPrice: 0 });
+        setNewOption({ id: "", name: "", price: 0 });
         setShowOptionInputs(false);
     };
 
@@ -269,7 +269,7 @@ export function ProductModal(props: {
                                         label="Preço"
                                         type="number"
                                         name="optionPrice"
-                                        value={formatCurrencyBRL(newOption.addPrice)}
+                                        value={formatCurrencyBRL(newOption.price)}
                                         onChange={handleChange}
                                     />
                                     <button
@@ -289,7 +289,7 @@ export function ProductModal(props: {
                                 <ul className="list-disc space-y-2">
                                     {product.options.map((opt, idx) => (
                                         <li key={idx} className="flex items-center w-full p-4 pt-5 rounded left-3 top-0 bg-white text-teal-500 border border-teal-500">
-                                            <span>{opt.name} - {formatCurrencyBRL(opt.addPrice)}</span>
+                                            <span>{opt.name} - {formatCurrencyBRL(opt.price)}</span>
                                             <FaTrash className="ml-auto text-red-500 cursor-pointer"
                                                 onClick={() => handleRemoveOption(idx)} />
                                         </li>

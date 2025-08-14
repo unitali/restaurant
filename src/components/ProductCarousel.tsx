@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { ProductCard } from ".";
 import type { ProductType } from "../types";
 
-export function ProductCarousel({ products, autoSlide = false, slideInterval = 3000 }: { products: ProductType[], autoSlide?: boolean, slideInterval?: number }) {
+export function ProductCarousel({ products, autoSlide = false, slideInterval = 3000, setIsAnyProductModalOpen }: { products: ProductType[], autoSlide?: boolean, slideInterval?: number, setIsAnyProductModalOpen: (isOpen: boolean) => void }) {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
@@ -24,7 +24,7 @@ export function ProductCarousel({ products, autoSlide = false, slideInterval = 3
         <div className="flex gap-1 overflow-x-auto px-1 pb-2 snap-x">
       {products.map((product) => (
         <div key={product.id} className="snap-center flex-shrink-0 w-40">
-          <ProductCard product={product} />
+          <ProductCard product={product} setIsAnyProductModalOpen={setIsAnyProductModalOpen} />
         </div>
       ))}
     </div>

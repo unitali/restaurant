@@ -20,7 +20,7 @@ export function Input({ ...props }: InputProps) {
     const isRequiredError = props.required && touched && !props.value;
 
     return (
-        <div className="relative flex-1 mb-2">
+        <div className="relative flex-1 mb-2 w-full">
             <label
                 id={`label-${props.id}`}
                 htmlFor={`input-${props.id}`}

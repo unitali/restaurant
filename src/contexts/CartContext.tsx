@@ -1,11 +1,24 @@
 import type { ReactNode } from "react";
-import { createContext, useContext, useState, useEffect } from "react";
-import type { ProductType, CartItem } from "../types";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { CartItem } from "../types";
+
+const generateItemSignature = (item: CartItem): string => {
+    const sortedOptions = item.selectedOptions
+        ? [...item.selectedOptions].sort((a, b) => (a.price || 0) - (b.price || 0))
+        : [];
+
+    const optionsString = sortedOptions
+        .map(opt => `${opt.id}:${opt.price}`)
+        .join(',');
+
+    return `${item.id}|obs:${item.observation || ''}|opts:${optionsString}`;
+};
 
 
 interface CartContextType {
     cart: CartItem[];
-    addToCart: (product: ProductType) => void;
+    total: number;
+    addToCart: (itemToAdd: CartItem) => void;
     removeFromCart: (productId: string) => void;
     clearCart: () => void;
 }
@@ -26,30 +39,53 @@ export function CartProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(CART_KEY, JSON.stringify(cart));
     }, [cart]);
 
-    function addToCart(product: ProductType) {
-        setCart((prev) => {
-            const exists = prev.find((item) => item.product.id === product.id);
-            if (exists) {
-                return prev.map((item) =>
-                    item.product.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
+    const total = cart.reduce((grandTotal, item) => {
+        const optionsPricePerUnit = item.selectedOptions?.reduce((optionsSubtotal, option) => {
+            return optionsSubtotal + (option.price * (option.quantity ?? 1));
+        }, 0) ?? 0;
+
+        const singleItemPrice = item.price + optionsPricePerUnit;
+        const lineItemTotal = singleItemPrice * item.quantity;
+        return grandTotal + lineItemTotal;
+    }, 0);
+
+
+    function addToCart(itemToAdd: CartItem) {
+        const signatureToAdd = generateItemSignature(itemToAdd);
+
+        setCart((prevCart) => {
+            const existingItemIndex = prevCart.findIndex(
+                (item) => generateItemSignature(item) === signatureToAdd
+            );
+            if (existingItemIndex > -1) {
+                const updatedCart = [...prevCart];
+                const existingItem = updatedCart[existingItemIndex];
+
+                updatedCart[existingItemIndex] = {
+                    ...existingItem,
+                    quantity: existingItem.quantity + itemToAdd.quantity,
+                };
+                return updatedCart;
+            } else {
+                return [...prevCart, itemToAdd];
             }
-            return [...prev, { product, quantity: 1, price: product.price }];
         });
     }
 
-    function removeFromCart(productId: string) {
-        setCart((prev) =>
-            prev
-                .map((item) =>
-                    item.product.id === productId
+    function removeFromCart(cartItemId: string) {
+        setCart((prev) => {
+            const itemToRemove = prev.find(item => item.id === cartItemId);
+
+            if (itemToRemove && itemToRemove.quantity > 1) {
+                return prev.map(item =>
+                    item.id === cartItemId
                         ? { ...item, quantity: item.quantity - 1 }
                         : item
-                )
-                .filter((item) => item.quantity > 0)
-        );
+                );
+            } else {
+                return prev.filter(item => item.id !== cartItemId);
+            }
+        });
     }
 
     function clearCart() {
@@ -57,7 +93,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+        <CartContext.Provider value={{ cart, total, addToCart, removeFromCart, clearCart }}>
             {children}
         </CartContext.Provider>
     );
