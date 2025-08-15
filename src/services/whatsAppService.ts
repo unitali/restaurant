@@ -18,9 +18,18 @@ export async function sendWhatsAppMessage({ ...props }: SendWhatsAppMessageProps
     const itemsMsg = props.cart
         .map(
             (item, index) =>
-                `${index + 1}. ${item.product.name}  \n` +
+                `${index + 1}. ${item.name}  \n` +
                 `  Quantidade: ${item.quantity}  \n` +
                 `  Preço unitário: ${formatCurrencyBRL(item.price)}  \n` +
+                (item.selectedOptions && item.selectedOptions.length > 0
+                    ? `  Opções: \n${
+                        item.selectedOptions.map(option => `    - ${option.name} - ${formatCurrencyBRL(option.price * (option.quantity ?? 1))}`).join("\n")}  \n`
+                    : ""
+                ) +
+                  (item.observation && item.observation.length > 0
+                    ? `  Observação: ${item.observation}\n`
+                    : ""
+                ) +
                 `  Subtotal: ${formatCurrencyBRL(item.price * item.quantity)}\n` +
                 `${"-".repeat(30)}`
         )
