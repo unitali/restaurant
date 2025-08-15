@@ -8,7 +8,6 @@ import { formatCurrencyBRL } from "../utils/currency";
 import { LoadingPage } from "./LoadingPage";
 import { FaShoppingBasket } from "react-icons/fa";
 
-// 1. Mantenha o MenuPage como o container principal dos providers
 export function MenuPage() {
   const { restaurantId } = useParams();
 
@@ -23,15 +22,13 @@ export function MenuPage() {
   );
 }
 
-// 2. Centralize toda a lógica de exibição no MenuContent
 function MenuContent() {
   const { restaurant, loading } = useRestaurant();
-  const { cart } = useCart(); // O cart vem do contexto
+  const { cart, total } = useCart();
   const [isOpenCart, setIsOpenCart] = useState(false);
   const [isAnyProductModalOpen, setIsAnyProductModalOpen] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Simplifique o estado local
   const products: ProductType[] = Array.isArray(restaurant?.products) ? restaurant!.products : [];
   const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant!.categories : [];
 
@@ -55,8 +52,6 @@ function MenuContent() {
   return (
     <>
       <BannerMenu />
-
-      {/* Nav bar */}
       <nav className="w-full max-w-2xl mx-auto bg-white z-40 shadow p-2 flex gap-4 overflow-x-auto sticky top-0">
         {categories
           .filter(category =>
@@ -72,8 +67,6 @@ function MenuContent() {
             </button>
           ))}
       </nav>
-
-      {/* Conteúdo principal */}
       <main className="w-full mx-auto p-2 max-w-2xl bg-gray-50 relative">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
@@ -121,7 +114,7 @@ function MenuContent() {
               onClick={handleOpenCart}
             >
               <FaShoppingBasket className="text-xl mx-2" />
-              <span>{`Ver Carrinho (${formatCurrencyBRL(cart.reduce((acc, item) => acc + (item.price * item.quantity), 0))})`}</span>
+              <span>{`Ver Carrinho (${formatCurrencyBRL(total)})`}</span>
             </button>
           </nav>
         )}

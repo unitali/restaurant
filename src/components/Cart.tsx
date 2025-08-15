@@ -1,11 +1,8 @@
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus } from ".";
 import { useCart } from "../contexts/CartContext";
-import { useRestaurant } from "../contexts/RestaurantContext";
+import { useWhatsApp } from "../hooks/useWhatsApp";
 import { LoadingPage } from "../pages/LoadingPage";
-import { sendWhatsAppMessage } from "../services/whatsAppService";
 import { formatCurrencyBRL } from "../utils/currency";
-import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus } from "./Button";
 
 interface CartProps {
     isOpen: boolean;
@@ -13,37 +10,18 @@ interface CartProps {
 }
 
 export function Cart({ isOpen, onClose }: CartProps) {
-    // 1. Obtenha o `total` do contexto. Ele já calcula os adicionais.
-    const { cart, removeFromCart, clearCart, addToCart, total } = useCart();
-    const { restaurant } = useRestaurant();
-    const [loading, setLoading] = useState(false);
+    const { cart, removeFromCart, addToCart, total } = useCart();
+    const { sendOrder, loading } = useWhatsApp();
 
-    const sentOrder = async (e: React.FormEvent) => {
-        e.preventDefault(); // Adicione o evento e previna o default
-        setLoading(true);
-        try {
-            if (!cart || cart.length === 0) {
-                setLoading(false);
-                return;
-            }
-            if (!restaurant) {
-                toast.error("Restaurante não encontrado.");
-                setLoading(false);
-                return;
-            }
-            // A chamada para o serviço está correta
-            sendWhatsAppMessage({ restaurant: restaurant.company, cart });
-            clearCart();
-        } catch (error) {
-            toast.error("Erro ao enviar pedido");
-        } finally {
-            setLoading(false);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await sendOrder();
+        if (cart.length > 0) {
             onClose();
         }
     };
 
     if (loading) return <LoadingPage />;
-
     if (!isOpen) return null;
 
     return (
@@ -56,37 +34,38 @@ export function Cart({ isOpen, onClose }: CartProps) {
                 >
                     &times;
                 </button>
-                <form className="p-1" onSubmit={sentOrder}>
+                <form className="p-1" onSubmit={handleSubmit}>
                     <h2 className="text-lg font-bold mb-4">Carrinho de Compras</h2>
                     <div className="flex flex-col gap-1">
-                        {cart.map(item => (
+                        {cart.map((product, index) => (
                             <div
-                                key={item.id}
+                                key={`product-${index}`}
                                 className="bg-white rounded-lg shadowflex p-5 flex-col gap-1 border border-gray-100 w-full"
                             >
-                                <div className="font-bold text-base mb-1">{item.name}</div>
-                                {item.observation && <p className="text-sm text-gray-500 pl-2">Obs: {item.observation}</p>}
-                                {item.selectedOptions && item.selectedOptions.length > 0 && (
+                                <div className="font-bold text-base mb-1">{product.name}</div>
+                                {product.observation && <p className="text-sm text-gray-500 pl-2">Obs: {product.observation}</p>}
+                                {product.options && product.options.length > 0 && (
                                     <ul className="text-sm text-gray-500 pl-2">
-                                        {item.selectedOptions.map(opt => (
-                                            <li key={opt.id}>- {opt.price}x {opt.name}</li>
+                                        {product.options.map((option) => (
+                                            <li key={option.id}>- {option.quantity}x {option.name} (+{formatCurrencyBRL(option.price)})</li>
                                         ))}
                                     </ul>
                                 )}
                                 <div className="flex items-center gap-2 w-full mt-2">
                                     <ButtonPrimaryMinus
-                                        id={`remove-${item.id}`}
-                                        onClick={() => removeFromCart(item.id!)}
-                                        quantity={item.quantity}
+                                        id={`remove-item-${product.productId}`}
+                                        onClick={() => removeFromCart(product.productId!)}
+                                        quantity={product.quantity}
                                     />
-                                    <span className="font-semibold">{item.quantity}</span>
+                                    <span className="font-semibold">{product.quantity}</span>
                                     <ButtonPrimaryPlus
-                                        id={`add-${item.id}`}
-                                        // 2. Corrija a chamada para enviar o item completo com quantidade 1
-                                        onClick={() => addToCart({ ...item, quantity: 1 })}
+                                        id={`add-item-${product.productId}`}
+                                        onClick={() => addToCart({ ...product, quantity: 1 })}
                                     />
                                     <span className="ml-3 text-green-700 font-bold flex-1 text-right">
-                                        {formatCurrencyBRL(item.price * item.quantity)}
+                                        {formatCurrencyBRL(
+                                            (product.price + (product.options?.reduce((acc, opt) => acc + (opt.price * (opt.quantity ?? 1)), 0) ?? 0)) * product.quantity
+                                        )}
                                     </span>
                                 </div>
                             </div>
@@ -95,7 +74,6 @@ export function Cart({ isOpen, onClose }: CartProps) {
                     <div className="mt-4">
                         <span className="font-bold text-lg">Total: </span>
                         <span className="text-green-700 font-bold">
-                            {/* 3. Use o `total` do contexto */}
                             {formatCurrencyBRL(total)}
                         </span>
                     </div>
@@ -103,7 +81,8 @@ export function Cart({ isOpen, onClose }: CartProps) {
                         <ButtonPrimary
                             id="submit-order"
                             type="submit"
-                            children="Enviar Pedido"
+                            disabled={loading}
+                            children={loading ? "Enviando..." : "Enviar Pedido"}
                         />
                     </div>
                 </form>

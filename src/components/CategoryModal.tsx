@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ButtonPrimary, Input, Modal, TextArea, type ModalProps } from ".";
 import { LoadingPage } from "../pages/LoadingPage";
-import { addCategory, updateCategory } from "../services/categoriesService";
+import { addCategory, updateCategory } from "../hooks/categoriesService";
 import type { CategoryType } from "../types";
 import { useRestaurant } from "../contexts/RestaurantContext";
 

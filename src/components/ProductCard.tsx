@@ -73,10 +73,10 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
         const cartItem = {
             ...product,
             id: cartItemId,
-            productId: product.id,
+            productId: product.id ?? "",
             quantity,
             observation,
-            selectedOptions,
+            options: selectedOptions,
         };
 
         addToCart(cartItem);

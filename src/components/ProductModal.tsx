@@ -4,8 +4,8 @@ import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary, ImageUpload, Input, Modal, Select, Switch } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { LoadingPage } from "../pages/LoadingPage";
-import { updateImage } from '../services/imagesServices';
-import { addProduct, updateProduct } from "../services/productsService";
+import { updateImage } from '../hooks/imagesServices';
+import { addProduct, updateProduct } from "../hooks/productsService";
 import type { CategoryType, ImageState, ImageType, ProductOptionsType, ProductType } from '../types';
 import { formatCurrencyBRL } from "../utils/currency";
 
@@ -18,7 +18,8 @@ const initialProductState: ProductType = {
     image: null,
     observationDisplay: false,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    options: [],
 };
 
 const initialImageState: ImageState = {
@@ -28,21 +29,24 @@ const initialImageState: ImageState = {
     previewUrl: null
 };
 
-export function ProductModal(props: {
+interface ProductModalProps extends React.ComponentProps<typeof Modal> {
     product?: ProductType;
     productId?: string | null;
     onProductChanged?: () => Promise<void>;
-} & React.ComponentProps<typeof Modal>) {
+}
+
+export function ProductModal(props: ProductModalProps) {
     const { restaurantId, restaurant } = useRestaurant();
     const initializedRef = useRef(false);
-
-
     const [loading, setLoading] = useState(false);
     const [product, setProduct] = useState<ProductType>(initialProductState);
-    const [products, setProducts] = useState<ProductType[]>(Array.isArray(restaurant?.products) ? restaurant.products : []);
     const [originalImage, setOriginalImage] = useState<ImageType | null>(null);
     const [imageState, setImageState] = useState<ImageState>(initialImageState);
-    const [newOption, setNewOption] = useState<ProductOptionsType>({ id: "", name: "", price: 0 });
+    const [newOption, setNewOption] = useState<ProductOptionsType>({
+        id: "",
+        name: "",
+        price: 0
+    });
     const [showOptionInputs, setShowOptionInputs] = useState(false);
     const [isActive, setIsActive] = useState(product.observationDisplay ?? false);
 
@@ -54,6 +58,7 @@ export function ProductModal(props: {
     }, [isActive]);
 
     const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
+    const products: ProductType[] = Array.isArray(restaurant?.products) ? restaurant.products : [];
 
     const resetForm = useCallback(() => {
         setProduct({
@@ -68,15 +73,12 @@ export function ProductModal(props: {
         const loadData = async () => {
             try {
                 setLoading(true);
-                setProducts(Array.isArray(restaurant?.products) ? restaurant.products : []);
                 if (!props.isOpen) {
                     initializedRef.current = false;
                     return;
                 }
                 if (props.productId) {
-                    const productData = products.length > 0
-                        ? products.find(p => p.id === props.productId) || null
-                        : null;
+                    const productData = products.find(p => p.id === props.productId) || null;
                     if (productData) {
                         setProduct(productData);
                         setOriginalImage(productData.image || null);
@@ -100,7 +102,7 @@ export function ProductModal(props: {
         };
 
         loadData();
-    }, [props.isOpen, props.productId, products, categories, resetForm]);
+    }, [props.isOpen, props.productId, products, resetForm]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -108,7 +110,7 @@ export function ProductModal(props: {
             setNewOption(prev => ({ ...prev, name: value }));
         } else if (name === "optionPrice") {
             const numeric = Number(value.replace(/\D/g, "")) / 100;
-            setNewOption(prev => ({ ...prev, addPrice: isNaN(numeric) ? 0 : numeric }));
+            setNewOption(prev => ({ ...prev, price: isNaN(numeric) ? 0 : numeric }));
         } else {
             setProduct(prev => ({
                 ...prev,
@@ -133,7 +135,14 @@ export function ProductModal(props: {
         }
         setProduct(prev => ({
             ...prev,
-            options: [...(prev.options || []), { ...newOption, price: Number(newOption.price) }]
+            options: [
+                ...(prev.options || []),
+                {
+                    id: newOption.id,
+                    name: newOption.name,
+                    price: newOption.price,
+                }
+            ]
         }));
         setNewOption({ id: "", name: "", price: 0 });
         setShowOptionInputs(false);
@@ -182,7 +191,7 @@ export function ProductModal(props: {
     };
 
     return (
-        <Modal id={props.id} onClose={props.onClose} isOpen={props.isOpen}>
+        <Modal id={props.id} onClose={props.onClose} isOpen={true}>
             {loading ? (
                 <div className="flex items-center justify-center min-h-2xl">
                     <LoadingPage />
@@ -241,7 +250,7 @@ export function ProductModal(props: {
                                 />
                             </div>
                         </div>
-                        <div className="flex items-center justify-between my-4 p-4 border bg-white rounded border-teal-500">
+                        <div className="flex items-center justify-between mb-2 p-4 border bg-white rounded border-teal-500">
                             <span className="text-teal-500 mr-2">
                                 Adicionar Campo Observação?
                             </span>
@@ -251,35 +260,44 @@ export function ProductModal(props: {
                             />
                         </div>
                         {showOptionInputs && (
-                            <div className="border rounded-md p-3 mb-2 border-teal-600 shadow">
-                                <div className="flex flex-col md:flex-row gap-2 mb-2">
-                                    <Input
-                                        id="product-option-name"
-                                        label="Nome do opcional"
-                                        name="optionName"
-                                        value={newOption.name}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full"
-                                    />
-                                </div>
-                                <div className="flex gap-2 items-end">
-                                    <Input
-                                        id="option-price"
-                                        label="Preço"
-                                        type="number"
-                                        name="optionPrice"
-                                        value={formatCurrencyBRL(newOption.price)}
-                                        onChange={handleChange}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="bg-teal-600 text-white px-4 py-2 rounded flex items-center hover:bg-teal-700"
-                                        onClick={handleAddOption}
-                                        title="Salvar opcional"
-                                    >
-                                        <FaSave />
-                                    </button>
+                            <div className="border bg-gray-100 rounded p-2 pt-4 border-teal-500">
+                                <Input
+                                    id="product-option-name"
+                                    label="Nome do opcional"
+                                    name="optionName"
+                                    value={newOption.name}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <div className="flex flex-row justify-center align-items-center gap-2">
+                                    <div className="flex-1">
+                                        <Input
+                                            id="option-price"
+                                            label="Preço"
+                                            name="optionPrice"
+                                            value={formatCurrencyBRL(newOption.price)}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    {newOption.name ? (
+                                        <button
+                                            type="button"
+                                            className="mb-2 p-3 bg-teal-500 text-white rounded hover:bg-teal-700"
+                                            onClick={handleAddOption}
+                                            title="Salvar opcional"
+                                        >
+                                            <FaSave className="text-2xl" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className="mb-2 bg-red-500 text-white p-3 rounded hover:bg-red-700"
+                                            onClick={() => setShowOptionInputs(false)}
+                                            title="Fechar opcional"
+                                        >
+                                            <FaTrash className="text-2xl" />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -297,7 +315,7 @@ export function ProductModal(props: {
                                 </ul>
                             </div>
                         )}
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 mt-2">
                             <ButtonOutline
                                 id="product-option-cancel"
                                 onClick={() => setShowOptionInputs(true)}

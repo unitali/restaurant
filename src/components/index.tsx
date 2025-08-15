@@ -18,7 +18,6 @@ export * from './PlanCard';
 export * from './ProductCard';
 export * from './ProductCarousel';
 export * from './ProductModal';
-export * from './ProductOption';
 export * from './ProductsTab';
 export * from './ProductTable';
 export * from './PublicHeader';

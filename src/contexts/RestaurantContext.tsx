@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { fetchRestaurantById } from "../services/restaurantsService";
+import { fetchRestaurantById } from "../hooks/restaurantsService";
 import type { RestaurantType } from "../types";
 
 interface RestaurantContextType {

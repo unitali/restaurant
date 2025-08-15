@@ -2,19 +2,17 @@ import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import type { CartItem } from "../types";
 
-const generateItemSignature = (item: CartItem): string => {
-    const sortedOptions = item.selectedOptions
-        ? [...item.selectedOptions].sort((a, b) => (a.price || 0) - (b.price || 0))
+const generateItemSignature = (product: CartItem): string => {
+    const sortedOptions = product.options
+        ? [...product.options].sort((a, b) => (a.id || "").localeCompare(b.id || ""))
         : [];
 
     const optionsString = sortedOptions
-        .map(opt => `${opt.id}:${opt.price}`)
+        .map(opt => `${opt.id}:${opt.quantity}`)
         .join(',');
 
-    return `${item.id}|obs:${item.observation || ''}|opts:${optionsString}`;
+    return `${product.productId}|obs:${product.observation || ''}|opts:${optionsString}`;
 };
-
-
 interface CartContextType {
     cart: CartItem[];
     total: number;
@@ -39,51 +37,66 @@ export function CartProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(CART_KEY, JSON.stringify(cart));
     }, [cart]);
 
-    const total = cart.reduce((grandTotal, item) => {
-        const optionsPricePerUnit = item.selectedOptions?.reduce((optionsSubtotal, option) => {
+    const total = cart.reduce((grandTotal, product) => {
+        const optionsPricePerUnit = product.options?.reduce((optionsSubtotal, option) => {
             return optionsSubtotal + (option.price * (option.quantity ?? 1));
         }, 0) ?? 0;
 
-        const singleItemPrice = item.price + optionsPricePerUnit;
-        const lineItemTotal = singleItemPrice * item.quantity;
+        const singleItemPrice = product.price + optionsPricePerUnit;
+        const lineItemTotal = singleItemPrice * product.quantity;
         return grandTotal + lineItemTotal;
     }, 0);
 
 
-    function addToCart(itemToAdd: CartItem) {
-        const signatureToAdd = generateItemSignature(itemToAdd);
+    function addToCart(productToAdd: CartItem) {
+        const signatureToAdd = generateItemSignature(productToAdd);
 
         setCart((prevCart) => {
             const existingItemIndex = prevCart.findIndex(
-                (item) => generateItemSignature(item) === signatureToAdd
+                (product) => generateItemSignature(product) === signatureToAdd
             );
+
             if (existingItemIndex > -1) {
                 const updatedCart = [...prevCart];
-                const existingItem = updatedCart[existingItemIndex];
+                const existingItem = { ...updatedCart[existingItemIndex] }; // Crie uma cópia para modificar
 
-                updatedCart[existingItemIndex] = {
-                    ...existingItem,
-                    quantity: existingItem.quantity + itemToAdd.quantity,
-                };
+                // 2. Some a quantidade principal
+                existingItem.quantity += productToAdd.quantity;
+
+                // 3. Some as quantidades dos opcionais
+                if (existingItem.options && productToAdd.options) {
+                    existingItem.options = existingItem.options.map(existingOpt => {
+                        const optionToAdd = productToAdd.options?.find(opt => opt.id === existingOpt.id);
+                        if (optionToAdd) {
+                            return {
+                                ...existingOpt,
+                                quantity: (existingOpt.quantity ?? 0) + (optionToAdd.quantity ?? 0)
+                            };
+                        }
+                        return existingOpt;
+                    });
+                }
+
+                updatedCart[existingItemIndex] = existingItem;
                 return updatedCart;
             } else {
-                return [...prevCart, itemToAdd];
+                return [...prevCart, productToAdd];
             }
         });
     }
 
-    function removeFromCart(cartItemId: string) {
+    function removeFromCart(productId: string) {
         setCart((prev) => {
-            const itemToRemove = prev.find(item => item.id === cartItemId);
+            const itemToRemove = prev.find(product => product.productId === productId);
 
             if (itemToRemove && itemToRemove.quantity > 1) {
-                return prev.map(item =>
-                    item.id === cartItemId
-                        ? { ...item, quantity: item.quantity - 1 }
-                        : item
+                return prev.map(product =>
+                    product.productId === productId
+                        ? { ...product, quantity: product.quantity - 1 }
+                        : product
                 );
             } else {
-                return prev.filter(item => item.id !== cartItemId);
+                return prev.filter(product => product.productId !== productId);
             }
         });
     }

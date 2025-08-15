@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useMemo, useState } from "react";
 import { ButtonPrimary, InputColor } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
-import { updateSettings } from "../services/settingsService";
+import { useSettings } from "../hooks/useSettings";
 import type { SettingsType } from "../types";
 
 const defaultSettings: SettingsType = {
@@ -12,7 +11,7 @@ const defaultSettings: SettingsType = {
     secondaryTextColor: "#000000",
 };
 
-function getValidSettings(settingsFromDb?: Partial<SettingsType>): SettingsType {
+function getValidSettings(settingsFromDb?: Partial<SettingsType> | null): SettingsType {
     return {
         ...defaultSettings,
         ...(settingsFromDb && Object.keys(settingsFromDb).length > 0 ? settingsFromDb : {}),
@@ -20,63 +19,60 @@ function getValidSettings(settingsFromDb?: Partial<SettingsType>): SettingsType 
 }
 
 export function Settings() {
-    const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
-    const [editSettings, setEditSettings] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [settings, setSettings] = useState<SettingsType>(
-        getValidSettings(restaurant?.settings)
-    );
+    const { restaurantId, refresh, loading: restaurantLoading, restaurant } = useRestaurant();
+    const {
+        loading: settingsLoading,
+        updateSettings
+    } = useSettings();
 
-    useEffect(() => {
-        setSettings(getValidSettings(restaurant?.settings));
-    }, [restaurant?.settings]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [formState, setFormState] = useState<SettingsType>(defaultSettings);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSettings({ ...settings, [e.target.name]: e.target.value });
+        setFormState({ ...formState, [e.target.name]: e.target.value });
     };
-
-    const isChanged =
-        editSettings &&
-        restaurant?.settings &&
-        settings &&
-        (
-            restaurant.settings.primaryColor !== settings.primaryColor ||
-            restaurant.settings.primaryTextColor !== settings.primaryTextColor ||
-            restaurant.settings.secondaryColor !== settings.secondaryColor ||
-            restaurant.settings.secondaryTextColor !== settings.secondaryTextColor
+    const isChanged = useMemo(() => {
+        if (!restaurant?.settings || !formState) return false;
+        const original = getValidSettings(restaurant.settings);
+        return (
+            original.primaryColor !== formState.primaryColor ||
+            original.primaryTextColor !== formState.primaryTextColor ||
+            original.secondaryColor !== formState.secondaryColor ||
+            original.secondaryTextColor !== formState.secondaryTextColor
         );
+    }, [formState, restaurant]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editSettings) {
-            setEditSettings(true);
-            setSettings(getValidSettings(restaurant?.settings));
+
+        if (!isEditing) {
+            setIsEditing(true);
             return;
         }
         if (!isChanged) {
-            setEditSettings(false);
-            setSettings(getValidSettings(restaurant?.settings));
+            setIsEditing(false);
+            setFormState(getValidSettings(restaurant?.settings));
             return;
         }
-        setLoading(true);
-        try {
-            await updateSettings(restaurantId, settings);
+        if (restaurantId) {
+            await updateSettings(formState);
             await refresh();
-            setEditSettings(false);
-            toast.success("Configurações de cores atualizadas!");
-        } catch (error) {
-            console.error("Erro ao atualizar configurações de cores:", error);
-            toast.error("Erro ao atualizar as configurações de cores.");
-        } finally {
-            setLoading(false);
+            setIsEditing(false);
         }
     };
 
+    const handleCancel = () => {
+        setIsEditing(false);
+        setFormState(getValidSettings(restaurant?.settings));
+    };
+
+    const totalLoading = settingsLoading || restaurantLoading;
+
     const buttonText = () => {
-        if (loading || restaurantLoading) return "Carregando...";
-        if (editSettings && !isChanged) return "Cancelar";
-        if (editSettings) return "Salvar";
-        return "Editar";
+        if (totalLoading) return "Carregando...";
+        if (isEditing && !isChanged) return "Cancelar";
+        if (isEditing) return "Salvar";
+        return "Editar Cores";
     };
 
     return (
@@ -84,53 +80,60 @@ export function Settings() {
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Configurações de Cores</h2>
             </div>
-            <form
-                onSubmit={handleSubmit}
-                className="flex flex-col gap-3"
-            >
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <InputColor
                     label="Cor Primária"
                     id="primary"
                     name="primaryColor"
-                    value={settings.primaryColor}
+                    value={formState.primaryColor}
                     onChange={handleChange}
-                    required
-                    disabled={!editSettings}
+                    disabled={!isEditing}
                 />
                 <InputColor
                     label="Texto Primário"
                     id="primary-text"
                     name="primaryTextColor"
-                    value={settings.primaryTextColor}
+                    value={formState.primaryTextColor}
                     onChange={handleChange}
-                    required
-                    disabled={!editSettings}
+                    disabled={!isEditing}
                 />
                 <InputColor
                     label="Cor Secundária"
                     id="secondary-color"
                     name="secondaryColor"
-                    value={settings.secondaryColor}
+                    value={formState.secondaryColor}
                     onChange={handleChange}
-                    required
-                    disabled={!editSettings}
+                    disabled={!isEditing}
                 />
                 <InputColor
                     label="Texto Secundário"
                     id="secondary-text-color"
                     name="secondaryTextColor"
-                    value={settings.secondaryTextColor}
+                    value={formState.secondaryTextColor}
                     onChange={handleChange}
-                    required
-                    disabled={!editSettings}
+                    disabled={!isEditing}
                 />
-                <ButtonPrimary
-                    id={editSettings ? (isChanged ? "save-settings" : "cancel-settings") : "edit-settings"}
-                    type="submit"
-                    disabled={loading || restaurantLoading}
-                >
-                    {buttonText()}
-                </ButtonPrimary>
+                <div className="flex gap-2 mt-2">
+                    {isEditing && (
+                        <ButtonPrimary
+                            id="cancel-settings"
+                            type="button"
+                            onClick={handleCancel}
+                            className="bg-gray-500 hover:bg-gray-600 flex-1"
+                            disabled={totalLoading}
+                        >
+                            Cancelar
+                        </ButtonPrimary>
+                    )}
+                    <ButtonPrimary
+                        id={isEditing ? (isChanged ? "save-settings" : "cancel-settings") : "edit-settings"}
+                        type="submit"
+                        className="flex-1"
+                        disabled={totalLoading}
+                    >
+                        {buttonText()}
+                    </ButtonPrimary>
+                </div>
             </form>
         </div>
     );

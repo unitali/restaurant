@@ -39,12 +39,12 @@ export interface ImageState {
 }
 
 export interface CartItem {
-    id: string;
+    productId: string;
     name: string;
     price: number;
     quantity: number;
     observation?: string;
-    selectedOptions?: ProductOptionsType[];
+    options?: ProductOptionsType[];
 }
 export interface ProductType {
     id?: string;

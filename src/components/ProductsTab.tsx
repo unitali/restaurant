@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { ButtonPrimary, ConfirmModal, Input, ProductModal, ProductTable, Select } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { LoadingPage } from "../pages/LoadingPage";
-import { deleteProduct } from "../services/productsService";
+import { deleteProduct } from "../hooks/productsService";
 import type { CategoryType, ProductType } from "../types";
 
 export function ProductsTab() {

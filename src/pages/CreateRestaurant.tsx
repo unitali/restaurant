@@ -7,7 +7,7 @@ import { ButtonPrimary, Input } from "../components";
 import { HeaderPublic } from "../components/PublicHeader";
 import { db } from "../config/firebase";
 import { webRoutes } from "../routes";
-import { createRestaurant } from "../services/restaurantsService";
+import { createRestaurant } from "../hooks/restaurantsService";
 import type { CompanyType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";

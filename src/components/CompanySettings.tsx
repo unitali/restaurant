@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ButtonPrimary, ImageUpload, Input, LabelCopy } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
-import { updateImage } from "../services/imagesServices";
-import { updateRestaurant } from "../services/restaurantsService";
+import { updateImage } from "../hooks/imagesServices";
+import { updateRestaurant } from "../hooks/restaurantsService";
 import type { CompanyType, ImageState } from "../types";
 
 export function CompanySettings() {
