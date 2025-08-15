@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ButtonPrimary, Input, Modal, TextArea, type ModalProps } from ".";
-import { LoadingPage } from "../pages/LoadingPage";
-import { addCategory, updateCategory } from "../hooks/categoriesService";
-import type { CategoryType } from "../types";
 import { useRestaurant } from "../contexts/RestaurantContext";
+import { useCategories } from "../hooks/useCategories";
+import { LoadingPage } from "../pages/LoadingPage";
+import type { CategoryType } from "../types";
 
 interface CategoryModalProps extends ModalProps {
     restaurantId: string;
@@ -18,6 +18,7 @@ const initialCategoryState: CategoryType = {
 };
 
 export function CategoryModal({ ...props }: CategoryModalProps) {
+    const { addCategory, updateCategory } = useCategories();
     const [category, setCategory] = useState<CategoryType>(initialCategoryState);
     const [loading, setLoading] = useState(false);
     const { refresh } = useRestaurant();

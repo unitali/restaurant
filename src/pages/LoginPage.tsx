@@ -1,22 +1,22 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary, Input } from "../components";
 import { HeaderPublic } from "../components/PublicHeader";
-import { handleEmailLogin, handleGoogleLogin } from "../hooks/loginServices";
+import { useAuth } from "../hooks/useAuth";
 import type { UserType } from "../types";
 import { LoadingPage } from "./LoadingPage";
 
 export function LoginPage() {
+    const { loginWithEmail, loginWithGoogle } = useAuth();
+
     const [user, setUser] = useState<UserType | null>(null);
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
         try {
-            await handleEmailLogin({ email: user?.email || "", password: user?.password || "" }, navigate);
+            await loginWithEmail({ email: user?.email || "", password: user?.password || "" });
         } catch (err: any) {
             toast.error("E-mail ou senha inválidos.");
         } finally {
@@ -57,7 +57,7 @@ export function LoginPage() {
                         <hr className="my-4 text-gray-300" />
                         <ButtonOutline
                             id="google-login"
-                            className="w-full" onClick={() => handleGoogleLogin(navigate)}
+                            className="w-full" onClick={() => loginWithGoogle()}
                             children="Acessar com Google"
                         />
                     </div>

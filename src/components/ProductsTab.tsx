@@ -3,11 +3,12 @@ import { toast } from "react-toastify";
 import { ButtonPrimary, ConfirmModal, Input, ProductModal, ProductTable, Select } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { LoadingPage } from "../pages/LoadingPage";
-import { deleteProduct } from "../hooks/productsService";
+import { useProducts } from "../hooks/useProducts";
 import type { CategoryType, ProductType } from "../types";
 
 export function ProductsTab() {
     const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
+    const { deleteProduct } = useProducts();
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
     const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
@@ -111,7 +112,7 @@ export function ProductsTab() {
                             id="product-modal"
                             isOpen={isOpenModalProduct}
                             onClose={() => setIsOpenModalProduct(false)}
-                            onProductChanged={refresh}
+                            onProductChanged={async () => { refresh(); }}
                             productId={productSelected}
                         />
                     )}

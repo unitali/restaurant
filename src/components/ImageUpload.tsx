@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCamera, FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { validateImageFile } from '../hooks/imagesServices';
+import { useImages } from '../hooks/useImages';
 import type { ImageState } from '../types';
 interface ImageUploadProps {
     id: string;
@@ -16,7 +16,10 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload(props: ImageUploadProps) {
+    const { validateImageFile } = useImages();
+
     const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [originalPreview, setOriginalPreview] = useState<string | null>(props.initialUrl || props.value || null);
     const [preview, setPreview] = useState<string | null>(props.initialUrl || props.value || null);
     const [touched, setTouched] = useState(false);

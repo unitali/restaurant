@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import { ButtonPrimary, Input } from "../components";
 import { HeaderPublic } from "../components/PublicHeader";
 import { db } from "../config/firebase";
+import { useRestaurants } from "../hooks/useRestaurants";
 import { webRoutes } from "../routes";
-import { createRestaurant } from "../hooks/restaurantsService";
 import type { CompanyType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";
@@ -34,6 +34,7 @@ const userInitialState: UserType = {
 
 
 export function CreateRestaurant() {
+    const { createRestaurant } = useRestaurants();
     const [restaurant, setRestaurant] = useState<CompanyType>(restaurantInitialState);
     const [userAdmin, setUserAdmin] = useState<UserType>(userInitialState);
     const [loading, setLoading] = useState(false);

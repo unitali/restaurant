@@ -3,9 +3,9 @@ import { FaSave, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary, ImageUpload, Input, Modal, Select, Switch } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
+import { useImages } from '../hooks/useImages';
+import { useProducts } from "../hooks/useProducts";
 import { LoadingPage } from "../pages/LoadingPage";
-import { updateImage } from '../hooks/imagesServices';
-import { addProduct, updateProduct } from "../hooks/productsService";
 import type { CategoryType, ImageState, ImageType, ProductOptionsType, ProductType } from '../types';
 import { formatCurrencyBRL } from "../utils/currency";
 
@@ -37,6 +37,9 @@ interface ProductModalProps extends React.ComponentProps<typeof Modal> {
 
 export function ProductModal(props: ProductModalProps) {
     const { restaurantId, restaurant } = useRestaurant();
+    const { addProduct, updateProduct } = useProducts();
+    const { updateImage } = useImages();
+
     const initializedRef = useRef(false);
     const [loading, setLoading] = useState(false);
     const [product, setProduct] = useState<ProductType>(initialProductState);
@@ -160,7 +163,17 @@ export function ProductModal(props: ProductModalProps) {
                         oldImagePath: originalImage?.path,
                         restaurantId
                     });
-                    productToSave.image = { ...imageResult };
+                    productToSave.image = imageResult
+                        ? {
+                            path: imageResult.path ?? "",
+                            url: imageResult.url ?? "",
+                            imageId: imageResult.imageId ?? ""
+                        }
+                        : {
+                            path: "",
+                            url: "",
+                            imageId: ""
+                        };
                 } else if (imageState.removed && originalImage?.path) {
                     await updateImage({ oldImagePath: originalImage.path, restaurantId, file: new File([""], "dummy.txt") });
                     productToSave.image = null;

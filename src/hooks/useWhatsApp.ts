@@ -3,15 +3,14 @@ import { toast } from 'react-toastify';
 import { useCart } from '../contexts/CartContext';
 import { useRestaurant } from '../contexts/RestaurantContext';
 import { formatCurrencyBRL } from '../utils/currency';
-import { today } from '../utils/date';
 
 
 export function useWhatsApp() {
     const [loading, setLoading] = useState(false);
-    const { cart, total, clearCart } = useCart();
+    const { cart, total } = useCart();
     const { restaurant } = useRestaurant();
 
-    const sendOrder = useCallback(async () => {
+    const sendOrder = useCallback(async (orderNumber: string) => {
         if (!restaurant) {
             toast.error("Dados do restaurante não encontrados.");
             return;
@@ -24,9 +23,7 @@ export function useWhatsApp() {
         setLoading(true);
 
         try {
-            const now = today();
-            const orderNumber = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${Math.floor(Math.random() * 9000 + 1000)}`;
-            const itemsMsg = cart
+             const itemsMsg = cart
                 .map((product, index) => {
                     const optionsTotalPerUnit = product.options?.reduce(
                         (acc, opt) => acc + (opt.price * (opt.quantity ?? 1)),
@@ -46,12 +43,12 @@ export function useWhatsApp() {
                         : "";
 
                     return (
-                        `${index + 1}. *${product.name}*\n` +
+                        `${index + 1}. ${product.name}\n` +
                         `  Quantidade: ${product.quantity}\n` +
                         `  Preço: ${formatCurrencyBRL(product.price)}\n` +
                         optionsString +
                         observationString +
-                        `  Subtotal: *${formatCurrencyBRL(lineSubtotal)}*\n` +
+                        `  Subtotal: ${formatCurrencyBRL(lineSubtotal)}\n` +
                         `${"-".repeat(30)}`
                     );
                 })
@@ -65,8 +62,6 @@ export function useWhatsApp() {
 
             const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
             window.open(url, "_blank");
-            clearCart();
-
         } catch (error) {
             console.error("Erro ao enviar pedido via WhatsApp:", error);
             toast.error("Não foi possível preparar a mensagem para o WhatsApp.");
@@ -74,7 +69,7 @@ export function useWhatsApp() {
             setLoading(false);
         }
 
-    }, [cart, total, restaurant, clearCart]);
+    }, [cart, total, restaurant ]);
 
     return { sendOrder, loading };
 }

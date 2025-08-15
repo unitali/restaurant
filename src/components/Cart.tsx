@@ -1,8 +1,10 @@
 import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus } from ".";
 import { useCart } from "../contexts/CartContext";
-import { useWhatsApp } from "../hooks/useWhatsApp";
+import { useRestaurant } from "../contexts/RestaurantContext";
+import { useOrders } from "../hooks/useOrders";
 import { LoadingPage } from "../pages/LoadingPage";
 import { formatCurrencyBRL } from "../utils/currency";
+import { createOrderNumber } from "../utils/orderNumber";
 
 interface CartProps {
     isOpen: boolean;
@@ -10,13 +12,23 @@ interface CartProps {
 }
 
 export function Cart({ isOpen, onClose }: CartProps) {
-    const { cart, removeFromCart, addToCart, total } = useCart();
-    const { sendOrder, loading } = useWhatsApp();
+    const { cart, removeFromCart, addToCart, total, clearCart } = useCart();
+    const { restaurantId } = useRestaurant();
+    const { createOrder, loading } = useOrders();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await sendOrder();
-        if (cart.length > 0) {
+        const orderNumber = createOrderNumber();
+
+        const orderId = await createOrder({
+            restaurantId,
+            cart,
+            total,
+            orderNumber,
+        });
+
+        if (orderId) {
+            clearCart();
             onClose();
         }
     };
@@ -42,29 +54,44 @@ export function Cart({ isOpen, onClose }: CartProps) {
                                 key={`product-${index}`}
                                 className="bg-white rounded-lg shadowflex p-5 flex-col gap-1 border border-gray-100 w-full"
                             >
-                                <div className="font-bold text-base mb-1">{product.name}</div>
-                                {product.observation && <p className="text-sm text-gray-500 pl-2">Obs: {product.observation}</p>}
+                                <div className="font-bold text-base mb-1">
+                                    {product.name}
+                                </div>
+                                {product.observation && (
+                                    <p className="text-sm text-gray-500 pl-2">
+                                        Obs: {product.observation}
+                                    </p>
+                                )}
                                 {product.options && product.options.length > 0 && (
                                     <ul className="text-sm text-gray-500 pl-2">
-                                        {product.options.map((option) => (
-                                            <li key={option.id}>- {option.quantity}x {option.name} (+{formatCurrencyBRL(option.price)})</li>
+                                        {product.options.map((option, index) => (
+                                            <li key={`option-${index}`}>
+                                                - {option.quantity}x {option.name} (
+                                                {formatCurrencyBRL(option.price)})
+                                            </li>
                                         ))}
                                     </ul>
                                 )}
                                 <div className="flex items-center gap-2 w-full mt-2">
                                     <ButtonPrimaryMinus
-                                        id={`remove-item-${product.productId}`}
+                                        id={`remove-item-${index}`}
                                         onClick={() => removeFromCart(product.productId!)}
                                         quantity={product.quantity}
                                     />
                                     <span className="font-semibold">{product.quantity}</span>
                                     <ButtonPrimaryPlus
-                                        id={`add-item-${product.productId}`}
+                                        id={`add-item-${index}`}
                                         onClick={() => addToCart({ ...product, quantity: 1 })}
                                     />
                                     <span className="ml-3 text-green-700 font-bold flex-1 text-right">
                                         {formatCurrencyBRL(
-                                            (product.price + (product.options?.reduce((acc, opt) => acc + (opt.price * (opt.quantity ?? 1)), 0) ?? 0)) * product.quantity
+                                            (product.price +
+                                                (product.options?.reduce(
+                                                    (acc, opt) =>
+                                                        acc + opt.price * (opt.quantity ?? 1),
+                                                    0
+                                                ) ?? 0)) *
+                                                product.quantity
                                         )}
                                     </span>
                                 </div>

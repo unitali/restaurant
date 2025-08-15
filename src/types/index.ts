@@ -1,3 +1,4 @@
+
 export interface CategoryType {
     id?: string;
     name: string;
@@ -72,10 +73,22 @@ export interface PlanType {
 }
 
 export interface RestaurantType {
+    id?: string;
     company: CompanyType;
-    categories: CategoryType;
+    categories: CategoryType[];
     settings: SettingsType;
-    products: ProductType;
+    products: ProductType[];
+    orders: OrderType[];
+}
+
+export interface OrderType {
+    id?: string;
+    orderNumber: string;
+    items: CartItem[];
+    total: number;
+    status: "pending" | "inProgress" | "completed" | "canceled";
+    createdAt: Date;
+    updatedAt?: Date;
 }
 
 export interface SettingsType {

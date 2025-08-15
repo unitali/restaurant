@@ -1,11 +1,10 @@
 import { FaSignOutAlt, FaUtensils } from 'react-icons/fa';
-import { useNavigate } from "react-router-dom";
 import { useRestaurant } from '../contexts/RestaurantContext';
-import { handleLogout } from '../hooks/loginServices';
+import { useAuth } from '../hooks/useAuth';
 
 export function HeaderAdmin() {
     const { restaurantId, restaurant } = useRestaurant();
-    const navigate = useNavigate();
+    const { logout } = useAuth();
 
     const handleMenuPage = () => {
         if (restaurantId) {
@@ -26,7 +25,7 @@ export function HeaderAdmin() {
                     title='Ir para o Cardápio'
                 />
                 <FaSignOutAlt
-                    onClick={() => handleLogout(navigate)}
+                    onClick={logout}
                     className="text-white cursor-pointer"
                     size={20}
                     title='Sair'

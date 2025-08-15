@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ButtonPrimary, ImageUpload, Input, LabelCopy } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
-import { updateImage } from "../hooks/imagesServices";
-import { updateRestaurant } from "../hooks/restaurantsService";
+import { useImages } from "../hooks/useImages";
+import { useRestaurants as useRestaurantsManager } from "../hooks/useRestaurants";
 import type { CompanyType, ImageState } from "../types";
 
 export function CompanySettings() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
+    const { updateRestaurantCompany, loading: updateLoading } = useRestaurantsManager();
+    const { updateImage } = useImages();
+
     const [editCompany, setEditCompany] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [formRestaurant, setFormRestaurant] = useState<CompanyType | null>(null);
     const [bannerImageState, setBannerImageState] = useState<ImageState>({
         file: null,
@@ -65,9 +67,13 @@ export function CompanySettings() {
             setFormRestaurant(restaurant?.company ?? null);
             return;
         }
-        setLoading(true);
+
         try {
-            let updatedCompany: CompanyType = { ...(formRestaurant as CompanyType) };
+            let updatedCompany: Partial<CompanyType> = {
+                name: formRestaurant?.name,
+                address: formRestaurant?.address,
+                phone: formRestaurant?.phone,
+            };
 
             if (bannerImageState.dirty) {
                 if (bannerImageState.file) {
@@ -96,27 +102,24 @@ export function CompanySettings() {
                 }
             }
 
-            // Remove undefined fields (garantia extra)
             (Object.keys(updatedCompany) as (keyof CompanyType)[]).forEach(key => {
                 if (updatedCompany[key] === undefined) {
                     delete updatedCompany[key];
                 }
             });
 
-            await updateRestaurant(restaurantId, updatedCompany);
+            await updateRestaurantCompany(updatedCompany);
             await refresh();
             setEditCompany(false);
             toast.success("Dados da empresa atualizados com sucesso!");
         } catch (error) {
             console.error("Erro ao atualizar os dados da empresa:", error);
             toast.error("Erro ao atualizar os dados da empresa.");
-        } finally {
-            setLoading(false);
         }
     };
 
     const buttonText = () => {
-        if (loading || restaurantLoading) return "Carregando...";
+        if (updateLoading || restaurantLoading) return "Carregando...";
         if (editCompany && !(isChanged || bannerImageState.dirty || logoImageState.dirty)) return "Cancelar";
         if (editCompany) return "Salvar";
         return "Editar";
@@ -138,7 +141,7 @@ export function CompanySettings() {
                     required
                     value={editCompany ? formRestaurant?.name || "" : restaurant?.company?.name || ""}
                     onChange={handleChange}
-                    disabled={!editCompany || loading || restaurantLoading}
+                    disabled={!editCompany || updateLoading || restaurantLoading}
                 />
                 <Input
                     id="company-address"
@@ -147,7 +150,7 @@ export function CompanySettings() {
                     required
                     value={editCompany ? formRestaurant?.address || "" : restaurant?.company?.address || ""}
                     onChange={handleChange}
-                    disabled={!editCompany || loading || restaurantLoading}
+                    disabled={!editCompany || updateLoading || restaurantLoading}
                 />
                 <Input
                     id="company-phone"
@@ -156,7 +159,7 @@ export function CompanySettings() {
                     required
                     value={editCompany ? formRestaurant?.phone || "" : restaurant?.company?.phone || ""}
                     onChange={handleChange}
-                    disabled={!editCompany || loading || restaurantLoading}
+                    disabled={!editCompany || updateLoading || restaurantLoading}
                 />
                 <ImageUpload
                     id="banner-image"
@@ -164,7 +167,7 @@ export function CompanySettings() {
                     required={false}
                     initialUrl={restaurant?.company.banner?.url || null}
                     onStateChange={setBannerImageState}
-                    disabled={!editCompany || loading || restaurantLoading}
+                    disabled={!editCompany || updateLoading || restaurantLoading}
                 />
                 <ImageUpload
                     id="logo-image"
@@ -172,12 +175,12 @@ export function CompanySettings() {
                     required={false}
                     initialUrl={restaurant?.company.logo?.url || null}
                     onStateChange={setLogoImageState}
-                    disabled={!editCompany || loading || restaurantLoading}
+                    disabled={!editCompany || updateLoading || restaurantLoading}
                 />
                 <ButtonPrimary
                     id={editCompany ? (isChanged ? "save-company" : "cancel-company") : "edit-company"}
                     type="submit"
-                    disabled={loading || restaurantLoading}
+                    disabled={updateLoading || restaurantLoading}
                 >
                     {buttonText()}
                 </ButtonPrimary>
@@ -186,7 +189,7 @@ export function CompanySettings() {
                     label="Link do Cardapio"
                     name="menuLink"
                     value={restaurant?.company?.shortUrlMenu || ""}
-                    disabled={!editCompany || loading || restaurantLoading}
+                    disabled={!editCompany || updateLoading || restaurantLoading}
                 />
             </form>
         </section>
