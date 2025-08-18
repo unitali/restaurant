@@ -1,37 +1,52 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary, Input } from "../components";
 import { HeaderPublic } from "../components/PublicHeader";
 import { useAuth } from "../hooks/useAuth";
+import { webRoutes } from "../routes";
 import type { UserType } from "../types";
 import { LoadingPage } from "./LoadingPage";
 
 export function LoginPage() {
     const { loginWithEmail, loginWithGoogle } = useAuth();
+    const navigate = useNavigate();
 
     const [user, setUser] = useState<UserType | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
+    const handleLogin = async (email: string, password: string) => {
+        setIsLoading(true);
         try {
-            await loginWithEmail({ email: user?.email || "", password: user?.password || "" });
+            await loginWithEmail({ email, password });
+            navigate(webRoutes.admin);
         } catch (err: any) {
             toast.error("E-mail ou senha inválidos.");
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
-    }
+    };
+
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+        try {
+            await loginWithGoogle();
+            navigate(webRoutes.admin);
+        } catch (err: any) {
+            toast.error("Erro ao fazer login com Google.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
             <HeaderPublic />
             <main className="flex justify-center items-center min-h-screen">
-                {loading ? <LoadingPage /> : (
+                {isLoading ? <LoadingPage /> : (
                     <div className="w-full max-w-md bg-white p-8 rounded shadow">
                         <h2 className="text-xl font-bold mb-6">Acessar a Aplicação</h2>
-                        <form className="space-y-4" onSubmit={handleSubmit}>
+                        <form className="space-y-4" onSubmit={e => { e.preventDefault(); handleLogin(user?.email || "", user?.password || ""); }}>
                             <Input
                                 id="email"
                                 type="email"
@@ -57,7 +72,7 @@ export function LoginPage() {
                         <hr className="my-4 text-gray-300" />
                         <ButtonOutline
                             id="google-login"
-                            className="w-full" onClick={() => loginWithGoogle()}
+                            className="w-full" onClick={handleGoogleLogin}
                             children="Acessar com Google"
                         />
                     </div>

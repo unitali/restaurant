@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ImageUpload, Input, LabelCopy } from ".";
+import { ButtonOutline, ButtonPrimary, ImageUpload, Input, LabelCopy } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useImages } from "../hooks/useImages";
 import { useRestaurants as useRestaurantsManager } from "../hooks/useRestaurants";
 import type { CompanyType, ImageState } from "../types";
+import { getShortUrl } from "../utils/shortUrl";
 
 export function CompanySettings() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
@@ -88,7 +89,6 @@ export function CompanySettings() {
                 }
             }
 
-            // Logo
             if (logoImageState.dirty) {
                 if (logoImageState.file) {
                     const logoImage = await updateImage({
@@ -108,13 +108,26 @@ export function CompanySettings() {
                 }
             });
 
-            await updateRestaurantCompany(updatedCompany);
+            await updateRestaurantCompany(restaurantId, updatedCompany);
             await refresh();
             setEditCompany(false);
             toast.success("Dados da empresa atualizados com sucesso!");
         } catch (error) {
             console.error("Erro ao atualizar os dados da empresa:", error);
             toast.error("Erro ao atualizar os dados da empresa.");
+        }
+    };
+
+    const handleCreateShortUrl = async () => {
+        if (!restaurant) return;
+        try {
+            const shortUrl = await getShortUrl(restaurantId);
+            await updateRestaurantCompany(restaurantId, { shortUrlMenu: shortUrl });
+            refresh();
+            toast.success("Link do cardápio criado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao criar link do cardápio:", error);
+            toast.error("Erro ao criar link do cardápio.");
         }
     };
 
@@ -184,13 +197,21 @@ export function CompanySettings() {
                 >
                     {buttonText()}
                 </ButtonPrimary>
-                <LabelCopy
-                    id="link-menu"
-                    label="Link do Cardapio"
-                    name="menuLink"
-                    value={restaurant?.company?.shortUrlMenu || ""}
-                    disabled={!editCompany || updateLoading || restaurantLoading}
-                />
+                {restaurant?.company?.shortUrlMenu ? (
+                    <LabelCopy
+                        id="link-menu"
+                        label="Link do Cardapio"
+                        name="menuLink"
+                        value={restaurant?.company?.shortUrlMenu}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                    />
+                ) : (
+                    <ButtonOutline
+                        id="create-menu-link"
+                        children="Criar Link do Cardápio"
+                        onClick={handleCreateShortUrl}
+                    />
+                )}
             </form>
         </section>
     );

@@ -1,13 +1,7 @@
-import { createUserWithEmailAndPassword, deleteUser, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { ButtonPrimary, Input } from "../components";
 import { HeaderPublic } from "../components/PublicHeader";
-import { db } from "../config/firebase";
 import { useRestaurants } from "../hooks/useRestaurants";
-import { webRoutes } from "../routes";
 import type { CompanyType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";
@@ -34,83 +28,20 @@ const userInitialState: UserType = {
 
 
 export function CreateRestaurant() {
-    const { createRestaurant } = useRestaurants();
+    const { createRestaurantWithAdmin, loading } = useRestaurants();
     const [restaurant, setRestaurant] = useState<CompanyType>(restaurantInitialState);
     const [userAdmin, setUserAdmin] = useState<UserType>(userInitialState);
-    const [loading, setLoading] = useState(false);
-    const auth = getAuth();
-    const navigate = useNavigate();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setLoading(true);
-        let createdUser = null;
-        try {
-
-            if (userAdmin.password !== userAdmin.confirmPassword) {
-                toast.error("As senhas não coincidem");
-                return;
+        await createRestaurantWithAdmin(
+            restaurant,
+            userAdmin,
+            () => {
+                setRestaurant(restaurantInitialState);
+                setUserAdmin(userInitialState);
             }
-
-            if (!restaurant.name || !restaurant.address || !restaurant.phone) {
-                toast.error("Preencha todos os campos do restaurante");
-                return;
-            }
-            if (!userAdmin.email || !userAdmin.password) {
-                toast.error("Preencha todos os campos do admin");
-                return;
-            }
-
-            if (userAdmin.password.length < 6) {
-                toast.error("A senha deve ter pelo menos 6 caracteres");
-                return;
-            }
-
-            const userExists = await fetchSignInMethodsForEmail(auth, userAdmin.email);
-            if (userExists.length > 0) {
-                toast.error("E-mail já cadastrado");
-                setLoading(false);
-                return;
-            }
-
-            const restaurantData = {
-                ...restaurant,
-                createdAt: today(),
-                expiredAt: plusDays(today(), 15),
-            };
-
-            const result = await createUserWithEmailAndPassword(auth, userAdmin.email, userAdmin.password!);
-            createdUser = result.user;
-
-            const restaurantId = await createRestaurant(restaurantData);
-
-            await setDoc(doc(db, "users", createdUser.uid), {
-                email: userAdmin.email,
-                profile: userAdmin.profile,
-                restaurantId,
-            });
-
-            toast.success("Restaurante e usuário criados com sucesso!");
-            setRestaurant(restaurantInitialState);
-            setUserAdmin(userInitialState);
-            navigate(webRoutes.admin, { replace: true });
-        } catch (err: any) {
-            if (createdUser) {
-                try {
-                    await deleteUser(createdUser);
-                } catch (deleteErr) {
-                    console.error("Erro ao remover usuário do Auth:", deleteErr);
-                }
-            }
-            if (err.code === "auth/email-already-in-use") {
-                toast.error("E-mail já cadastrado");
-            } else {
-                console.error("Erro ao criar restaurante ou admin:", err);
-                toast.error("Erro ao criar restaurante ou admin");
-            }
-        } finally {
-            setLoading(false);
-        }
+        );
     }
     return (
         <>

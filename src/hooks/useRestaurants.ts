@@ -1,10 +1,13 @@
-import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, deleteUser, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
+import { addDoc, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { db } from "../config/firebase";
-import type { CompanyType, RestaurantType } from "../types";
-import { today } from "../utils/date";
-import { getShortUrl } from "../utils/shortUrl";
+import { webRoutes } from "../routes";
+import type { CompanyType, RestaurantType, UserType } from "../types";
+import { plusDays, today } from "../utils/date";
+
 
 export function useRestaurants() {
     const [restaurants, setRestaurants] = useState<RestaurantType[]>([]);
@@ -20,14 +23,12 @@ export function useRestaurants() {
             const fetchedRestaurants = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as RestaurantType));
             setRestaurants(fetchedRestaurants);
         } catch (err) {
-            console.error("Erro ao buscar restaurantes:", err);
             setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
             toast.error("Não foi possível carregar os restaurantes.");
         } finally {
             setLoading(false);
         }
     }, []);
-
 
     const fetchRestaurantById = useCallback(async (restaurantId: string) => {
         if (!restaurantId) return null;
@@ -45,7 +46,6 @@ export function useRestaurants() {
                 throw new Error("Restaurante não encontrado");
             }
         } catch (err) {
-            console.error("Erro ao buscar restaurante por ID:", err);
             setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
             toast.error("Não foi possível carregar os dados do restaurante.");
             return null;
@@ -76,17 +76,10 @@ export function useRestaurants() {
             };
 
             const docRef = await addDoc(collection(db, "restaurants"), data);
-            const menuUrl = await getShortUrl(docRef.id);
-
-            if (menuUrl) {
-                await updateDoc(docRef, { "company.shortUrlMenu": menuUrl });
-            }
-
             toast.success("Restaurante criado com sucesso!");
             return docRef.id;
 
         } catch (err) {
-            console.error("Erro ao criar restaurante:", err);
             setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
             toast.error("Não foi possível criar o restaurante.");
             return null;
@@ -95,24 +88,94 @@ export function useRestaurants() {
         }
     }, []);
 
-    const updateRestaurantCompany = useCallback(async (data: Partial<CompanyType>) => {
-        if (!currentRestaurant?.id) return;
+    const createRestaurantWithAdmin = useCallback(
+        async (
+            restaurant: CompanyType,
+            userAdmin: UserType,
+            onSuccess?: () => void,
+            onError?: (err: any) => void
+        ) => {
+            setLoading(true);
+                const navigate = useNavigate();
+            let createdUser = null;
+            try {
+                if (userAdmin.password !== userAdmin.confirmPassword) {
+                    toast.error("As senhas não coincidem");
+                    return;
+                }
+                if (!restaurant.name || !restaurant.address || !restaurant.phone) {
+                    toast.error("Preencha todos os campos do restaurante");
+                    return;
+                }
+                if (!userAdmin.email || !userAdmin.password) {
+                    toast.error("Preencha todos os campos do admin");
+                    return;
+                }
+                if (userAdmin.password.length < 6) {
+                    toast.error("A senha deve ter pelo menos 6 caracteres");
+                    return;
+                }
+                const auth = getAuth();
+                const userExists = await fetchSignInMethodsForEmail(auth, userAdmin.email);
+                if (userExists.length > 0) {
+                    toast.error("E-mail já cadastrado");
+                    return;
+                }
+                const restaurantData = {
+                    ...restaurant,
+                    createdAt: today(),
+                    expiredAt: plusDays(today(), 15),
+                };
+                const result = await createUserWithEmailAndPassword(auth, userAdmin.email, userAdmin.password!);
+                createdUser = result.user;
+                const restaurantId = await createRestaurant(restaurantData);
+                if (!restaurantId) throw new Error("Erro ao criar restaurante.");
+                await setDoc(doc(db, "users", createdUser.uid), {
+                    email: userAdmin.email,
+                    profile: userAdmin.profile,
+                    restaurantId,
+                });
+                toast.success("Restaurante e usuário criados com sucesso!");
+                navigate(webRoutes.admin, { replace: true });
+
+                if (onSuccess) onSuccess();
+            } catch (err: any) {
+                if (createdUser) {
+                    try {
+                        await deleteUser(createdUser);
+                    } catch (deleteErr) {
+                        console.error("Erro ao remover usuário do Auth:", deleteErr);
+                    }
+                }
+                if (err.code === "auth/email-already-in-use") {
+                    toast.error("E-mail já cadastrado");
+                } else {
+                    toast.error("Erro ao criar restaurante ou admin");
+                }
+                if (onError) onError(err);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [createRestaurant]
+    );
+
+    const updateRestaurantCompany = useCallback(async (restaurantId: string, data: Partial<CompanyType>) => {
         setLoading(true);
         setError(null);
         try {
-            const restaurantRef = doc(db, "restaurants", currentRestaurant.id);
-            const companyDataToUpdate = { ...data, updatedAt: today() };
+            const restaurantRef = doc(db, "restaurants", restaurantId);
             const updatePayload: { [key: string]: any } = {};
-            for (const [key, value] of Object.entries(companyDataToUpdate)) {
+            for (const [key, value] of Object.entries(data)) {
                 updatePayload[`company.${key}`] = value;
             }
-
             await updateDoc(restaurantRef, updatePayload);
-            setCurrentRestaurant(prev => prev ? { ...prev, company: { ...prev.company, ...companyDataToUpdate } } : null);
+            setCurrentRestaurant(prev => prev
+                ? { ...prev, company: { ...prev.company, ...data } }
+                : null
+            );
             toast.success("Dados do restaurante atualizados!");
-
         } catch (err) {
-            console.error("Erro ao atualizar restaurante:", err);
             setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
             toast.error("Não foi possível atualizar os dados.");
         } finally {
@@ -128,6 +191,7 @@ export function useRestaurants() {
         fetchAllRestaurants,
         fetchRestaurantById,
         createRestaurant,
+        createRestaurantWithAdmin,
         updateRestaurantCompany,
     };
 }

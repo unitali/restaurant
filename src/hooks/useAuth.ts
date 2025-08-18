@@ -72,57 +72,68 @@ export function useAuth() {
         return () => unsubscribe();
     }, []);
 
-    const loginWithEmail = useCallback(async ({ email, password }: { email: string; password: string }): Promise<DocumentSnapshot | null> => {
-        setLoading(true);
-        setError(null);
-        const auth = getAuth();
-        try {
-            const res = await signInWithEmailAndPassword(auth, email, password);
-            const doc = await findUserDoc(res.user.uid, res.user.email);
-            if (!doc) {
-                await signOut(auth);
-                throw new Error("Acesso negado. Contate o administrador.");
-            }
-            await ensureRestaurantClaim(res.user);
-            toast.success("Login realizado com sucesso!");
-            return doc;
-        } catch (err) {
-            const error = err instanceof Error ? err : new Error("E-mail ou senha inválidos.");
-            setError(error);
-            toast.error(error.message);
-            return null;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const loginWithGoogle = useCallback(async (): Promise<DocumentSnapshot | null> => {
-        setLoading(true);
-        setError(null);
-        const auth = getAuth();
-        const provider = new GoogleAuthProvider();
-        try {
-            const res = await signInWithPopup(auth, provider);
-            const doc = await findUserDoc(res.user.uid, res.user.email);
-            if (!doc) {
-                if (res.user.metadata.creationTime === res.user.metadata.lastSignInTime) {
-                    try { await res.user.delete(); } catch { }
+    const loginWithEmail = useCallback(
+        async (
+            { email, password }: { email: string; password: string },
+            onSuccess?: () => void
+        ): Promise<DocumentSnapshot | null> => {
+            setLoading(true);
+            setError(null);
+            const auth = getAuth();
+            try {
+                const res = await signInWithEmailAndPassword(auth, email, password);
+                const doc = await findUserDoc(res.user.uid, res.user.email);
+                if (!doc) {
+                    await signOut(auth);
+                    throw new Error("Acesso negado. Contate o administrador.");
                 }
-                await signOut(auth);
-                throw new Error("Sua conta Google não está autorizada.");
+                await ensureRestaurantClaim(res.user);
+                toast.success("Login realizado com sucesso!");
+                if (onSuccess) onSuccess();
+                return doc;
+            } catch (err) {
+                const error = err instanceof Error ? err : new Error("E-mail ou senha inválidos.");
+                setError(error);
+                toast.error(error.message);
+                return null;
+            } finally {
+                setLoading(false);
             }
-            await ensureRestaurantClaim(res.user);
-            toast.success("Login com Google realizado com sucesso!");
-            return doc;
-        } catch (err) {
-            const error = err instanceof Error ? err : new Error("Erro ao fazer login com Google.");
-            setError(error);
-            toast.error(error.message);
-            return null;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+        },
+        []
+    );
+
+    const loginWithGoogle = useCallback(
+        async (onSuccess?: () => void): Promise<DocumentSnapshot | null> => {
+            setLoading(true);
+            setError(null);
+            const auth = getAuth();
+            const provider = new GoogleAuthProvider();
+            try {
+                const res = await signInWithPopup(auth, provider);
+                const doc = await findUserDoc(res.user.uid, res.user.email);
+                if (!doc) {
+                    if (res.user.metadata.creationTime === res.user.metadata.lastSignInTime) {
+                        try { await res.user.delete(); } catch { }
+                    }
+                    await signOut(auth);
+                    throw new Error("Sua conta Google não está autorizada.");
+                }
+                await ensureRestaurantClaim(res.user);
+                toast.success("Login com Google realizado com sucesso!");
+                if (onSuccess) onSuccess();
+                return doc;
+            } catch (err) {
+                const error = err instanceof Error ? err : new Error("Erro ao fazer login com Google.");
+                setError(error);
+                toast.error(error.message);
+                return null;
+            } finally {
+                setLoading(false);
+            }
+        },
+        []
+    );
 
     const logout = useCallback(async () => {
         setLoading(true);
