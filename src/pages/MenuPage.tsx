@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
+import { FaShoppingBasket } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { BannerMenu, Cart, ProductCard, ProductCarousel } from "../components";
+import { Cart, HeaderMenu, ProductCard, ProductCarousel } from "../components";
 import { CartProvider, useCart } from "../contexts/CartContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
 import { formatCurrencyBRL } from "../utils/currency";
 import { LoadingPage } from "./LoadingPage";
-import { FaShoppingBasket } from "react-icons/fa";
 
 export function MenuPage() {
   const { restaurantId } = useParams();
@@ -51,7 +51,7 @@ function MenuContent() {
 
   return (
     <>
-      <BannerMenu />
+      <HeaderMenu />
       <nav className="w-full max-w-2xl mx-auto bg-white z-40 shadow p-2 flex gap-4 overflow-x-auto sticky top-0">
         {categories
           .filter(category =>

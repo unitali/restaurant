@@ -9,11 +9,12 @@ import { LoadingPage } from '../pages/LoadingPage';
 import { PopUpConfirmOpen } from './PopUpConfirmOpen';
 
 export function HeaderAdmin() {
-    const { restaurantId, restaurant, isOpen, setIsOpen } = useRestaurant();
-    const { updateRestaurantCompany, loading } = useRestaurants();
-
+    const { restaurantId, restaurant, refresh, loading: restaurantLoading } = useRestaurant();
+    const { updateRestaurantCompany, loading: updateLoading } = useRestaurants();
     const { logout } = useAuth();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+    const isOpen = restaurant?.company.isOpen ?? false;
 
     const handleMenuPage = () => {
         if (restaurantId) {
@@ -26,12 +27,12 @@ export function HeaderAdmin() {
     };
 
     const handleOpenAndClose = async () => {
-        setIsOpen(!isOpen);
         setIsConfirmOpen(false);
         await updateRestaurantCompany(restaurantId, { isOpen: !isOpen });
+        refresh();
     };
 
-    if (loading) return <LoadingPage />;
+    if (restaurantLoading || updateLoading || !restaurant) return <LoadingPage />;
 
     return (
         <header className="bg-gray-800 w-full max-w-2xl md:max-w-none mx-auto px-2 py-2 md:p-4 flex justify-between items-center top-0 left-0 z-50 fixed">
