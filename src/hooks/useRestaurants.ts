@@ -182,7 +182,11 @@ export function useRestaurants() {
                 ? { ...prev, company: { ...prev.company, ...data } }
                 : null
             );
-            toast.success("Dados atualizados com sucesso!");
+            if (data.isOpen !== undefined) {
+                toast.success(`Restaurante ${data.isOpen ? 'aberto' : 'fechado'} com sucesso!`);
+            } else {
+                toast.success("Dados atualizados com sucesso!");
+            }
         } catch (err) {
             setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
             toast.error("Não foi possível atualizar os dados.");

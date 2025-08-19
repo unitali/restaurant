@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect } from "react";
-import { useRestaurants } from "../hooks/useRestaurants"; // Importe o hook completo
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useRestaurants } from "../hooks/useRestaurants";
 import type { RestaurantType } from "../types";
 
 interface RestaurantContextType {
@@ -7,6 +7,8 @@ interface RestaurantContextType {
     loading: boolean;
     refresh: () => void;
     restaurantId: string;
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
@@ -17,6 +19,8 @@ export function RestaurantProvider({ restaurantId, children }: { restaurantId: s
         loading,
         fetchRestaurantById
     } = useRestaurants();
+
+    const [isOpen, setIsOpen] = useState(false);
 
     const fetchAndSetData = useCallback(() => {
         if (restaurantId) {
@@ -33,6 +37,8 @@ export function RestaurantProvider({ restaurantId, children }: { restaurantId: s
         loading,
         refresh: fetchAndSetData,
         restaurantId,
+        isOpen,
+        setIsOpen
     };
 
     return (

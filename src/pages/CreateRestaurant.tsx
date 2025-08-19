@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ButtonPrimary, Input } from "../components";
-import { HeaderPublic } from "../components/PublicHeader";
+import { HeaderPublic } from "../components/HeaderPublic";
 import { useRestaurants } from "../hooks/useRestaurants";
 import type { CompanyType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";

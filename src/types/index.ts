@@ -17,6 +17,7 @@ export interface CompanyType {
     status: "active" | "inactive";
     logo: ImageType | null;
     banner: ImageType | null;
+    isOpen: boolean;
 }
 
 export interface ImageParams {
