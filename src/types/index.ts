@@ -14,9 +14,9 @@ export interface CompanyType {
     expiredAt?: Date;
     updatedAt?: Date;
     shortUrlMenu?: string;
-    status?: "active" | "inactive";
-    logo?: ImageType | null;
-    banner?: ImageType | null;
+    status: "active" | "inactive";
+    logo: ImageType | null;
+    banner: ImageType | null;
 }
 
 export interface ImageParams {

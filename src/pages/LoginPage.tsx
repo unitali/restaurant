@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary, Input } from "../components";
 import { HeaderPublic } from "../components/PublicHeader";
 import { useAuth } from "../hooks/useAuth";
@@ -17,26 +16,16 @@ export function LoginPage() {
 
     const handleLogin = async (email: string, password: string) => {
         setIsLoading(true);
-        try {
-            await loginWithEmail({ email, password });
-            navigate(webRoutes.admin);
-        } catch (err: any) {
-            toast.error("E-mail ou senha inválidos.");
-        } finally {
-            setIsLoading(false);
-        }
+        await loginWithEmail({ email, password });
+        navigate(webRoutes.admin);
+        setIsLoading(false);
     };
 
     const handleGoogleLogin = async () => {
         setIsLoading(true);
-        try {
-            await loginWithGoogle();
-            navigate(webRoutes.admin);
-        } catch (err: any) {
-            toast.error("Erro ao fazer login com Google.");
-        } finally {
-            setIsLoading(false);
-        }
+        await loginWithGoogle();
+        navigate(webRoutes.admin);
+        setIsLoading(false);
     };
 
     return (

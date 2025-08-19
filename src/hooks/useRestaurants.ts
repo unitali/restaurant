@@ -96,7 +96,7 @@ export function useRestaurants() {
             onError?: (err: any) => void
         ) => {
             setLoading(true);
-                const navigate = useNavigate();
+            const navigate = useNavigate();
             let createdUser = null;
             try {
                 if (userAdmin.password !== userAdmin.confirmPassword) {
@@ -140,21 +140,29 @@ export function useRestaurants() {
 
                 if (onSuccess) onSuccess();
             } catch (err: any) {
+                const error = err instanceof Error ? err : new Error("Erro ao fazer logout.");
+                setError(error);
                 if (createdUser) {
                     try {
                         await deleteUser(createdUser);
                     } catch (deleteErr) {
-                        console.error("Erro ao remover usuário do Auth:", deleteErr);
+                        const error = err instanceof Error ? err : new Error("Erro ao remover usuário do Auth:");
+                        setError(error);
+                        console.error(error.message, deleteErr);
                     }
                 }
                 if (err.code === "auth/email-already-in-use") {
-                    toast.error("E-mail já cadastrado");
+                    const error = err instanceof Error ? err : new Error("E-mail já cadastrado");
+                    setError(error);
                 } else {
-                    toast.error("Erro ao criar restaurante ou admin");
+                    const error = err instanceof Error ? err : new Error("Erro ao criar restaurante ou admin. Tente Novamente.");
+                    setError(error);
                 }
                 if (onError) onError(err);
+
             } finally {
                 setLoading(false);
+                toast.error(error ? error.message : "Erro ao criar restaurante ou admin. Tente Novamente.");
             }
         },
         [createRestaurant]
@@ -174,7 +182,7 @@ export function useRestaurants() {
                 ? { ...prev, company: { ...prev.company, ...data } }
                 : null
             );
-            toast.success("Dados do restaurante atualizados!");
+            toast.success("Dados atualizados com sucesso!");
         } catch (err) {
             setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
             toast.error("Não foi possível atualizar os dados.");

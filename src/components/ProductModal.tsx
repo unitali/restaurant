@@ -91,9 +91,7 @@ export function ProductModal(props: ProductModalProps) {
                             dirty: false,
                             previewUrl: productData.image?.url || null
                         });
-                    } else {
-                        toast.error("Produto não encontrado.");
-                    }
+                    } 
                 } else {
                     resetForm();
                 }
@@ -181,11 +179,9 @@ export function ProductModal(props: ProductModalProps) {
             }
             if (props.productId) {
                 await updateProduct(restaurantId, productToSave);
-                toast.success("Produto atualizado com sucesso!");
                 props.onClose();
             } else {
                 await addProduct(restaurantId, productToSave);
-                toast.success("Produto cadastrado com sucesso!");
             }
             if (props.onProductChanged) await props.onProductChanged();
             props.productId ? setOriginalImage(productToSave.image || null) : resetForm();
@@ -196,7 +192,6 @@ export function ProductModal(props: ProductModalProps) {
                 previewUrl: productToSave.image?.url || null
             });
         } catch (error) {
-            toast.error("Erro ao salvar produto.");
             console.error("Erro ao salvar produto:", error);
         } finally {
             setLoading(false);

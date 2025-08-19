@@ -35,7 +35,7 @@ export function CompanySettings() {
                 phone: restaurant.company.phone,
                 banner: restaurant.company.banner,
                 logo: restaurant.company.logo,
-            });
+            } as CompanyType);
         }
     }, [editCompany, restaurant]);
 
@@ -111,10 +111,8 @@ export function CompanySettings() {
             await updateRestaurantCompany(restaurantId, updatedCompany);
             await refresh();
             setEditCompany(false);
-            toast.success("Dados da empresa atualizados com sucesso!");
         } catch (error) {
             console.error("Erro ao atualizar os dados da empresa:", error);
-            toast.error("Erro ao atualizar os dados da empresa.");
         }
     };
 
@@ -152,7 +150,7 @@ export function CompanySettings() {
                     label="Nome Fantasia"
                     name="name"
                     required
-                    value={editCompany ? formRestaurant?.name || "" : restaurant?.company?.name || ""}
+                    value={editCompany ? formRestaurant?.name : restaurant?.company?.name}
                     onChange={handleChange}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
@@ -161,7 +159,7 @@ export function CompanySettings() {
                     label="Endereço"
                     name="address"
                     required
-                    value={editCompany ? formRestaurant?.address || "" : restaurant?.company?.address || ""}
+                    value={editCompany ? formRestaurant?.address : restaurant?.company?.address}
                     onChange={handleChange}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
@@ -170,7 +168,7 @@ export function CompanySettings() {
                     label="WhatsApp"
                     name="phone"
                     required
-                    value={editCompany ? formRestaurant?.phone || "" : restaurant?.company?.phone || ""}
+                    value={editCompany ? formRestaurant?.phone : restaurant?.company?.phone}
                     onChange={handleChange}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
@@ -178,7 +176,7 @@ export function CompanySettings() {
                     id="banner-image"
                     label="Banner da Empresa"
                     required={false}
-                    initialUrl={restaurant?.company.banner?.url || null}
+                    initialUrl={restaurant?.company.banner?.url}
                     onStateChange={setBannerImageState}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />

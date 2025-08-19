@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus } from ".";
 import { useCart } from "../contexts/CartContext";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useOrders } from "../hooks/useOrders";
+import { useWhatsApp } from "../hooks/useWhatsApp";
 import { LoadingPage } from "../pages/LoadingPage";
 import { formatCurrencyBRL } from "../utils/currency";
 import { createOrderNumber } from "../utils/orderNumber";
@@ -13,23 +13,35 @@ interface CartProps {
 
 export function Cart({ isOpen, onClose }: CartProps) {
     const { cart, removeFromCart, addToCart, total, clearCart } = useCart();
-    const { restaurantId } = useRestaurant();
-    const { createOrder, loading } = useOrders();
+    const { sendOrder } = useWhatsApp();
+    const [loading, setLoading] = useState(false);
+    //const { restaurantId } = useRestaurant();
+    //const { createOrder, loading } = useOrders();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const orderNumber = createOrderNumber();
+        setLoading(true);
+        try {
+            const orderNumber = createOrderNumber();
+            sendOrder(orderNumber);
 
-        const orderId = await createOrder({
-            restaurantId,
-            cart,
-            total,
-            orderNumber,
-        });
+            /*
+             const orderId = await createOrder({
+                 restaurantId,
+                 cart,
+                 total,
+                 orderNumber,
+             });
+             */
 
-        if (orderId) {
-            clearCart();
-            onClose();
+            if (orderNumber) {
+                clearCart();
+                onClose();
+            }
+        } catch (err: any) {
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -91,7 +103,7 @@ export function Cart({ isOpen, onClose }: CartProps) {
                                                         acc + opt.price * (opt.quantity ?? 1),
                                                     0
                                                 ) ?? 0)) *
-                                                product.quantity
+                                            product.quantity
                                         )}
                                     </span>
                                 </div>

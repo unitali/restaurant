@@ -98,7 +98,6 @@ export function useImages() {
                 await _remove(props.oldImagePath);
             }
             const newImage = await _upload({ file: props.file, restaurantId: props.restaurantId });
-            toast.success("Imagem atualizada com sucesso!");
             return newImage;
         } catch (err) {
             console.error("Erro ao atualizar imagem:", err);

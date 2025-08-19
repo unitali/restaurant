@@ -84,6 +84,13 @@ export function useAuth() {
                 const res = await signInWithEmailAndPassword(auth, email, password);
                 const doc = await findUserDoc(res.user.uid, res.user.email);
                 if (!doc) {
+                    // Remove do Authentication se não existir em users/{uid}
+                    try {
+                        await res.user.delete();
+                    } catch (deleteErr) {
+                        // Se não conseguir deletar, tente remover pelo Admin SDK (no backend)
+                        console.error("Erro ao remover do Auth:", deleteErr);
+                    }
                     await signOut(auth);
                     throw new Error("Acesso negado. Contate o administrador.");
                 }
@@ -91,10 +98,12 @@ export function useAuth() {
                 toast.success("Login realizado com sucesso!");
                 if (onSuccess) onSuccess();
                 return doc;
-            } catch (err) {
-                const error = err instanceof Error ? err : new Error("E-mail ou senha inválidos.");
-                setError(error);
-                toast.error(error.message);
+            } catch (err: any) {
+                if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") {
+                    err.message = "E-mail ou senha inválidos.";
+                }
+                toast.error(err.message);
+                setLoading(false);
                 return null;
             } finally {
                 setLoading(false);
@@ -107,14 +116,17 @@ export function useAuth() {
         async (onSuccess?: () => void): Promise<DocumentSnapshot | null> => {
             setLoading(true);
             setError(null);
+
             const auth = getAuth();
             const provider = new GoogleAuthProvider();
             try {
                 const res = await signInWithPopup(auth, provider);
                 const doc = await findUserDoc(res.user.uid, res.user.email);
                 if (!doc) {
-                    if (res.user.metadata.creationTime === res.user.metadata.lastSignInTime) {
-                        try { await res.user.delete(); } catch { }
+                    try {
+                        await res.user.delete();
+                    } catch (deleteErr) {
+                        console.error("Erro ao remover do Auth:", deleteErr);
                     }
                     await signOut(auth);
                     throw new Error("Sua conta Google não está autorizada.");
@@ -122,11 +134,11 @@ export function useAuth() {
                 await ensureRestaurantClaim(res.user);
                 toast.success("Login com Google realizado com sucesso!");
                 if (onSuccess) onSuccess();
+
                 return doc;
-            } catch (err) {
-                const error = err instanceof Error ? err : new Error("Erro ao fazer login com Google.");
-                setError(error);
-                toast.error(error.message);
+            } catch (err: any) {
+                toast.error("Erro ao fazer login com Google.");
+                setLoading(false);
                 return null;
             } finally {
                 setLoading(false);

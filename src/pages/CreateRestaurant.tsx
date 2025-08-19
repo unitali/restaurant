@@ -14,6 +14,8 @@ const restaurantInitialState: CompanyType = {
     createdAt: today(),
     expiredAt: plusDays(today(), 30),
     status: "active",
+    logo: null,
+    banner: null
 };
 
 const userInitialState: UserType = {
@@ -107,8 +109,7 @@ export function CreateRestaurant() {
                             />
                         </form>
                     </div>
-                )
-                }
+                )}
             </div>
         </>
     );
