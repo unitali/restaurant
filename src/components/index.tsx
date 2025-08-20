@@ -1,9 +1,9 @@
 export * from './Button';
 export * from './Cart';
-export * from './CategoriesTab';
 export * from './CategoryModal';
 export * from './CategoryTable';
-export * from './CompanySettings';
+export * from './CheckBox';
+export * from './CompanyOpeningHours';
 export * from './ConfirmPopUp';
 export * from './Footer';
 export * from './HeaderAdmin';
@@ -18,11 +18,13 @@ export * from './PlanCard';
 export * from './ProductCard';
 export * from './ProductCarousel';
 export * from './ProductModal';
-export * from './ProductsTab';
 export * from './ProductTable';
 export * from './Select';
 export * from './Settings';
-export * from './SettingsTab';
 export * from './Switch';
+export * from './TabCategories';
+export * from './TabCompany';
+export * from './TabProducts';
+export * from './TabSettings';
 export * from './TextArea';
 

@@ -7,7 +7,7 @@ import { useRestaurants as useRestaurantsManager } from "../hooks/useRestaurants
 import type { CompanyType, ImageState } from "../types";
 import { getShortUrl } from "../utils/shortUrl";
 
-export function CompanySettings() {
+export function CompanyTab() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
     const { updateRestaurantCompany, loading: updateLoading } = useRestaurantsManager();
     const { updateImage } = useImages();
@@ -137,14 +137,13 @@ export function CompanySettings() {
     };
 
     return (
-        <section className="shadow p-6 rounded bg-white max-w-md w-full">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Dados da Empresa</h2>
-            </div>
+        <section className="flex flex-col w-full mx-auto px-2 justify-center">
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-3"
             >
+                <h2 className="text-xl font-semibold">Dados da Empresa</h2>
+
                 <Input
                     id="company-name"
                     label="Nome Fantasia"

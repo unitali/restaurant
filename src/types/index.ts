@@ -18,6 +18,8 @@ export interface CompanyType {
     logo: ImageType | null;
     banner: ImageType | null;
     isOpen: boolean;
+    openingHours: OpeningHoursType;
+
 }
 
 export interface ImageParams {
@@ -71,6 +73,13 @@ export interface PlanType {
     name: string;
     price: string;
     features: Record<string, boolean>;
+}
+
+export interface OpeningHoursType {
+    [key: string]: {
+        open: boolean;
+        hours: string;
+    };
 }
 
 export interface RestaurantType {
