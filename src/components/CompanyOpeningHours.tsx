@@ -3,32 +3,14 @@ import { ButtonPrimary, CheckBox, Input } from '.';
 import { useRestaurant } from '../contexts/RestaurantContext';
 import { useRestaurants } from '../hooks/useRestaurants';
 import { LoadingPage } from '../pages/LoadingPage';
+import { daysLabels, daysOfWeek } from "../utils/date";
+
 
 type OpeningDaysState = {
     [key: string]: {
         open: boolean;
         hours: string;
     };
-};
-
-const daysOfWeek = [
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-    "sunday",
-];
-
-const daysLabels: { [key: string]: string } = {
-    monday: "Segunda-feira",
-    tuesday: "Terça-feira",
-    wednesday: "Quarta-feira",
-    thursday: "Quinta-feira",
-    friday: "Sexta-feira",
-    saturday: "Sábado",
-    sunday: "Domingo",
 };
 
 export function CompanyOpeningHours() {
