@@ -30,18 +30,36 @@ export function CompanyTab() {
     useEffect(() => {
         if (editCompany && restaurant?.company) {
             setFormRestaurant({
-                name: restaurant.company.name,
+                brandName: restaurant.company.brandName,
+                legalName: restaurant.company.legalName,
+                document: restaurant.company.document,
                 address: restaurant.company.address,
                 phone: restaurant.company.phone,
                 banner: restaurant.company.banner,
                 logo: restaurant.company.logo,
-            } as CompanyType);
+                status: restaurant.company.status,
+                isOpen: restaurant.company.isOpen,
+                openingHours: restaurant.company.openingHours,
+            });
         }
     }, [editCompany, restaurant]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!formRestaurant) return;
-        setFormRestaurant({ ...formRestaurant, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        if (name.startsWith("address")) {
+            const addressField = name.replace("address", "").replace(/^\w/, c => c.toLowerCase());
+            setFormRestaurant({
+                ...formRestaurant,
+                address: {
+                    ...formRestaurant.address,
+                    [addressField]: value,
+                },
+            });
+        } else {
+            setFormRestaurant({ ...formRestaurant, [name]: value });
+        }
     };
 
     const isChanged =
@@ -49,8 +67,13 @@ export function CompanyTab() {
         restaurant?.company &&
         formRestaurant &&
         (
-            restaurant.company.name !== formRestaurant.name ||
-            restaurant.company.address !== formRestaurant.address ||
+            restaurant.company.brandName !== formRestaurant.brandName ||
+            restaurant.company.legalName !== formRestaurant.legalName ||
+            restaurant.company.document !== formRestaurant.document ||
+            restaurant.company.address.street !== formRestaurant.address.street ||
+            restaurant.company.address.city !== formRestaurant.address.city ||
+            restaurant.company.address.state !== formRestaurant.address.state ||
+            restaurant.company.address.zipCode !== formRestaurant.address.zipCode ||
             restaurant.company.phone !== formRestaurant.phone ||
             bannerImageState.dirty ||
             logoImageState.dirty
@@ -71,7 +94,9 @@ export function CompanyTab() {
 
         try {
             let updatedCompany: Partial<CompanyType> = {
-                name: formRestaurant?.name,
+                brandName: formRestaurant?.brandName,
+                legalName: formRestaurant?.legalName,
+                document: formRestaurant?.document,
                 address: formRestaurant?.address,
                 phone: formRestaurant?.phone,
             };
@@ -143,34 +168,86 @@ export function CompanyTab() {
                 className="flex flex-col gap-3"
             >
                 <h2 className="text-xl font-semibold">Dados da Empresa</h2>
-
                 <Input
-                    id="company-name"
-                    label="Nome Fantasia"
-                    name="name"
-                    required
-                    value={editCompany ? formRestaurant?.name : restaurant?.company?.name}
+                    id="company-legal-name"
+                    label="Razão Social / Nome Completo"
+                    name="legalName"
+                    value={editCompany ? formRestaurant?.legalName : restaurant?.company?.legalName}
                     onChange={handleChange}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
+                <div className="flex flex-col md:flex-row gap-3">
+                    <Input
+                        id="company-name"
+                        label="Nome Fantasia"
+                        name="brandName"
+                        required
+                        value={editCompany ? formRestaurant?.brandName : restaurant?.company?.brandName}
+                        onChange={handleChange}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                    />
+                    <Input
+                        id="company-document"
+                        label="CNPJ / CPF"
+                        name="document"
+                        required
+                        value={editCompany ? formRestaurant?.document : restaurant?.company?.document}
+                        onChange={handleChange}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                    />
+                </div>
                 <Input
-                    id="company-address"
+                    id="company-street"
                     label="Endereço"
-                    name="address"
+                    name="addressStreet"
                     required
-                    value={editCompany ? formRestaurant?.address : restaurant?.company?.address}
+                    value={editCompany ? formRestaurant?.address.street : restaurant?.company?.address.street}
                     onChange={handleChange}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
-                <Input
-                    id="company-phone"
-                    label="WhatsApp"
-                    name="phone"
-                    required
-                    value={editCompany ? formRestaurant?.phone : restaurant?.company?.phone}
-                    onChange={handleChange}
-                    disabled={!editCompany || updateLoading || restaurantLoading}
-                />
+                <div className="flex flex-col md:flex-row gap-3">
+                    <Input
+                        id="company-city"
+                        label="Cidade"
+                        name="addressCity"
+                        required
+                        value={editCompany ? formRestaurant?.address.city : restaurant?.company?.address.city}
+                        onChange={handleChange}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                        className="flex-1"
+                    />
+                    <Input
+                        id="company-state"
+                        label="Estado"
+                        name="addressState"
+                        required
+                        value={editCompany ? formRestaurant?.address.state : restaurant?.company?.address.state}
+                        onChange={handleChange}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                        className="flex-1"
+                    />
+                    <Input
+                        id="company-zip-code"
+                        label="CEP"
+                        name="addressZipCode"
+                        type="number"
+                        required
+                        value={editCompany ? formRestaurant?.address.zipCode : restaurant?.company?.address.zipCode}
+                        onChange={handleChange}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                        className="flex-1"
+                    />
+                    <Input
+                        id="company-phone"
+                        label="WhatsApp"
+                        name="phone"
+                        type="tel"
+                        required
+                        value={editCompany ? formRestaurant?.phone : restaurant?.company?.phone}
+                        onChange={handleChange}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                    />
+                </div>
                 <ImageUpload
                     id="banner-image"
                     label="Banner da Empresa"

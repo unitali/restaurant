@@ -7,8 +7,10 @@ export interface CategoryType {
 
 export interface CompanyType {
     id?: string;
-    name: string;
-    address: string;
+    brandName: string;
+    legalName?: string;
+    document?: string;
+    address: AddressType;
     phone: string;
     createdAt?: Date;
     expiredAt?: Date;
@@ -19,7 +21,13 @@ export interface CompanyType {
     banner: ImageType | null;
     isOpen: boolean;
     openingHours: OpeningHoursType;
+}
 
+export interface AddressType {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
 }
 
 export interface ImageParams {

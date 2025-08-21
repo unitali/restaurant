@@ -27,7 +27,7 @@ export function CompanyOpeningHours() {
 
     useEffect(() => {
         if (restaurant?.company?.openingHours) {
-            setOpeningDays((prev) => {
+            setOpeningDays(() => {
                 const bd = restaurant.company.openingHours;
                 return daysOfWeek.reduce((acc, day) => {
                     acc[day] = bd[day]
