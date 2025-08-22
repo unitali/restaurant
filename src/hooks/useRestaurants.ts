@@ -103,7 +103,7 @@ export function useRestaurants() {
                     toast.error("As senhas não coincidem");
                     return;
                 }
-                if (!restaurant.name || !restaurant.address || !restaurant.phone) {
+                if (!restaurant.brandName || !restaurant.address || !restaurant.phone) {
                     toast.error("Preencha todos os campos do restaurante");
                     return;
                 }

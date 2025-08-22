@@ -8,14 +8,23 @@ import { LoadingPage } from "./LoadingPage";
 
 const restaurantInitialState: CompanyType = {
     id: "",
-    name: "",
-    address: "",
+    legalName: "",
+    brandName: "",
+    document: "",
+    address: {
+        street: "",
+        city: "",
+        state: "",
+        zipCode: ""
+    },
     phone: "",
     createdAt: today(),
     expiredAt: plusDays(today(), 30),
     status: "active",
     logo: null,
-    banner: null
+    banner: null,
+    isOpen: false,
+    openingHours: {},
 };
 
 const userInitialState: UserType = {
@@ -58,15 +67,36 @@ export function CreateRestaurant() {
                             <Input
                                 id="restaurant-name"
                                 label="Nome do restaurante"
-                                value={restaurant.name}
-                                onChange={e => setRestaurant({ ...restaurant, name: e.target.value })}
+                                value={restaurant.brandName}
+                                onChange={e => setRestaurant({ ...restaurant, brandName: e.target.value })}
                                 required
                             />
                             <Input
-                                id="restaurant-address"
+                                id="restaurant-address-street"
                                 label="Endereço"
-                                value={restaurant.address}
-                                onChange={e => setRestaurant({ ...restaurant, address: e.target.value })}
+                                value={restaurant.address.street}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, street: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-city"
+                                label="Cidade"
+                                value={restaurant.address.city}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, city: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-state"
+                                label="Estado"
+                                value={restaurant.address.state}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, state: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-zip-code"
+                                label="CEP"
+                                value={restaurant.address.zipCode}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, zipCode: e.target.value } })}
                                 required
                             />
                             <Input
