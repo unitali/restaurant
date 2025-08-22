@@ -1,3 +1,4 @@
+
 export interface CategoryType {
     id?: string;
     name: string;
@@ -6,14 +7,27 @@ export interface CategoryType {
 
 export interface CompanyType {
     id?: string;
-    name: string;
-    address: string;
+    brandName: string;
+    legalName?: string;
+    document?: string;
+    address: AddressType;
     phone: string;
     createdAt?: Date;
     expiredAt?: Date;
     updatedAt?: Date;
     shortUrlMenu?: string;
-    status?: "active" | "inactive";
+    status: "active" | "inactive";
+    logo: ImageType | null;
+    banner: ImageType | null;
+    isOpen: boolean;
+    openingHours: OpeningHoursType;
+}
+
+export interface AddressType {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
 }
 
 export interface ImageParams {
@@ -37,31 +51,62 @@ export interface ImageState {
 }
 
 export interface CartItem {
-    product: ProductType;
-    quantity: number;
+    productId: string;
+    name: string;
     price: number;
+    quantity: number;
+    observation?: string;
+    options?: ProductOptionsType[];
 }
-
 export interface ProductType {
     id?: string;
     name: string;
     price: number;
     categoryId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    observationDisplay: boolean;
+    observation?: string;
     description?: string;
     image?: ImageType | null;
+    options?: ProductOptionsType[];
 }
-
+export interface ProductOptionsType {
+    id: string;
+    name: string;
+    price: number;
+    quantity?: number;
+}
 export interface PlanType {
     name: string;
     price: string;
     features: Record<string, boolean>;
 }
 
+export interface OpeningHoursType {
+    [key: string]: {
+        open: boolean;
+        hours: string;
+    };
+}
+
 export interface RestaurantType {
+    id?: string;
     company: CompanyType;
-    categories: CategoryType;
+    categories: CategoryType[];
     settings: SettingsType;
-    products: ProductType;
+    products: ProductType[];
+    orders: OrderType[];
+}
+
+export interface OrderType {
+    id?: string;
+    orderNumber: string;
+    items: CartItem[];
+    total: number;
+    status: "pending" | "inProgress" | "completed" | "canceled";
+    createdAt: Date;
+    updatedAt?: Date;
 }
 
 export interface SettingsType {

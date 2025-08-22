@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CategoriesTab, HeaderAdmin, ProductsTab, SettingsTab } from "../components";
+import { CategoriesTab, CompanyTab, HeaderAdmin, ProductsTab, SettingsTab } from "../components";
 import { RestaurantProvider } from "../contexts/RestaurantContext";
 import { webRoutes } from "../routes";
 import { LoadingPage } from "./LoadingPage";
@@ -8,7 +8,7 @@ import { LoadingPage } from "./LoadingPage";
 export function AdminPage() {
     const [restaurantId, setRestaurantId] = useState<string>();
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<"products" | "categories" | "settings">("products");
+    const [activeTab, setActiveTab] = useState<"products" | "categories" | "settings" | "company">("products");
 
     const navigate = useNavigate();
 
@@ -57,6 +57,13 @@ export function AdminPage() {
                                 Categorias
                             </button>
                             <button
+                                id="admin-company-tab"
+                                className={`px-4 py-2 font-semibold hover:cursor-pointer ${activeTab === "company" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
+                                onClick={() => setActiveTab("company")}
+                            >
+                                Empresa
+                            </button>
+                            <button
                                 id="admin-settings-tab"
                                 className={`px-4 py-2 font-semibold hover:cursor-pointer ${activeTab === "settings" ? "border-b-2 border-teal-600 text-teal-700" : "text-gray-500"}`}
                                 onClick={() => setActiveTab("settings")}
@@ -75,6 +82,10 @@ export function AdminPage() {
 
                             {activeTab === "categories" && (
                                 <CategoriesTab />
+                            )}
+
+                            {activeTab === "company" && (
+                                <CompanyTab />
                             )}
 
                             {activeTab === "settings" && (

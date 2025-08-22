@@ -20,7 +20,7 @@ export function Input({ ...props }: InputProps) {
     const isRequiredError = props.required && touched && !props.value;
 
     return (
-        <div className="relative flex-1 mb-2">
+        <div className="relative flex-1 mb-2 w-full">
             <label
                 id={`label-${props.id}`}
                 htmlFor={`input-${props.id}`}
@@ -34,7 +34,7 @@ export function Input({ ...props }: InputProps) {
                 {...props}
                 id={`input-${props.id}`}
                 type={inputType}
-                className={`w-full p-3 pt-5 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-teal-500 focus:ring-teal-500"}`}
+                className={`w-full pb-2 ps-4 pt-7 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-teal-500 focus:ring-teal-500"}`}
                 onBlur={(e) => {
                     setTouched(true);
                     props.onBlur && props.onBlur(e);
