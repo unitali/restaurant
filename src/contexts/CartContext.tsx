@@ -1,11 +1,22 @@
 import type { ReactNode } from "react";
-import { createContext, useContext, useState, useEffect } from "react";
-import type { ProductType, CartItem } from "../types";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { CartItem } from "../types";
 
+const generateItemSignature = (product: CartItem): string => {
+    const sortedOptions = product.options
+        ? [...product.options].sort((a, b) => (a.id || "").localeCompare(b.id || ""))
+        : [];
 
+    const optionsString = sortedOptions
+        .map(opt => `${opt.id}:${opt.quantity}`)
+        .join(',');
+
+    return `${product.productId}|obs:${product.observation || ''}|opts:${optionsString}`;
+};
 interface CartContextType {
     cart: CartItem[];
-    addToCart: (product: ProductType) => void;
+    total: number;
+    addToCart: (itemToAdd: CartItem) => void;
     removeFromCart: (productId: string) => void;
     clearCart: () => void;
 }
@@ -26,30 +37,68 @@ export function CartProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(CART_KEY, JSON.stringify(cart));
     }, [cart]);
 
-    function addToCart(product: ProductType) {
-        setCart((prev) => {
-            const exists = prev.find((item) => item.product.id === product.id);
-            if (exists) {
-                return prev.map((item) =>
-                    item.product.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
+    const total = cart.reduce((grandTotal, product) => {
+        const optionsPricePerUnit = product.options?.reduce((optionsSubtotal, option) => {
+            return optionsSubtotal + (option.price * (option.quantity ?? 1));
+        }, 0) ?? 0;
+
+        const singleItemPrice = product.price + optionsPricePerUnit;
+        const lineItemTotal = singleItemPrice * product.quantity;
+        return grandTotal + lineItemTotal;
+    }, 0);
+
+
+    function addToCart(productToAdd: CartItem) {
+        const signatureToAdd = generateItemSignature(productToAdd);
+
+        setCart((prevCart) => {
+            const existingItemIndex = prevCart.findIndex(
+                (product) => generateItemSignature(product) === signatureToAdd
+            );
+
+            if (existingItemIndex > -1) {
+                const updatedCart = [...prevCart];
+                const existingItem = { ...updatedCart[existingItemIndex] }; // Crie uma cópia para modificar
+
+                // 2. Some a quantidade principal
+                existingItem.quantity += productToAdd.quantity;
+
+                // 3. Some as quantidades dos opcionais
+                if (existingItem.options && productToAdd.options) {
+                    existingItem.options = existingItem.options.map(existingOpt => {
+                        const optionToAdd = productToAdd.options?.find(opt => opt.id === existingOpt.id);
+                        if (optionToAdd) {
+                            return {
+                                ...existingOpt,
+                                quantity: (existingOpt.quantity ?? 0) + (optionToAdd.quantity ?? 0)
+                            };
+                        }
+                        return existingOpt;
+                    });
+                }
+
+                updatedCart[existingItemIndex] = existingItem;
+                return updatedCart;
+            } else {
+                return [...prevCart, productToAdd];
             }
-            return [...prev, { product, quantity: 1, price: product.price }];
         });
     }
 
     function removeFromCart(productId: string) {
-        setCart((prev) =>
-            prev
-                .map((item) =>
-                    item.product.id === productId
-                        ? { ...item, quantity: item.quantity - 1 }
-                        : item
-                )
-                .filter((item) => item.quantity > 0)
-        );
+        setCart((prev) => {
+            const itemToRemove = prev.find(product => product.productId === productId);
+
+            if (itemToRemove && itemToRemove.quantity > 1) {
+                return prev.map(product =>
+                    product.productId === productId
+                        ? { ...product, quantity: product.quantity - 1 }
+                        : product
+                );
+            } else {
+                return prev.filter(product => product.productId !== productId);
+            }
+        });
     }
 
     function clearCart() {
@@ -57,7 +106,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+        <CartContext.Provider value={{ cart, total, addToCart, removeFromCart, clearCart }}>
             {children}
         </CartContext.Provider>
     );

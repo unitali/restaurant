@@ -2,12 +2,13 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { ButtonPrimary, CategoryModal, CategoryTable, ConfirmModal, Input } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
+import { useCategories } from "../hooks/useCategories";
 import { LoadingPage } from "../pages/LoadingPage";
-import { deleteCategory } from "../services/categoriesService";
 import type { CategoryType } from "../types";
 
 export function CategoriesTab() {
     const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
+    const { deleteCategory } = useCategories();
     const [isOpenModalCategory, setIsOpenModalCategory] = useState(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false);
     const [search, setSearch] = useState("");
@@ -54,29 +55,29 @@ export function CategoriesTab() {
     }
 
     return (
-        <div className="flex flex-col gap-4 w-full items-center">
-            <div className="w-full max-w-2xl md:max-w-none mx-auto px-2">
-                {categories.length > 0 && (
-                    <div className="mb-2 md:mb-4 flex flex-col md:flex-row gap-2 w-full">
+        <div className="flex flex-col gap-2 items-center">
+            <div className="w-full max-w-2xl md:max-w-none mx-auto">
+                <div className="mb-2 md:mb-4 flex flex-col md:flex-row gap-2">
+                    {categories.length > 0 && (
                         <Input
                             id="search-category"
                             type="text"
                             label="Buscar categoria"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full md:max-w-xs"
+                            className="w-full"
                         />
-                        <ButtonPrimary
-                            id="new-category"
-                            className="w-full md:w-auto md:px-8 md:py-3"
-                            onClick={() => {
-                                setCategorySelected(null);
-                                setIsOpenModalCategory(true);
-                            }}
-                            children="Nova Categoria"
-                        />
-                    </div>
-                )}
+                    )}
+                    <ButtonPrimary
+                        id="new-category"
+                        className="md:w-xs"
+                        onClick={() => {
+                            setCategorySelected(null);
+                            setIsOpenModalCategory(true);
+                        }}
+                        children="Nova Categoria"
+                    />
+                </div>
                 <div className="flex w-full items-stretch mb-4">
                 </div>
             </div>

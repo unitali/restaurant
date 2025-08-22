@@ -1,25 +1,30 @@
-import { createUserWithEmailAndPassword, deleteUser, fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { ButtonPrimary, Input } from "../components";
-import { HeaderPublic } from "../components/PublicHeader";
-import { db } from "../config/firebase";
-import { webRoutes } from "../routes";
-import { createRestaurant } from "../services/restaurantsService";
+import { HeaderPublic } from "../components/HeaderPublic";
+import { useRestaurants } from "../hooks/useRestaurants";
 import type { CompanyType, UserType } from "../types";
 import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";
 
 const restaurantInitialState: CompanyType = {
     id: "",
-    name: "",
-    address: "",
+    legalName: "",
+    brandName: "",
+    document: "",
+    address: {
+        street: "",
+        city: "",
+        state: "",
+        zipCode: ""
+    },
     phone: "",
     createdAt: today(),
     expiredAt: plusDays(today(), 30),
     status: "active",
+    logo: null,
+    banner: null,
+    isOpen: false,
+    openingHours: {},
 };
 
 const userInitialState: UserType = {
@@ -34,82 +39,20 @@ const userInitialState: UserType = {
 
 
 export function CreateRestaurant() {
+    const { createRestaurantWithAdmin, loading } = useRestaurants();
     const [restaurant, setRestaurant] = useState<CompanyType>(restaurantInitialState);
     const [userAdmin, setUserAdmin] = useState<UserType>(userInitialState);
-    const [loading, setLoading] = useState(false);
-    const auth = getAuth();
-    const navigate = useNavigate();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setLoading(true);
-        let createdUser = null;
-        try {
-
-            if (userAdmin.password !== userAdmin.confirmPassword) {
-                toast.error("As senhas não coincidem");
-                return;
+        await createRestaurantWithAdmin(
+            restaurant,
+            userAdmin,
+            () => {
+                setRestaurant(restaurantInitialState);
+                setUserAdmin(userInitialState);
             }
-
-            if (!restaurant.name || !restaurant.address || !restaurant.phone) {
-                toast.error("Preencha todos os campos do restaurante");
-                return;
-            }
-            if (!userAdmin.email || !userAdmin.password) {
-                toast.error("Preencha todos os campos do admin");
-                return;
-            }
-
-            if (userAdmin.password.length < 6) {
-                toast.error("A senha deve ter pelo menos 6 caracteres");
-                return;
-            }
-
-            const userExists = await fetchSignInMethodsForEmail(auth, userAdmin.email);
-            if (userExists.length > 0) {
-                toast.error("E-mail já cadastrado");
-                setLoading(false);
-                return;
-            }
-
-            const restaurantData = {
-                ...restaurant,
-                createdAt: today(),
-                expiredAt: plusDays(today(), 15),
-            };
-
-            const result = await createUserWithEmailAndPassword(auth, userAdmin.email, userAdmin.password!);
-            createdUser = result.user;
-
-            const restaurantId = await createRestaurant(restaurantData);
-
-            await setDoc(doc(db, "users", createdUser.uid), {
-                email: userAdmin.email,
-                profile: userAdmin.profile,
-                restaurantId,
-            });
-
-            toast.success("Restaurante e usuário criados com sucesso!");
-            setRestaurant(restaurantInitialState);
-            setUserAdmin(userInitialState);
-            navigate(webRoutes.admin, { replace: true });
-        } catch (err: any) {
-            if (createdUser) {
-                try {
-                    await deleteUser(createdUser);
-                } catch (deleteErr) {
-                    console.error("Erro ao remover usuário do Auth:", deleteErr);
-                }
-            }
-            if (err.code === "auth/email-already-in-use") {
-                toast.error("E-mail já cadastrado");
-            } else {
-                console.error("Erro ao criar restaurante ou admin:", err);
-                toast.error("Erro ao criar restaurante ou admin");
-            }
-        } finally {
-            setLoading(false);
-        }
+        );
     }
     return (
         <>
@@ -124,15 +67,36 @@ export function CreateRestaurant() {
                             <Input
                                 id="restaurant-name"
                                 label="Nome do restaurante"
-                                value={restaurant.name}
-                                onChange={e => setRestaurant({ ...restaurant, name: e.target.value })}
+                                value={restaurant.brandName}
+                                onChange={e => setRestaurant({ ...restaurant, brandName: e.target.value })}
                                 required
                             />
                             <Input
-                                id="restaurant-address"
+                                id="restaurant-address-street"
                                 label="Endereço"
-                                value={restaurant.address}
-                                onChange={e => setRestaurant({ ...restaurant, address: e.target.value })}
+                                value={restaurant.address.street}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, street: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-city"
+                                label="Cidade"
+                                value={restaurant.address.city}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, city: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-state"
+                                label="Estado"
+                                value={restaurant.address.state}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, state: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-zip-code"
+                                label="CEP"
+                                value={restaurant.address.zipCode}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, zipCode: e.target.value } })}
                                 required
                             />
                             <Input
@@ -175,8 +139,7 @@ export function CreateRestaurant() {
                             />
                         </form>
                     </div>
-                )
-                }
+                )}
             </div>
         </>
     );

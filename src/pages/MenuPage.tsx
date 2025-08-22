@@ -1,10 +1,12 @@
+import { useRef, useState } from "react";
+import { FaShoppingBasket } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { Footer, HeaderMenu, ProductCarousel, Slider } from "../components";
-import { CartProvider } from "../contexts/CartContext";
+import { Cart, HeaderMenu, ProductCard, ProductCarousel } from "../components";
+import { CartProvider, useCart } from "../contexts/CartContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
+import { formatCurrencyBRL } from "../utils/currency";
 import { LoadingPage } from "./LoadingPage";
-import { useState, useEffect, useRef } from "react";
 
 export function MenuPage() {
   const { restaurantId } = useParams();
@@ -12,9 +14,9 @@ export function MenuPage() {
   return (
     <RestaurantProvider restaurantId={restaurantId!}>
       <CartProvider>
-        <HeaderMenu />
-        <MenuContent />
-        <Footer />
+        <div className="w-full max-w-2xl mx-auto">
+          <MenuContent />
+        </div>
       </CartProvider>
     </RestaurantProvider>
   );
@@ -22,21 +24,13 @@ export function MenuPage() {
 
 function MenuContent() {
   const { restaurant, loading } = useRestaurant();
-  const [products, setProducts] = useState<ProductType[]>([]);
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-
-  // Cria refs para cada categoria
+  const { cart, total } = useCart();
+  const [isOpenCart, setIsOpenCart] = useState(false);
+  const [isAnyProductModalOpen, setIsAnyProductModalOpen] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  useEffect(() => {
-    setProducts(Array.isArray(restaurant?.products) ? restaurant!.products : []);
-    setCategories(Array.isArray(restaurant?.categories) ? restaurant!.categories : []);
-  }, [restaurant]);
-
-  if (loading) return <LoadingPage />;
-  if (!restaurant) return null;
-
-  const featuredProducts = products.slice(0, 3);
+  const products: ProductType[] = Array.isArray(restaurant?.products) ? restaurant!.products : [];
+  const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant!.categories : [];
 
   const scrollToCategory = (id: string) => {
     const ref = categoryRefs.current[id];
@@ -45,9 +39,20 @@ function MenuContent() {
     }
   };
 
+  if (loading) return <LoadingPage />;
+  if (!restaurant) return null;
+
+  const featuredProducts = products.slice(0, 3);
+
+  const handleOpenCart = () => {
+    setIsOpenCart(true);
+    setIsAnyProductModalOpen(false);
+  };
+
   return (
     <>
-      <nav className="fixed top-15 left-1/2 -translate-x-1/2 w-full bg-white z-40 shadow p-2 flex gap-4 overflow-x-auto">
+      <HeaderMenu />
+      <nav className="w-full max-w-2xl mx-auto bg-white z-40 shadow p-2 flex gap-4 overflow-x-auto sticky top-0">
         {categories
           .filter(category =>
             products.some(product => product.categoryId === category.id)
@@ -62,15 +67,15 @@ function MenuContent() {
             </button>
           ))}
       </nav>
-      <main className="w-full mx-auto px-2 pt-28 pb-2 md:pb-12">
+      <main className="w-full mx-auto p-2 max-w-2xl bg-gray-50 relative">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
-          <Slider
+          <ProductCarousel
             products={featuredProducts}
-            autoSlide
-            slideInterval={3000}
+            setIsAnyProductModalOpen={setIsAnyProductModalOpen}
           />
         </section>
+
         {categories.map((category) => {
           const productsOfCategory = products.filter(
             (p) => p.categoryId === category.id
@@ -81,17 +86,38 @@ function MenuContent() {
               <h3
                 className="text-lg font-semibold mb-2 scroll-mt-30"
                 ref={(el: HTMLHeadingElement | null) => {
-                  if (category.id !== undefined) {
-                    categoryRefs.current[category.id as string] = el;
-                  }
+                  if (category.id) categoryRefs.current[category.id] = el;
                 }}
               >
                 {category.name}
               </h3>
-              <ProductCarousel products={productsOfCategory} />
+              {productsOfCategory.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  setIsAnyProductModalOpen={setIsAnyProductModalOpen}
+                />
+              ))}
             </section>
           );
         })}
+
+        <Cart isOpen={isOpenCart} onClose={() => setIsOpenCart(false)} />
+
+        {cart && cart.length > 0 && !isAnyProductModalOpen && !isOpenCart && (
+          <nav
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md flex justify-center"
+            style={{ pointerEvents: "auto" }}
+          >
+            <button
+              className="bg-red-600 text-white font-bold px-6 py-3 shadow-lg transition hover:bg-red-700 w-full flex items-center justify-center gap-2"
+              onClick={handleOpenCart}
+            >
+              <FaShoppingBasket className="text-xl mx-2" />
+              <span>{`Ver Carrinho (${formatCurrencyBRL(total)})`}</span>
+            </button>
+          </nav>
+        )}
       </main>
     </>
   );
