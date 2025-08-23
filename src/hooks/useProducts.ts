@@ -20,7 +20,6 @@ export function useProducts() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    // 1. Chame o hook useImages no nível superior. Isso é permitido.
     const { removeImage, loading: imageLoading } = useImages();
 
     const _getRestaurantDoc = async (restaurantId: string) => {
@@ -58,14 +57,14 @@ export function useProducts() {
 
             const newProduct = {
                 ...cleanProductData(productData),
-                id: Date.now().toString(), // Garante um ID único
+                id: Date.now().toString(),
                 createdAt: new Date(),
             };
 
             const updatedProducts = [...currentProducts, newProduct];
             await updateDoc(ref, { products: updatedProducts });
 
-            setProducts(updatedProducts); // Atualiza o estado local
+            setProducts(updatedProducts);
             toast.success("Produto adicionado com sucesso!");
             return newProduct;
         } catch (err) {
@@ -103,7 +102,7 @@ export function useProducts() {
 
             await updateDoc(ref, { products: updatedProducts });
 
-            setProducts(updatedProducts); // Atualiza o estado local
+            setProducts(updatedProducts);
             toast.success("Produto atualizado com sucesso!");
             return updatedProduct;
         } catch (err) {
@@ -124,7 +123,6 @@ export function useProducts() {
             const currentProducts = data.products || [];
             const productToDelete = currentProducts.find((p: ProductType) => p.id === productId);
 
-            // 2. Use a função `removeImage` obtida do hook `useImages`.
             if (productToDelete?.image?.path) {
                 await removeImage(productToDelete.image.path);
             }
