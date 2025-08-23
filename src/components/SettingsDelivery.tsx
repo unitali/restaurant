@@ -10,39 +10,37 @@ export function SettingsDelivery() {
     const { restaurant, restaurantId, refresh } = useRestaurant();
     const { updateRestaurantCompany } = useRestaurants();
     const [loading, setLoading] = useState(false);
+
     const initialDeliveryEnabled = !!restaurant?.company?.delivery?.enabled;
     const initialTakeoutEnabled = !!restaurant?.company?.delivery?.takeout;
-
-    const tarifasRegistradas =
+    const taxfeesRegistered =
         restaurant?.company?.delivery?.tax?.map(d => ({
             distance: d.maxDistance || 0,
             price: d.price || 0,
         })) || [];
 
-    const [tarifas, setTarifas] = useState<{ distance: number; price: number }[]>(tarifasRegistradas);
-
+    const [taxfees, setTaxfees] = useState<{ distance: number; price: number }[]>(taxfeesRegistered);
     const [isEditing, setIsEditing] = useState(false);
     const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(initialDeliveryEnabled);
     const [isTakeoutEnabled, setIsTakeoutEnabled] = useState(initialTakeoutEnabled);
-    const [distanceInput, setDistanceInput] = useState("");
-    const [priceInput, setPriceInput] = useState("");
+
+    const [newTaxfee, setNewTaxfee] = useState({ distance: "", price: "" });
 
     const isChanged =
         isDeliveryEnabled !== initialDeliveryEnabled ||
         isTakeoutEnabled !== initialTakeoutEnabled ||
-        JSON.stringify(tarifas) !== JSON.stringify(tarifasRegistradas);
+        JSON.stringify(taxfees) !== JSON.stringify(taxfeesRegistered);
 
-    const handleAddTarifa = () => {
-        const distance = Number(distanceInput);
-        const price = Number(priceInput.replace(/\D/g, "")) / 100;
+    const handleAddTaxfee = () => {
+        const distance = Number(newTaxfee.distance);
+        const price = Number(newTaxfee.price.replace(/\D/g, "")) / 100;
         if (!distance || !price) return;
-        setTarifas(prev => [...prev, { distance, price }]);
-        setDistanceInput("");
-        setPriceInput("");
+        setTaxfees(prev => [...prev, { distance, price }]);
+        setNewTaxfee({ distance: "", price: "" });
     };
 
-    const handleRemoveTarifa = (index: number) => {
-        setTarifas(prev => prev.filter((_, i) => i !== index));
+    const handleRemoveTaxfee = (index: number) => {
+        setTaxfees(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -58,7 +56,7 @@ export function SettingsDelivery() {
                     ? {
                         enabled: isDeliveryEnabled,
                         takeout: isTakeoutEnabled,
-                        tax: tarifas.map(t => ({
+                        tax: taxfees.map(t => ({
                             price: t.price,
                             maxDistance: t.distance
                         })),
@@ -71,9 +69,8 @@ export function SettingsDelivery() {
             setIsEditing(false);
             setIsDeliveryEnabled(initialDeliveryEnabled);
             setIsTakeoutEnabled(initialTakeoutEnabled);
-            setTarifas(tarifasRegistradas);
-            setDistanceInput("");
-            setPriceInput("");
+            setTaxfees(taxfeesRegistered);
+            setNewTaxfee({ distance: "", price: "" });
         }
         refresh();
     };
@@ -112,9 +109,9 @@ export function SettingsDelivery() {
                                     id="delivery-distance-input"
                                     label="Distância (KM)"
                                     name="deliveryDistance"
-                                    value={distanceInput ? Number(distanceInput) : ""}
-                                    required={tarifas.length > 0 ? false : true}
-                                    onChange={e => setDistanceInput(e.target.value)}
+                                    value={newTaxfee.distance}
+                                    required={taxfees.length > 0 ? false : true}
+                                    onChange={e => setNewTaxfee(nt => ({ ...nt, distance: e.target.value }))}
                                     className="w-full"
                                     disabled={!isEditing}
                                 />
@@ -124,34 +121,33 @@ export function SettingsDelivery() {
                                     id="delivery-price-input"
                                     label="Preço"
                                     name="deliveryPrice"
-                                    value={priceInput ? formatCurrencyBRL(Number(priceInput) / 100) : "R$ 0,00"}
-                                    onChange={e => setPriceInput(e.target.value.replace(/\D/g, ""))}
-                                    required={tarifas.length > 0 ? false : true}
+                                    value={newTaxfee.price ? formatCurrencyBRL(Number(newTaxfee.price) / 100) : "R$ 0,00"}
+                                    onChange={e => setNewTaxfee(nt => ({ ...nt, price: e.target.value.replace(/\D/g, "") }))}
+                                    required={taxfees.length > 0 ? false : true}
                                     className="w-full"
                                     disabled={!isEditing}
                                 />
                             </div>
                             <div className="flex items-center justify-end h-full">
                                 <ButtonPrimaryPlus
-                                    id="add-delivery-tarifa"
-                                    onClick={handleAddTarifa}
+                                    id="add-delivery-taxfee"
+                                    onClick={handleAddTaxfee}
                                     disabled={!isEditing}
                                 />
                             </div>
                         </div>
-                        {/* Lista de tarifas sempre atualizada */}
-                        {tarifas.length > 0 && (
+                        {taxfees.length > 0 && (
                             <ul className="mt-2">
-                                {tarifas
-                                    .slice() 
-                                    .sort((a, b) => a.distance - b.distance) 
+                                {taxfees
+                                    .slice()
+                                    .sort((a, b) => a.distance - b.distance)
                                     .map((t, i) => (
                                         <li key={i} className="grid grid-cols-[1fr_1fr_auto] items-center gap-4 py-1">
                                             <span>Distância: {t.distance} KM</span>
                                             <span>Preço: {formatCurrencyBRL(t.price)}</span>
                                             <FaTrash
                                                 className="cursor-pointer text-red-500 justify-self-end"
-                                                onClick={() => isEditing && handleRemoveTarifa(i)}
+                                                onClick={() => isEditing && handleRemoveTaxfee(i)}
                                                 style={{ opacity: isEditing ? 1 : 0.5, pointerEvents: isEditing ? "auto" : "none" }}
                                             />
                                         </li>
