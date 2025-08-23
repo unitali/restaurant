@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { FaShoppingBasket } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { Cart, HeaderMenu, ProductCard, ProductCarousel } from "../components";
-import { CartProvider, useCart } from "../contexts/CartContext";
+import { HeaderMenu, ModalCheckout, ProductCard, ProductCarousel } from "../components";
+import { OrderProvider, useOrder } from "../contexts/OrderContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
 import { formatCurrencyBRL } from "../utils/currency";
@@ -13,18 +13,18 @@ export function MenuPage() {
 
   return (
     <RestaurantProvider restaurantId={restaurantId!}>
-      <CartProvider>
+      <OrderProvider>
         <div className="w-full max-w-2xl mx-auto">
           <MenuContent />
         </div>
-      </CartProvider>
+      </OrderProvider>
     </RestaurantProvider>
   );
 }
 
 function MenuContent() {
   const { restaurant, loading } = useRestaurant();
-  const { cart, total } = useCart();
+  const { cart, total } = useOrder();
   const [isOpenCart, setIsOpenCart] = useState(false);
   const [isAnyProductModalOpen, setIsAnyProductModalOpen] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -102,7 +102,7 @@ function MenuContent() {
           );
         })}
 
-        <Cart isOpen={isOpenCart} onClose={() => setIsOpenCart(false)} />
+        <ModalCheckout isOpen={isOpenCart} onClose={() => setIsOpenCart(false)} />
 
         {cart && cart.length > 0 && !isAnyProductModalOpen && !isOpenCart && (
           <nav

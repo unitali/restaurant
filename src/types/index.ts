@@ -26,9 +26,12 @@ export interface CompanyType {
 
 export interface AddressType {
     street: string;
-    city: string;
-    state: string;
-    zipCode: string;
+    number: string;
+    neighborhood: string;
+    reference?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
 }
 
 export interface ImageParams {

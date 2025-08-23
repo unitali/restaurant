@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { FaTrash } from "react-icons/fa";
-import { ButtonPrimary, ButtonPrimaryPlus, Input, Switch } from ".";
+import { useState, useEffect } from "react";
+import { ButtonPrimary, Input, Switch } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useRestaurants } from "../hooks/useRestaurants";
 import { LoadingPage } from "../pages/LoadingPage";
@@ -24,23 +23,47 @@ export function SettingsDelivery() {
     const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(initialDeliveryEnabled);
     const [isTakeoutEnabled, setIsTakeoutEnabled] = useState(initialTakeoutEnabled);
 
-    const [newTaxfee, setNewTaxfee] = useState({ distance: "", price: "" });
+    const initialTaxfee = restaurant?.company?.delivery?.tax?.[0] || { maxDistance: "", price: "" };
+
+    const [newTaxfee, setNewTaxfee] = useState({
+        distance: initialTaxfee.maxDistance ? String(initialTaxfee.maxDistance) : "",
+        price: initialTaxfee.price ? String(Math.round(Number(initialTaxfee.price) * 100)) : ""
+    });
+
+    useEffect(() => {
+        const tax = restaurant?.company?.delivery?.tax?.[0];
+        setNewTaxfee({
+            distance: tax?.maxDistance ? String(tax.maxDistance) : "",
+            price: tax?.price ? String(Math.round(tax.price * 100)) : ""
+        });
+    }, [restaurant]);
 
     const isChanged =
         isDeliveryEnabled !== initialDeliveryEnabled ||
         isTakeoutEnabled !== initialTakeoutEnabled ||
-        JSON.stringify(taxfees) !== JSON.stringify(taxfeesRegistered);
+        JSON.stringify(taxfees) !== JSON.stringify(taxfeesRegistered) ||
+        newTaxfee.distance !== "" ||
+        newTaxfee.price !== "";
 
-    const handleAddTaxfee = () => {
-        const distance = Number(newTaxfee.distance);
-        const price = Number(newTaxfee.price.replace(/\D/g, "")) / 100;
-        if (!distance || !price) return;
-        setTaxfees(prev => [...prev, { distance, price }]);
-        setNewTaxfee({ distance: "", price: "" });
-    };
+    // const handleAddTaxfee = () => {
+    //     const distance = Number(newTaxfee.distance);
+    //     const price = Number(newTaxfee.price.replace(/\D/g, "")) / 100;
+    //     if (!distance || !price) return;
+    //     setTaxfees(prev => [...prev, { distance, price }]);
+    //     setNewTaxfee({ distance: "", price: "" });
+    // };
 
-    const handleRemoveTaxfee = (index: number) => {
-        setTaxfees(prev => prev.filter((_, i) => i !== index));
+    // const handleRemoveTaxfee = (index: number) => {
+    //     setTaxfees(prev => prev.filter((_, i) => i !== index));
+    // };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setNewTaxfee(nt => ({
+            ...nt,
+            distance: name === "deliveryDistance" ? value : nt.distance,
+            price: name === "deliveryPrice" ? value.replace(/\D/g, "") : nt.price
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -56,10 +79,10 @@ export function SettingsDelivery() {
                     ? {
                         enabled: isDeliveryEnabled,
                         takeout: isTakeoutEnabled,
-                        tax: taxfees.map(t => ({
-                            price: t.price,
-                            maxDistance: t.distance
-                        })),
+                        tax: [{
+                            price: Number(newTaxfee.price) / 100,
+                            maxDistance: Number(newTaxfee.distance)
+                        }]
                     }
                     : null
             });
@@ -111,7 +134,7 @@ export function SettingsDelivery() {
                                     name="deliveryDistance"
                                     value={newTaxfee.distance}
                                     required={taxfees.length > 0 ? false : true}
-                                    onChange={e => setNewTaxfee(nt => ({ ...nt, distance: e.target.value }))}
+                                    onChange={handleChange}
                                     className="w-full"
                                     disabled={!isEditing}
                                 />
@@ -122,21 +145,22 @@ export function SettingsDelivery() {
                                     label="Preço"
                                     name="deliveryPrice"
                                     value={newTaxfee.price ? formatCurrencyBRL(Number(newTaxfee.price) / 100) : "R$ 0,00"}
-                                    onChange={e => setNewTaxfee(nt => ({ ...nt, price: e.target.value.replace(/\D/g, "") }))}
+                                    onChange={handleChange}
                                     required={taxfees.length > 0 ? false : true}
                                     className="w-full"
                                     disabled={!isEditing}
                                 />
                             </div>
-                            <div className="flex items-center justify-end h-full">
+                            {/* Add Delivery Tax Fee Button */}
+                            {/* <div className="flex items-center justify-end h-full">
                                 <ButtonPrimaryPlus
                                     id="add-delivery-taxfee"
                                     onClick={handleAddTaxfee}
                                     disabled={!isEditing}
                                 />
-                            </div>
+                            </div> */}
                         </div>
-                        {taxfees.length > 0 && (
+                        {/* {taxfees.length > 0 && (
                             <ul className="mt-2">
                                 {taxfees
                                     .slice()
@@ -153,7 +177,7 @@ export function SettingsDelivery() {
                                         </li>
                                     ))}
                             </ul>
-                        )}
+                        )} */}
                     </div>
                 )}
                 <ButtonPrimary
