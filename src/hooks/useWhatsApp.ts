@@ -57,12 +57,12 @@ export function useWhatsApp() {
                 .join("\n\n");
 
             const message =
-                `Pedido Nº: ${orderNumber}\n\n` +
+                `Pedido Nº: *${orderNumber}*\n\n` +
                 `${itemsMsg}\n` +
-                `\nTotal: ${formatCurrencyBRL(total)}\n\n` +
-                `\nEntrega: ${deliveryAddress ? addressFormat(deliveryAddress) : "Retirada no local"}` +
-                `\nPagamento: ${paymentMethod ? paymentMethods.find(method => method.id === paymentMethod)?.label : "Não informado"}` +
-                `\nObrigado pelo pedido!`;
+                `\nTotal: *${formatCurrencyBRL(total).trim()}* \n` +
+                `\nEntrega: ${deliveryAddress ? `*${addressFormat(deliveryAddress)}*` : "*RETIRADA NO LOCAL*"}\n` +
+                `\nPagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === paymentMethod)?.label}*` : "*Não informado*"}\n` +
+                `\n*Obrigado pelo pedido!*`;
 
             const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
             window.open(url, "_blank");
