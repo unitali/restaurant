@@ -13,6 +13,8 @@ const restaurantInitialState: CompanyType = {
     document: "",
     address: {
         street: "",
+        number: "",
+        neighborhood: "",
         city: "",
         state: "",
         zipCode: ""
@@ -25,6 +27,7 @@ const restaurantInitialState: CompanyType = {
     banner: null,
     isOpen: false,
     openingHours: {},
+    delivery: null,
 };
 
 const userInitialState: UserType = {
