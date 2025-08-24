@@ -1,13 +1,15 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useCart } from '../contexts/CartContext';
+import { useOrder } from '../contexts/OrderContext';
 import { useRestaurant } from '../contexts/RestaurantContext';
+import { addressFormat } from '../utils/addressFormat';
 import { formatCurrencyBRL } from '../utils/currency';
+import { paymentMethods } from '../utils/paymentsMethods';
 
 
 export function useWhatsApp() {
     const [loading, setLoading] = useState(false);
-    const { cart, total } = useCart();
+    const { cart, total, deliveryAddress, paymentMethod } = useOrder();
     const { restaurant } = useRestaurant();
 
     const sendOrder = useCallback(async (orderNumber: string) => {
@@ -23,7 +25,7 @@ export function useWhatsApp() {
         setLoading(true);
 
         try {
-             const itemsMsg = cart
+            const itemsMsg = cart
                 .map((product, index) => {
                     const optionsTotalPerUnit = product.options?.reduce(
                         (acc, opt) => acc + (opt.price * (opt.quantity ?? 1)),
@@ -55,10 +57,12 @@ export function useWhatsApp() {
                 .join("\n\n");
 
             const message =
-                `Pedido Nº: ${orderNumber}\n\n` +
+                `Pedido Nº: *${orderNumber}*\n\n` +
                 `${itemsMsg}\n` +
-                `\nTotal: ${formatCurrencyBRL(total)}\n\n` +
-                `Obrigado pelo pedido!`;
+                `\nTotal: *${formatCurrencyBRL(total).trim()}* \n` +
+                `\nEntrega: ${deliveryAddress ? `*${addressFormat(deliveryAddress)}*` : "*RETIRADA NO LOCAL*"}\n` +
+                `\nPagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === paymentMethod)?.label}*` : "*Não informado*"}\n` +
+                `\n*Obrigado pelo pedido!*`;
 
             const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
             window.open(url, "_blank");
@@ -69,7 +73,7 @@ export function useWhatsApp() {
             setLoading(false);
         }
 
-    }, [cart, total, restaurant ]);
+    }, [cart, total, restaurant]);
 
     return { sendOrder, loading };
 }

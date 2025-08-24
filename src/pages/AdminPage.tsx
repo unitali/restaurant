@@ -75,9 +75,7 @@ export function AdminPage() {
                         {/* Conteúdo das Tabs */}
                         <div className="w-full">
                             {activeTab === "products" && (
-                                <div className="overflow-x-auto w-full">
-                                    <ProductsTab />
-                                </div>
+                                <ProductsTab />
                             )}
 
                             {activeTab === "categories" && (

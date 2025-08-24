@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import type { CartItem } from "../types";
+import type { AddressType, CartItem } from "../types";
 
 const generateItemSignature = (product: CartItem): string => {
     const sortedOptions = product.options
@@ -13,28 +13,36 @@ const generateItemSignature = (product: CartItem): string => {
 
     return `${product.productId}|obs:${product.observation || ''}|opts:${optionsString}`;
 };
-interface CartContextType {
+
+interface OrderContextType {
     cart: CartItem[];
     total: number;
-    addToCart: (itemToAdd: CartItem) => void;
-    removeFromCart: (productId: string) => void;
-    clearCart: () => void;
+    addToOrder: (itemToAdd: CartItem) => void;
+    removeFromOrder: (productId: string) => void;
+    clearOrder: () => void;
+    addDeliveryAddress: (address: AddressType | null) => void;
+    deliveryAddress: AddressType | null;
+    paymentMethod: "card" | "pix" | "cash";
+    setPaymentMethod: (method: "card" | "pix" | "cash") => void;
 }
 
-const CartContext = createContext<CartContextType | null>(null);
 
-const CART_KEY = "restaurant_cart";
+const OrderContext = createContext<OrderContextType | null>(null);
 
-export function CartProvider({ children }: { children: ReactNode }) {
+const ORDER_KEY = "restaurant_order";
+
+export function OrderProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<CartItem[]>([]);
+    const [deliveryAddress, setDeliveryAddress] = useState<AddressType | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState<"card" | "pix" | "cash">("card");
 
     useEffect(() => {
-        const stored = localStorage.getItem(CART_KEY);
+        const stored = localStorage.getItem(ORDER_KEY);
         if (stored) setCart(JSON.parse(stored));
     }, []);
 
     useEffect(() => {
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        localStorage.setItem(ORDER_KEY, JSON.stringify(cart));
     }, [cart]);
 
     const total = cart.reduce((grandTotal, product) => {
@@ -47,8 +55,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return grandTotal + lineItemTotal;
     }, 0);
 
-
-    function addToCart(productToAdd: CartItem) {
+    function addToOrder(productToAdd: CartItem) {
         const signatureToAdd = generateItemSignature(productToAdd);
 
         setCart((prevCart) => {
@@ -58,12 +65,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
             if (existingItemIndex > -1) {
                 const updatedCart = [...prevCart];
-                const existingItem = { ...updatedCart[existingItemIndex] }; // Crie uma cópia para modificar
+                const existingItem = { ...updatedCart[existingItemIndex] };
 
-                // 2. Some a quantidade principal
                 existingItem.quantity += productToAdd.quantity;
 
-                // 3. Some as quantidades dos opcionais
                 if (existingItem.options && productToAdd.options) {
                     existingItem.options = existingItem.options.map(existingOpt => {
                         const optionToAdd = productToAdd.options?.find(opt => opt.id === existingOpt.id);
@@ -85,7 +90,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         });
     }
 
-    function removeFromCart(productId: string) {
+    function removeFromOrder(productId: string) {
         setCart((prev) => {
             const itemToRemove = prev.find(product => product.productId === productId);
 
@@ -101,19 +106,55 @@ export function CartProvider({ children }: { children: ReactNode }) {
         });
     }
 
-    function clearCart() {
+    function clearOrder() {
         setCart([]);
     }
 
+    function addDeliveryAddress(address: AddressType | null) {
+        setDeliveryAddress(address);
+
+        const storedOrder = localStorage.getItem(ORDER_KEY);
+        let orderData = storedOrder ? JSON.parse(storedOrder) : {};
+        orderData = {
+            ...orderData,
+            deliveryAddress: address
+        };
+        localStorage.setItem(ORDER_KEY, JSON.stringify(orderData));
+    }
+
+    function setPaymentMethodAndPersist(method: "card" | "pix" | "cash") {
+        setPaymentMethod(method);
+
+        const storedOrder = localStorage.getItem(ORDER_KEY);
+        let orderData = storedOrder ? JSON.parse(storedOrder) : {};
+        orderData = {
+            ...orderData,
+            paymentMethod: method
+        };
+        localStorage.setItem(ORDER_KEY, JSON.stringify(orderData));
+    }
+
     return (
-        <CartContext.Provider value={{ cart, total, addToCart, removeFromCart, clearCart }}>
+        <OrderContext.Provider
+            value={{
+                cart,
+                total,
+                addToOrder,
+                removeFromOrder,
+                clearOrder,
+                addDeliveryAddress,
+                deliveryAddress,
+                paymentMethod,
+                setPaymentMethod: setPaymentMethodAndPersist
+            }}
+        >
             {children}
-        </CartContext.Provider>
+        </OrderContext.Provider>
     );
 }
 
-export function useCart() {
-    const context = useContext(CartContext);
-    if (!context) throw new Error("useCart must be used within a CartProvider");
+export function useOrder() {
+    const context = useContext(OrderContext);
+    if (!context) throw new Error("useOrder must be used within an OrderProvider");
     return context;
 }

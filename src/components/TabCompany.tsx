@@ -40,6 +40,7 @@ export function CompanyTab() {
                 status: restaurant.company.status,
                 isOpen: restaurant.company.isOpen,
                 openingHours: restaurant.company.openingHours,
+                delivery: restaurant.company.delivery,
             });
         }
     }, [editCompany, restaurant]);
@@ -165,7 +166,7 @@ export function CompanyTab() {
         <section className="flex flex-col w-full mx-auto px-2 justify-center">
             <form
                 onSubmit={handleSubmit}
-                className="flex flex-col gap-3"
+                className="flex flex-col"
             >
                 <h2 className="text-xl font-semibold">Dados da Empresa</h2>
                 <Input
@@ -176,7 +177,7 @@ export function CompanyTab() {
                     onChange={handleChange}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
-                <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex flex-col md:flex-row md:gap-2">
                     <Input
                         id="company-name"
                         label="Nome Fantasia"
@@ -205,7 +206,7 @@ export function CompanyTab() {
                     onChange={handleChange}
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
-                <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex flex-col md:flex-row md:gap-2">
                     <Input
                         id="company-city"
                         label="Cidade"
@@ -248,22 +249,24 @@ export function CompanyTab() {
                         disabled={!editCompany || updateLoading || restaurantLoading}
                     />
                 </div>
-                <ImageUpload
-                    id="banner-image"
-                    label="Banner da Empresa"
-                    required={false}
-                    initialUrl={restaurant?.company.banner?.url}
-                    onStateChange={setBannerImageState}
-                    disabled={!editCompany || updateLoading || restaurantLoading}
-                />
-                <ImageUpload
-                    id="logo-image"
-                    label="Logo da Empresa"
-                    required={false}
-                    initialUrl={restaurant?.company.logo?.url || null}
-                    onStateChange={setLogoImageState}
-                    disabled={!editCompany || updateLoading || restaurantLoading}
-                />
+                <div className="flex flex-col md:flex-row md:gap-2">
+                    <ImageUpload
+                        id="banner-image"
+                        label="Banner da Empresa"
+                        required={false}
+                        initialUrl={restaurant?.company.banner?.url}
+                        onStateChange={setBannerImageState}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                    />
+                    <ImageUpload
+                        id="logo-image"
+                        label="Logo da Empresa"
+                        required={false}
+                        initialUrl={restaurant?.company.logo?.url || null}
+                        onStateChange={setLogoImageState}
+                        disabled={!editCompany || updateLoading || restaurantLoading}
+                    />
+                </div>
                 <ButtonPrimary
                     id={editCompany ? (isChanged ? "save-company" : "cancel-company") : "edit-company"}
                     type="submit"
