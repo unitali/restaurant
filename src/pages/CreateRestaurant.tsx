@@ -3,7 +3,6 @@ import { ButtonPrimary, Input } from "../components";
 import { HeaderPublic } from "../components/HeaderPublic";
 import { useRestaurants } from "../hooks/useRestaurants";
 import type { CompanyType, UserType } from "../types";
-import { plusDays, today } from "../utils/date";
 import { LoadingPage } from "./LoadingPage";
 
 const restaurantInitialState: CompanyType = {
@@ -20,14 +19,8 @@ const restaurantInitialState: CompanyType = {
         zipCode: ""
     },
     phone: "",
-    createdAt: today(),
-    expiredAt: plusDays(today(), 30),
-    status: "active",
     logo: null,
     banner: null,
-    isOpen: false,
-    openingHours: {},
-    delivery: null,
 };
 
 const userInitialState: UserType = {
@@ -40,14 +33,18 @@ const userInitialState: UserType = {
     createdAt: new Date(),
 };
 
-
 export function CreateRestaurant() {
     const { createRestaurantWithAdmin, loading } = useRestaurants();
     const [restaurant, setRestaurant] = useState<CompanyType>(restaurantInitialState);
     const [userAdmin, setUserAdmin] = useState<UserType>(userInitialState);
 
+    // Validação simples de senha
+    const isPasswordValid = userAdmin.password.length >= 6;
+    const isPasswordMatch = userAdmin.password === userAdmin.confirmPassword;
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        if (!isPasswordValid || !isPasswordMatch) return;
         await createRestaurantWithAdmin(
             restaurant,
             userAdmin,
@@ -57,12 +54,11 @@ export function CreateRestaurant() {
             }
         );
     }
+
     return (
         <>
             <HeaderPublic />
-
             <div className="flex justify-center items-center min-h-screen">
-
                 {loading ? <LoadingPage /> : (
                     <div className="w-full max-w-md bg-white p-8 rounded shadow">
                         <h2 id="create-restaurant-title" className="text-xl font-bold m-6">Criar Restaurante e Admin</h2>
@@ -79,6 +75,20 @@ export function CreateRestaurant() {
                                 label="Endereço"
                                 value={restaurant.address.street}
                                 onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, street: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-number"
+                                label="Número"
+                                value={restaurant.address.number}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, number: e.target.value } })}
+                                required
+                            />
+                            <Input
+                                id="restaurant-address-neighborhood"
+                                label="Bairro"
+                                value={restaurant.address.neighborhood}
+                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, neighborhood: e.target.value } })}
                                 required
                             />
                             <Input
@@ -125,6 +135,7 @@ export function CreateRestaurant() {
                                 value={userAdmin.password}
                                 onChange={e => setUserAdmin({ ...userAdmin, password: e.target.value })}
                                 required
+                                minLength={6}
                             />
                             <Input
                                 id="admin-confirm-password"
@@ -138,6 +149,7 @@ export function CreateRestaurant() {
                                 id="create-restaurant-button"
                                 className="w-full"
                                 type="submit"
+                                disabled={!isPasswordValid || !isPasswordMatch}
                                 children="Iniciar Período de Teste"
                             />
                         </form>

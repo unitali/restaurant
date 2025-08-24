@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import type { AddressType, CartItem } from "../types";
+import type { AddressType, CartItem, PaymentMethodsType } from "../types";
+import { createOrderNumber as orderNumberGenetator } from "../utils/orderNumber";
 
 const generateItemSignature = (product: CartItem): string => {
     const sortedOptions = product.options
@@ -14,6 +15,8 @@ const generateItemSignature = (product: CartItem): string => {
     return `${product.productId}|obs:${product.observation || ''}|opts:${optionsString}`;
 };
 
+const ORDER_KEY = "restaurant_order";
+
 interface OrderContextType {
     cart: CartItem[];
     total: number;
@@ -22,19 +25,22 @@ interface OrderContextType {
     clearOrder: () => void;
     addDeliveryAddress: (address: AddressType | null) => void;
     deliveryAddress: AddressType | null;
-    paymentMethod: "card" | "pix" | "cash";
-    setPaymentMethod: (method: "card" | "pix" | "cash") => void;
+    paymentMethod: PaymentMethodsType | null;
+    setPaymentMethod: (method: PaymentMethodsType | null) => void;
+    orderNumber: string | null;
+    createOrderNumber: () => string;
+    ORDER_KEY: typeof ORDER_KEY;
 }
 
 
 const OrderContext = createContext<OrderContextType | null>(null);
 
-const ORDER_KEY = "restaurant_order";
 
 export function OrderProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [deliveryAddress, setDeliveryAddress] = useState<AddressType | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState<"card" | "pix" | "cash">("card");
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethodsType | null>(null);
+    const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
     useEffect(() => {
         const stored = localStorage.getItem(ORDER_KEY);
@@ -90,6 +96,12 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         });
     }
 
+    function createOrderNumber() {
+        const newOrderNumber = orderNumberGenetator();
+        setOrderNumber(newOrderNumber);
+        return newOrderNumber;
+    }
+
     function removeFromOrder(productId: string) {
         setCart((prev) => {
             const itemToRemove = prev.find(product => product.productId === productId);
@@ -122,7 +134,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(ORDER_KEY, JSON.stringify(orderData));
     }
 
-    function setPaymentMethodAndPersist(method: "card" | "pix" | "cash") {
+    function setPaymentMethodAndPersist(method: PaymentMethodsType | null) {
         setPaymentMethod(method);
 
         const storedOrder = localStorage.getItem(ORDER_KEY);
@@ -145,7 +157,10 @@ export function OrderProvider({ children }: { children: ReactNode }) {
                 addDeliveryAddress,
                 deliveryAddress,
                 paymentMethod,
-                setPaymentMethod: setPaymentMethodAndPersist
+                setPaymentMethod: setPaymentMethodAndPersist,
+                ORDER_KEY,
+                orderNumber,
+                createOrderNumber
             }}
         >
             {children}

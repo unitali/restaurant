@@ -12,16 +12,8 @@ export interface CompanyType {
     document?: string;
     address: AddressType;
     phone: string;
-    createdAt?: Date;
-    expiredAt?: Date;
-    updatedAt?: Date;
-    shortUrlMenu?: string;
-    status: "active" | "inactive";
     logo: ImageType | null;
     banner: ImageType | null;
-    isOpen: boolean;
-    openingHours: OpeningHoursType;
-    delivery: DeliveryType | null;
 }
 
 export interface AddressType {
@@ -110,7 +102,22 @@ export interface RestaurantType {
     settings: SettingsType;
     products: ProductType[];
     orders: OrderType[];
-    delivery?: DeliveryType;
+    delivery?: DeliveryType | null;
+    paymentMethods?: PaymentMethodsType;
+    isOpen?: boolean;
+    openingHours?: OpeningHoursType;
+    plan?: PlanType;
+    createdAt?: Date;
+    expiredAt?: Date;
+    updatedAt?: Date;
+    status: "active" | "inactive";
+    shortUrlMenu?: string;
+}
+
+export interface PaymentMethodsType {
+    card: boolean;
+    cash: boolean;
+    pix: boolean;
 }
 
 export interface OrderType {
@@ -118,6 +125,8 @@ export interface OrderType {
     orderNumber: string;
     items: CartItem[];
     total: number;
+    address: AddressType | null;
+    paymentMethod: string;
     status: "pending" | "inProgress" | "completed" | "canceled";
     createdAt: Date;
     updatedAt?: Date;

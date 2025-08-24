@@ -2,34 +2,34 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { db } from "../config/firebase";
-import type { CartItem, OrderType } from "../types";
+import { useOrder } from '../contexts/OrderContext';
+import type { OrderType } from "../types";
+import { useRestaurant } from "../contexts/RestaurantContext";
 
-
-interface CreateOrderParams {
-    restaurantId: string;
-    cart: CartItem[];
-    total: number;
-    orderNumber: string;
-}
 
 export function useOrders() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
+    const [loadingOrder, setLoadingOrder] = useState(false);
+    const { ORDER_KEY, cart, total, orderNumber, deliveryAddress, paymentMethod } = useOrder();
+    const { restaurantId } = useRestaurant();
 
-    const createOrder = useCallback(async (params: CreateOrderParams) => {
-        const { restaurantId, cart, total, orderNumber } = params;
+    const createOrder = useCallback(async () => {
+        const storedOrder = localStorage.getItem(ORDER_KEY);
+        if (!storedOrder) {
+            toast.error("Nenhum pedido encontrado.");
+            return null;
+        }
 
-        setLoading(true);
-        setError(null);
+
+        setLoadingOrder(true);
 
         if (!restaurantId) {
             toast.error("ID do restaurante não fornecido.");
-            setLoading(false);
+            setLoadingOrder(false);
             return null;
         }
         if (cart.length === 0) {
             toast.warn("Seu carrinho está vazio.");
-            setLoading(false);
+            setLoadingOrder(false);
             return null;
         }
 
@@ -45,7 +45,10 @@ export function useOrders() {
                 total,
                 status: 'pending',
                 createdAt: new Date(),
-                orderNumber,
+                orderNumber: orderNumber ?? "",
+                address: deliveryAddress ?? null,
+                paymentMethod: typeof paymentMethod === "string" ? paymentMethod : String(paymentMethod) ?? "",
+
             };
 
             const updatedOrders = [...orders, newOrder];
@@ -56,18 +59,16 @@ export function useOrders() {
 
         } catch (err) {
             const error = err instanceof Error ? err : new Error("Erro desconhecido ao enviar o pedido.");
-            setError(error);
-            console.error("Erro ao criar pedido:", err);
+            console.error("Erro ao criar pedido:", error);
             toast.error("Não foi possível enviar o seu pedido.");
             return null;
         } finally {
-            setLoading(false);
+            setLoadingOrder(false);
         }
     }, []);
 
     return {
-        loading,
-        error,
+        loadingOrder,
         createOrder,
     };
 }

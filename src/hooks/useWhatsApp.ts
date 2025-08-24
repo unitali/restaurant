@@ -9,10 +9,10 @@ import { paymentMethods } from '../utils/paymentsMethods';
 
 export function useWhatsApp() {
     const [loading, setLoading] = useState(false);
-    const { cart, total, deliveryAddress, paymentMethod } = useOrder();
+    const { cart, total, deliveryAddress, paymentMethod, orderNumber } = useOrder();
     const { restaurant } = useRestaurant();
 
-    const sendOrder = useCallback(async (orderNumber: string) => {
+    const sendWhatsAppOrder = useCallback(async () => {
         if (!restaurant) {
             toast.error("Dados do restaurante não encontrados.");
             return;
@@ -61,19 +61,19 @@ export function useWhatsApp() {
                 `${itemsMsg}\n` +
                 `\nTotal: *${formatCurrencyBRL(total).trim()}* \n` +
                 `\nEntrega: ${deliveryAddress ? `*${addressFormat(deliveryAddress)}*` : "*RETIRADA NO LOCAL*"}\n` +
-                `\nPagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === paymentMethod)?.label}*` : "*Não informado*"}\n` +
-                `\n*Obrigado pelo pedido!*`;
+                `\nPagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label}*` : "*Não informado*"}\n` +
+            `\n*Obrigado pelo pedido!*`;
 
-            const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
-            window.open(url, "_blank");
-        } catch (error) {
-            console.error("Erro ao enviar pedido via WhatsApp:", error);
-            toast.error("Não foi possível preparar a mensagem para o WhatsApp.");
-        } finally {
-            setLoading(false);
-        }
+        const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+    } catch (error) {
+        console.error("Erro ao enviar pedido via WhatsApp:", error);
+        toast.error("Não foi possível preparar a mensagem para o WhatsApp.");
+    } finally {
+        setLoading(false);
+    }
 
-    }, [cart, total, restaurant]);
+}, [cart, total, restaurant]);
 
-    return { sendOrder, loading };
+return { sendWhatsAppOrder, loading };
 }

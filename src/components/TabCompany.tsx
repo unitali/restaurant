@@ -9,7 +9,7 @@ import { getShortUrl } from "../utils/shortUrl";
 
 export function CompanyTab() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();
-    const { updateRestaurantCompany, loading: updateLoading } = useRestaurantsManager();
+    const { updateRestaurant, loading: updateLoading, updateRestaurantCompany } = useRestaurantsManager();
     const { updateImage } = useImages();
 
     const [editCompany, setEditCompany] = useState(false);
@@ -37,10 +37,6 @@ export function CompanyTab() {
                 phone: restaurant.company.phone,
                 banner: restaurant.company.banner,
                 logo: restaurant.company.logo,
-                status: restaurant.company.status,
-                isOpen: restaurant.company.isOpen,
-                openingHours: restaurant.company.openingHours,
-                delivery: restaurant.company.delivery,
             });
         }
     }, [editCompany, restaurant]);
@@ -146,7 +142,7 @@ export function CompanyTab() {
         if (!restaurant) return;
         try {
             const shortUrl = await getShortUrl(restaurantId);
-            await updateRestaurantCompany(restaurantId, { shortUrlMenu: shortUrl });
+            await updateRestaurant(restaurantId, { shortUrlMenu: shortUrl });
             refresh();
             toast.success("Link do cardápio criado com sucesso!");
         } catch (error) {
@@ -274,12 +270,12 @@ export function CompanyTab() {
                 >
                     {buttonText()}
                 </ButtonPrimary>
-                {restaurant?.company?.shortUrlMenu ? (
+                {restaurant?.shortUrlMenu ? (
                     <LabelCopy
                         id="link-menu"
                         label="Link do Cardapio"
                         name="menuLink"
-                        value={restaurant?.company?.shortUrlMenu}
+                        value={restaurant?.shortUrlMenu}
                         disabled={!editCompany || updateLoading || restaurantLoading}
                     />
                 ) : (
