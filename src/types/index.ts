@@ -21,13 +21,17 @@ export interface CompanyType {
     banner: ImageType | null;
     isOpen: boolean;
     openingHours: OpeningHoursType;
+    delivery: DeliveryType | null;
 }
 
 export interface AddressType {
     street: string;
-    city: string;
-    state: string;
-    zipCode: string;
+    number: string;
+    neighborhood: string;
+    reference?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
 }
 
 export interface ImageParams {
@@ -90,6 +94,15 @@ export interface OpeningHoursType {
     };
 }
 
+export interface DeliveryType {
+    enabled: boolean;
+    takeout: boolean;
+    tax: {
+        price: number;
+        maxDistance: number;
+    }[]
+}
+
 export interface RestaurantType {
     id?: string;
     company: CompanyType;
@@ -97,6 +110,7 @@ export interface RestaurantType {
     settings: SettingsType;
     products: ProductType[];
     orders: OrderType[];
+    delivery?: DeliveryType;
 }
 
 export interface OrderType {

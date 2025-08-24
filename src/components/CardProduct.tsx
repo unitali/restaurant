@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { FaFileImage } from "react-icons/fa";
 import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, Input, Modal } from ".";
-import { useCart } from "../contexts/CartContext";
+import { useOrder } from "../contexts/OrderContext";
 import type { ProductType } from "../types";
 import { formatCurrencyBRL } from "../utils/currency";
 interface ProductCardProps {
@@ -14,7 +14,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
     const [quantity, setQuantity] = useState(0);
     const [observation, setObservation] = useState("");
 
-    const { addToCart } = useCart();
+    const { addToOrder } = useOrder();
 
     const [optionQuantities, setOptionQuantities] = useState(
         Array.isArray(product.options) ? product.options.map(() => 0) : []
@@ -79,7 +79,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
             options: selectedOptions,
         };
 
-        addToCart(cartItem);
+        addToOrder(cartItem);
         closeModal();
     };
 

@@ -263,6 +263,7 @@ export function ProductModal(props: ProductModalProps) {
                                 Adicionar Campo Observação?
                             </span>
                             <Switch
+                                id="product-observation"
                                 value={isActive}
                                 onChange={setIsActive}
                             />
