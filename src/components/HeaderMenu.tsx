@@ -8,7 +8,7 @@ export function HeaderMenu() {
     const { restaurant } = useRestaurant();
     const [showHours, setShowHours] = useState(false);
 
-    const openingDays = restaurant?.company?.openingHours || {};
+    const openingDays = restaurant?.openingHours || {};
 
     const handleShowHours = () => {
         setShowHours((prev) => !prev);
@@ -27,11 +27,11 @@ export function HeaderMenu() {
                 <div className="absolute bottom-4 right-4 flex items-center space-x-2 z-10">
                     {/* Botão Aberto/Fechado */}
                     <div
-                        className={`bg-opacity-80 rounded-full p-3 shadow cursor-pointer flex items-center ${restaurant?.company.isOpen ? 'bg-green-100' : 'bg-red-100'}`}
+                        className={`bg-opacity-80 rounded-full p-3 shadow cursor-pointer flex items-center ${restaurant?.isOpen ? 'bg-green-100' : 'bg-red-100'}`}
                         onClick={handleShowHours}
                         id="open-hours-btn"
                     >
-                        {restaurant?.company.isOpen ? (
+                        {restaurant?.isOpen ? (
                             <>
                                 <FaShop
                                     className="text-green-500"

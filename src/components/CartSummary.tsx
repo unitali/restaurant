@@ -1,39 +1,49 @@
-import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary } from ".";
 import { useOrder } from "../contexts/OrderContext";
+import { useOrders } from "../hooks/useOrders";
 import { useWhatsApp } from "../hooks/useWhatsApp";
+import { addressFormat } from "../utils/addressFormat";
 import { formatCurrencyBRL } from "../utils/currency";
 import { createOrderNumber } from "../utils/orderNumber";
 import { paymentMethods } from "../utils/paymentsMethods";
-import { addressFormat } from "../utils/addressFormat";
 
+interface CartSummaryProps {
+    onBack: () => void;
+    onClose: () => void;
+}
 
-export function CartSummary({ onBack }: { onBack: () => void }) {
-    const { cart, total, deliveryAddress, paymentMethod } = useOrder();
-    const { sendOrder } = useWhatsApp();
+export function CartSummary(props: CartSummaryProps) {
+    const { cart, total, deliveryAddress, paymentMethod, clearOrder } = useOrder();
+    const { createOrder } = useOrders();
+    const { sendWhatsAppOrder } = useWhatsApp();
     const isDelivery = !!deliveryAddress;
 
-    const handleSendOrder = () => {
-
-        sendOrder(createOrderNumber());
-        toast.success("Pedido enviado!");
+    const handleSendOrder = async () => {
+        let orderNumber = createOrderNumber();
+        await sendWhatsAppOrder(orderNumber);
+        await createOrder(orderNumber);
+        props.onClose();
+        clearOrder();
     };
+
+    const paymentLabel =
+        paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label || "Não informado";
 
     return (
         <div className="flex flex-col gap-4">
             <div>
                 <h5 className="font-semibold text-lg">Pedido</h5>
                 <div className="flex flex-col">
-                    {cart.map(item => (
-                        <div>
-                            <div key={item.productId} className="flex justify-between">
+                    {cart.map((item, index) => (
+                        <div key={index}>
+                            <div className="flex justify-between">
                                 <span>{item.quantity} x {item.name}</span>
-                                <span>{formatCurrencyBRL(item.price * item.quantity)}</span>
+                                <span>{formatCurrencyBRL((item.price ?? 0) * item.quantity)}</span>
                             </div>
                             {item.options && (
                                 <div className="flex flex-col pl-4">
-                                    {item.options.map(option => (
-                                        <span key={option.id}>{option.quantity} x {option.name}</span>
+                                    {item.options.map((option, index) => (
+                                        <span key={index}>{option.quantity} x {option.name}</span>
                                     ))}
                                 </div>
                             )}
@@ -55,11 +65,11 @@ export function CartSummary({ onBack }: { onBack: () => void }) {
             )}
             <div>
                 <h5 className="font-semibold">Forma de pagamento</h5>
-                <div>{paymentMethods.find(method => method.id === paymentMethod)?.label}</div>
+                <div>{paymentLabel}</div>
             </div>
             <div className="flex gap-2">
                 <ButtonOutline id="summary-back"
-                    onClick={onBack}
+                    onClick={props.onBack}
                     children="Voltar" />
                 <ButtonPrimary id="summary-confirm"
                     onClick={handleSendOrder}

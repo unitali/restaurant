@@ -8,7 +8,6 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
     const { addDeliveryAddress, deliveryAddress } = useOrder();
     const [isDelivery, setIsDelivery] = useState(false);
 
-    // Inicializa address como null se não for entrega
     const [address, setAddress] = useState<AddressType | null>(
         isDelivery ? (deliveryAddress ?? {
             street: "",
@@ -85,7 +84,6 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                             id="delivery-street"
                             name="street"
                             label="Rua"
-                            placeholder="Digite a rua"
                             value={address.street}
                             onChange={handleChange}
                             required
@@ -96,7 +94,6 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                                 id="delivery-number"
                                 name="number"
                                 label="Número"
-                                placeholder="Digite o número"
                                 value={address.number}
                                 onChange={handleChange}
                                 required
@@ -105,7 +102,6 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                                 id="delivery-state"
                                 name="neighborhood"
                                 label="Bairro"
-                                placeholder="Digite o bairro"
                                 value={address.neighborhood}
                                 onChange={handleChange}
                                 required
@@ -114,7 +110,6 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                                 id="delivery-reference"
                                 name="reference"
                                 label="Referência"
-                                placeholder="Digite a referência"
                                 value={address.reference || ""}
                                 onChange={handleChange}
                             />
@@ -122,7 +117,6 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                                 id="delivery-zipCode"
                                 name="zipCode"
                                 label="CEP"
-                                placeholder="Digite o CEP"
                                 value={address.zipCode || ""}
                                 onChange={handleChange}
                             />

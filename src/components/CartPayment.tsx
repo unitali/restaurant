@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { ButtonOutline, ButtonPrimary, RadioButton } from ".";
 import { useOrder } from "../contexts/OrderContext";
+import type { PaymentMethodsType } from "../types";
+import { paymentMethods } from "../utils/paymentsMethods";
+
 
 export function CartPayment({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
     const { paymentMethod, setPaymentMethod } = useOrder();
-    const [selectedMethod, setSelectedMethod] = useState(paymentMethod ?? "card");
+    const [selectedMethod, setSelectedMethod] = useState<PaymentMethodsType>(
+        paymentMethod ?? (paymentMethods[0]?.id as unknown as PaymentMethodsType)
+    );
 
     const handleNext = () => {
         setPaymentMethod(selectedMethod);
@@ -12,29 +17,17 @@ export function CartPayment({ onNext, onBack }: { onNext: () => void; onBack: ()
     };
 
     return (
-        <div className="flex flex-col gap-4">
-            <div>
-                <p className="text-lg font-medium mb-2">Escolha a forma de pagamento</p>
-                <div className="flex flex-col gap-2">
+        <div>
+            <div className="flex flex-col gap-2">
+                {paymentMethods.map((option, index) => (
                     <RadioButton
-                        name="payment-cash"
-                        label="Dinheiro"
-                        checked={selectedMethod === "cash"}
-                        onChange={() => setSelectedMethod("cash")}
+                        key={index}
+                        name="payment-method"
+                        label={option.label}
+                        checked={selectedMethod === (option.id as unknown as PaymentMethodsType)}
+                        onChange={() => setSelectedMethod(option.id as unknown as PaymentMethodsType)}
                     />
-                    <RadioButton
-                        name="payment-card"
-                        checked={selectedMethod === "card"}
-                        label="Cartão"
-                        onChange={() => setSelectedMethod("card")}
-                    />
-                    <RadioButton
-                        name="payment-pix"
-                        checked={selectedMethod === "pix"}
-                        label="Pix"
-                        onChange={() => setSelectedMethod("pix")}
-                    />
-                </div>
+                ))}
             </div>
             <div className="flex gap-2">
                 <ButtonOutline
