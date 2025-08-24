@@ -15,7 +15,7 @@ type OpeningDaysState = {
 
 export function CompanyOpeningHours() {
     const { restaurantId, restaurant } = useRestaurant();
-    const { updateRestaurantCompany, loading } = useRestaurants();
+    const { updateRestaurant, loading } = useRestaurants();
     const [edit, setEdit] = useState(false);
 
     const [openingDays, setOpeningDays] = useState<OpeningDaysState>(
@@ -26,18 +26,18 @@ export function CompanyOpeningHours() {
     );
 
     useEffect(() => {
-        if (restaurant?.company?.openingHours) {
+        if (restaurant?.openingHours) {
             setOpeningDays(() => {
-                const bd = restaurant.company.openingHours;
+                const bd = restaurant.openingHours || {};
                 return daysOfWeek.reduce((acc, day) => {
-                    acc[day] = bd[day]
+                    acc[day] =  bd[day]
                         ? { open: !!bd[day].open, hours: bd[day].hours || "" }
                         : { open: false, hours: "" };
                     return acc;
                 }, {} as OpeningDaysState);
             });
         }
-    }, [restaurant?.company?.openingHours]);
+    }, [restaurant?.openingHours]);
 
     const handleCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!edit) return;
@@ -67,7 +67,7 @@ export function CompanyOpeningHours() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (edit) {
-            await updateRestaurantCompany(restaurantId, { openingHours: openingDays });
+            await updateRestaurant(restaurantId, { openingHours: openingDays });
             setEdit(false);
         } else {
             setEdit(true);

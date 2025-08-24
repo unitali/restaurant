@@ -27,7 +27,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
         const optionsTotal = Array.isArray(product.options)
             ? product.options.reduce((acc, option, idx) => {
                 const optionQuantity = optionQuantities[idx] || 0;
-                return acc + (option.price * optionQuantity);
+                return acc + ((option.price ?? 0) * optionQuantity);
             }, 0)
             : 0;
 
@@ -157,7 +157,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
                                                 />
                                             </div>
                                             <label htmlFor={`optional-${idx}`} className="ms-4 text-gray-800 text-xl">
-                                                {option.name} (+{formatCurrencyBRL(option.price)})
+                                                {option.name} (+{formatCurrencyBRL(option.price ?? 0)})
                                             </label>
                                         </li>
                                     ))}

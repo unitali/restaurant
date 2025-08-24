@@ -7,13 +7,13 @@ import { formatCurrencyBRL } from "../utils/currency";
 
 export function SettingsDelivery() {
     const { restaurant, restaurantId, refresh } = useRestaurant();
-    const { updateRestaurantCompany } = useRestaurants();
+    const { updateRestaurant } = useRestaurants();
     const [loading, setLoading] = useState(false);
 
-    const initialDeliveryEnabled = !!restaurant?.company?.delivery?.enabled;
-    const initialTakeoutEnabled = !!restaurant?.company?.delivery?.takeout;
+    const initialDeliveryEnabled = !!restaurant?.delivery?.enabled;
+    const initialTakeoutEnabled = !!restaurant?.delivery?.takeout;
     const taxfeesRegistered =
-        restaurant?.company?.delivery?.tax?.map(d => ({
+        restaurant?.delivery?.tax?.map(d => ({
             distance: d.maxDistance || 0,
             price: d.price || 0,
         })) || [];
@@ -23,7 +23,7 @@ export function SettingsDelivery() {
     const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(initialDeliveryEnabled);
     const [isTakeoutEnabled, setIsTakeoutEnabled] = useState(initialTakeoutEnabled);
 
-    const initialTaxfee = restaurant?.company?.delivery?.tax?.[0] || { maxDistance: "", price: "" };
+    const initialTaxfee = restaurant?.delivery?.tax?.[0] || { maxDistance: "", price: "" };
 
     const [newTaxfee, setNewTaxfee] = useState({
         distance: initialTaxfee.maxDistance ? String(initialTaxfee.maxDistance) : "",
@@ -31,7 +31,7 @@ export function SettingsDelivery() {
     });
 
     useEffect(() => {
-        const tax = restaurant?.company?.delivery?.tax?.[0];
+        const tax = restaurant?.delivery?.tax?.[0];
         setNewTaxfee({
             distance: tax?.maxDistance ? String(tax.maxDistance) : "",
             price: tax?.price ? String(Math.round(tax.price * 100)) : ""
@@ -74,7 +74,7 @@ export function SettingsDelivery() {
         }
         if (isChanged) {
             setLoading(true);
-            await updateRestaurantCompany(restaurantId, {
+            await updateRestaurant(restaurantId, {
                 delivery: isDeliveryEnabled
                     ? {
                         enabled: isDeliveryEnabled,
@@ -84,7 +84,11 @@ export function SettingsDelivery() {
                             maxDistance: Number(newTaxfee.distance)
                         }]
                     }
-                    : null
+                    : {
+                        enabled: isDeliveryEnabled,
+                        takeout: isTakeoutEnabled,
+                        tax: []
+                    }
             });
             setLoading(false);
             setIsEditing(false);
@@ -190,4 +194,3 @@ export function SettingsDelivery() {
         </div>
     );
 }
-

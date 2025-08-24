@@ -61,8 +61,6 @@ export function useRestaurants() {
             const data: Omit<RestaurantType, 'id'> = {
                 company: {
                     ...props,
-                    createdAt: props.createdAt || today(),
-                    status: props.status || "active",
                 },
                 categories: [],
                 settings: {
@@ -71,8 +69,18 @@ export function useRestaurants() {
                     secondaryColor: "#fbbf24",
                     secondaryTextColor: "#000000",
                 },
+                createdAt: today(),
+                status: "active",
                 orders: [],
                 products: [],
+                isOpen: false,
+                openingHours: {},
+                paymentMethods: {
+                    card: false,
+                    cash: false,
+                    pix: false
+                },
+                delivery: null
             };
 
             const docRef = await addDoc(collection(db, "restaurants"), data);
@@ -168,6 +176,29 @@ export function useRestaurants() {
         [createRestaurant]
     );
 
+    const updateRestaurant = useCallback(async (restaurantId: string, data: Partial<RestaurantType>) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const restaurantRef = doc(db, "restaurants", restaurantId);
+            await updateDoc(restaurantRef, data);
+            setCurrentRestaurant(prev => prev
+                ? { ...prev, ...data }
+                : null
+            );
+            if (data.isOpen !== undefined) {
+                toast.success(`Restaurante ${data.isOpen ? 'aberto' : 'fechado'} com sucesso!`);
+            } else {
+                toast.success("Dados atualizados com sucesso!");
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
+            toast.error("Não foi possível atualizar os dados.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     const updateRestaurantCompany = useCallback(async (restaurantId: string, data: Partial<CompanyType>) => {
         setLoading(true);
         setError(null);
@@ -182,11 +213,6 @@ export function useRestaurants() {
                 ? { ...prev, company: { ...prev.company, ...data } }
                 : null
             );
-            if (data.isOpen !== undefined) {
-                toast.success(`Restaurante ${data.isOpen ? 'aberto' : 'fechado'} com sucesso!`);
-            } else {
-                toast.success("Dados atualizados com sucesso!");
-            }
         } catch (err) {
             setError(err instanceof Error ? err : new Error("Ocorreu um erro desconhecido."));
             toast.error("Não foi possível atualizar os dados.");
@@ -205,5 +231,6 @@ export function useRestaurants() {
         createRestaurant,
         createRestaurantWithAdmin,
         updateRestaurantCompany,
+        updateRestaurant
     };
 }

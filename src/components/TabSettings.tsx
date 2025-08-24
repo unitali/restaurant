@@ -1,4 +1,5 @@
 import { CompanyOpeningHours, SettingsDelivery } from ".";
+import { SettingsPayment } from "./SettingsPayment";
 
 export function SettingsTab() {
     return (
@@ -10,6 +11,7 @@ export function SettingsTab() {
                 </div>
                 <div>
                     <SettingsDelivery />
+                    <SettingsPayment />
                 </div>
             </div>
         </section>

@@ -10,11 +10,11 @@ import { PopUpConfirmOpen } from './PopUpConfirmOpen';
 
 export function HeaderAdmin() {
     const { restaurantId, restaurant, refresh, loading: restaurantLoading } = useRestaurant();
-    const { updateRestaurantCompany, loading: updateLoading } = useRestaurants();
+    const { updateRestaurant, loading: updateLoading } = useRestaurants();
     const { logout } = useAuth();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-    const isOpen = restaurant?.company.isOpen ?? false;
+    const isOpen = restaurant?.isOpen ?? false;
 
     const handleMenuPage = () => {
         if (restaurantId) {
@@ -28,7 +28,7 @@ export function HeaderAdmin() {
 
     const handleOpenAndClose = async () => {
         setIsConfirmOpen(false);
-        await updateRestaurantCompany(restaurantId, { isOpen: !isOpen });
+        await updateRestaurant(restaurantId, { isOpen: !isOpen });
         refresh();
     };
 

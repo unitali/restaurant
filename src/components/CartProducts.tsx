@@ -26,7 +26,7 @@ export function CartProducts({ onNext }: { onNext: () => void }) {
                                 {product.options.map((option, index) => (
                                     <li key={`option-${index}`}>
                                         - {option.quantity}x {option.name} (
-                                        {formatCurrencyBRL(option.price)})
+                                        {formatCurrencyBRL(option.price ?? 0)})
                                     </li>
                                 ))}
                             </ul>
@@ -44,10 +44,10 @@ export function CartProducts({ onNext }: { onNext: () => void }) {
                             />
                             <span className="ml-3 text-green-700 font-bold flex-1 text-right">
                                 {formatCurrencyBRL(
-                                    (product.price +
+                                    ((product.price ?? 0) +
                                         (product.options?.reduce(
                                             (acc, opt) =>
-                                                acc + opt.price * (opt.quantity ?? 1),
+                                                acc + (opt.price ?? 0) * (opt.quantity ?? 1),
                                             0
                                         ) ?? 0)) *
                                     product.quantity

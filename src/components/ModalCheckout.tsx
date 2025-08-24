@@ -1,16 +1,5 @@
 import { useState } from "react";
 import { CartDelivery, CartPayment, CartProducts, CartSummary, Modal } from ".";
-
-
-
-function ModalHeader({ children }: { children: React.ReactNode }) {
-    return <div className="border-b px-6 py-4 text-xl font-bold">{children}</div>;
-}
-
-function ModalContent({ children }: { children: React.ReactNode }) {
-    return <div className="px-6 py-4">{children}</div>;
-}
-
 interface ModalCheckoutProps {
     isOpen: boolean;
     onClose: () => void;
@@ -27,18 +16,18 @@ export function ModalCheckout(props: ModalCheckoutProps) {
             id="checkout-modal"
             isOpen={props.isOpen}
             onClose={props.onClose}>
-            <ModalHeader>
+            <div className="border-b px-6 py-4 text-xl font-bold">
                 {step === 1 && "Carrinho"}
                 {step === 2 && "Entrega"}
                 {step === 3 && "Pagamento"}
                 {step === 4 && "Finalizar Pedido"}
-            </ModalHeader>
-            <ModalContent>
+            </div>
+            <div className="px-6 py-4">
                 {step === 1 && <CartProducts onNext={nextStep} />}
                 {step === 2 && <CartDelivery onNext={nextStep} onBack={prevStep} />}
                 {step === 3 && <CartPayment onNext={nextStep} onBack={prevStep} />}
-                {step === 4 && <CartSummary onBack={prevStep} />}
-            </ModalContent>
+                {step === 4 && <CartSummary onBack={prevStep} onClose={props.onClose} />}
+            </div>
         </Modal>
     );
 }
