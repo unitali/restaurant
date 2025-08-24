@@ -9,10 +9,10 @@ import { paymentMethods } from '../utils/paymentsMethods';
 
 export function useWhatsApp() {
     const [loading, setLoading] = useState(false);
-    const { cart, total, deliveryAddress, paymentMethod, orderNumber } = useOrder();
+    const { cart, total, deliveryAddress, paymentMethod } = useOrder();
     const { restaurant } = useRestaurant();
 
-    const sendWhatsAppOrder = useCallback(async () => {
+    const sendWhatsAppOrder = useCallback(async (orderNumber: string) => {
         if (!restaurant) {
             toast.error("Dados do restaurante não encontrados.");
             return;
@@ -28,15 +28,15 @@ export function useWhatsApp() {
             const itemsMsg = cart
                 .map((product, index) => {
                     const optionsTotalPerUnit = product.options?.reduce(
-                        (acc, opt) => acc + (opt.price * (opt.quantity ?? 1)),
+                        (acc, opt) => acc + ((opt.price ?? 0) * (opt.quantity ?? 1)),
                         0
                     ) ?? 0;
 
-                    const lineSubtotal = (product.price + optionsTotalPerUnit) * product.quantity;
+                    const lineSubtotal = ((product.price ?? 0) + optionsTotalPerUnit) * product.quantity;
 
                     const optionsString = product.options && product.options.length > 0
                         ? `  Opções:\n${product.options
-                            .map(opt => `    - ${opt.quantity}x ${opt.name} (+${formatCurrencyBRL(opt.price)})`)
+                            .map(opt => `    - ${opt.quantity}x ${opt.name} (+${formatCurrencyBRL(opt.price ?? 0)})`)
                             .join("\n")}\n`
                         : "";
 
@@ -47,7 +47,7 @@ export function useWhatsApp() {
                     return (
                         `${index + 1}. ${product.name}\n` +
                         `  Quantidade: ${product.quantity}\n` +
-                        `  Preço: ${formatCurrencyBRL(product.price)}\n` +
+                        `  Preço: ${formatCurrencyBRL(product.price ?? 0)}\n` +
                         optionsString +
                         observationString +
                         `  Subtotal: ${formatCurrencyBRL(lineSubtotal)}\n` +
@@ -62,18 +62,18 @@ export function useWhatsApp() {
                 `\nTotal: *${formatCurrencyBRL(total).trim()}* \n` +
                 `\nEntrega: ${deliveryAddress ? `*${addressFormat(deliveryAddress)}*` : "*RETIRADA NO LOCAL*"}\n` +
                 `\nPagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label}*` : "*Não informado*"}\n` +
-            `\n*Obrigado pelo pedido!*`;
+                `\n*Obrigado pelo pedido!*`;
 
-        const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
-        window.open(url, "_blank");
-    } catch (error) {
-        console.error("Erro ao enviar pedido via WhatsApp:", error);
-        toast.error("Não foi possível preparar a mensagem para o WhatsApp.");
-    } finally {
-        setLoading(false);
-    }
+            const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
+            window.open(url, "_blank");
+        } catch (error) {
+            console.error("Erro ao enviar pedido via WhatsApp:", error);
+            toast.error("Não foi possível preparar a mensagem para o WhatsApp.");
+        } finally {
+            setLoading(false);
+        }
 
-}, [cart, total, restaurant]);
+    }, [cart, total, restaurant]);
 
-return { sendWhatsAppOrder, loading };
+    return { sendWhatsAppOrder, loading };
 }

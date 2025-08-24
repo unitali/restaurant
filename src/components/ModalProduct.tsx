@@ -130,7 +130,7 @@ export function ProductModal(props: ProductModalProps) {
     };
 
     const handleAddOption = () => {
-        if (!newOption.name.trim()) {
+        if (!(newOption.name ?? "").trim()) {
             toast.error("Informe o nome do opcional.");
             return;
         }
@@ -284,7 +284,7 @@ export function ProductModal(props: ProductModalProps) {
                                             id="option-price"
                                             label="Preço"
                                             name="optionPrice"
-                                            value={formatCurrencyBRL(newOption.price)}
+                                            value={formatCurrencyBRL(newOption.price ?? 0)}
                                             onChange={handleChange}
                                         />
                                     </div>
@@ -316,7 +316,7 @@ export function ProductModal(props: ProductModalProps) {
                                 <ul className="list-disc space-y-2">
                                     {product.options.map((opt, idx) => (
                                         <li key={idx} className="flex items-center w-full p-4 pt-5 rounded left-3 top-0 bg-white text-teal-500 border border-teal-500">
-                                            <span>{opt.name} - {formatCurrencyBRL(opt.price)}</span>
+                                            <span>{opt.name} - {formatCurrencyBRL(opt.price ?? 0)}</span>
                                             <FaTrash className="ml-auto text-red-500 cursor-pointer"
                                                 onClick={() => handleRemoveOption(idx)} />
                                         </li>

@@ -53,10 +53,10 @@ export function OrderProvider({ children }: { children: ReactNode }) {
 
     const total = cart.reduce((grandTotal, product) => {
         const optionsPricePerUnit = product.options?.reduce((optionsSubtotal, option) => {
-            return optionsSubtotal + (option.price * (option.quantity ?? 1));
+            return optionsSubtotal + ((option.price ?? 0) * (option.quantity ?? 1));
         }, 0) ?? 0;
 
-        const singleItemPrice = product.price + optionsPricePerUnit;
+        const singleItemPrice = (product.price ?? 0) + optionsPricePerUnit;
         const lineItemTotal = singleItemPrice * product.quantity;
         return grandTotal + lineItemTotal;
     }, 0);

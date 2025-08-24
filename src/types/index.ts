@@ -48,8 +48,8 @@ export interface ImageState {
 
 export interface CartItem {
     productId: string;
-    name: string;
-    price: number;
+    name?: string;
+    price?: number;
     quantity: number;
     observation?: string;
     options?: ProductOptionsType[];
@@ -69,8 +69,8 @@ export interface ProductType {
 }
 export interface ProductOptionsType {
     id: string;
-    name: string;
-    price: number;
+    name?: string;
+    price?: number;
     quantity?: number;
 }
 export interface PlanType {
@@ -122,9 +122,8 @@ export interface PaymentMethodsType {
 
 export interface OrderType {
     id?: string;
-    orderNumber: string;
     items: CartItem[];
-    total: number;
+    total?: number;
     address: AddressType | null;
     paymentMethod: string;
     status: "pending" | "inProgress" | "completed" | "canceled";

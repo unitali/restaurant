@@ -7,7 +7,9 @@ import { paymentMethods } from "../utils/paymentsMethods";
 
 export function CartPayment({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
     const { paymentMethod, setPaymentMethod } = useOrder();
-    const [selectedMethod, setSelectedMethod] = useState<PaymentMethodsType | null>(paymentMethod);
+    const [selectedMethod, setSelectedMethod] = useState<PaymentMethodsType>(
+        paymentMethod ?? (paymentMethods[0]?.id as unknown as PaymentMethodsType)
+    );
 
     const handleNext = () => {
         setPaymentMethod(selectedMethod);
@@ -17,12 +19,12 @@ export function CartPayment({ onNext, onBack }: { onNext: () => void; onBack: ()
     return (
         <div>
             <div className="flex flex-col gap-2">
-                {paymentMethods.map(option => (
+                {paymentMethods.map((option, index) => (
                     <RadioButton
-                        key={option.id}
+                        key={index}
                         name="payment-method"
                         label={option.label}
-                        checked={selectedMethod === option.id as unknown as PaymentMethodsType}
+                        checked={selectedMethod === (option.id as unknown as PaymentMethodsType)}
                         onChange={() => setSelectedMethod(option.id as unknown as PaymentMethodsType)}
                     />
                 ))}
