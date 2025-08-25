@@ -1,5 +1,4 @@
 export * from './Button';
-export * from './CardPlan';
 export * from './CardProduct';
 export * from './CarouselProduct';
 export * from './CartDelivery';
