@@ -42,8 +42,6 @@ function MenuContent() {
   if (loading) return <LoadingPage />;
   if (!restaurant) return null;
 
-  const featuredProducts = products.slice(0, 3);
-
   const handleOpenCart = () => {
     setIsOpenCart(true);
     setIsAnyProductModalOpen(false);
@@ -68,16 +66,20 @@ function MenuContent() {
           ))}
       </nav>
       <main className="w-full mx-auto p-2 max-w-2xl bg-gray-50 relative">
-        <section className="my-6">
-          <h2 className="text-xl font-bold mb-2">Destaques</h2>
-          {featuredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              setIsAnyProductModalOpen={setIsAnyProductModalOpen}
-            />
-          ))}
-        </section>
+        {products.some(product => product.topPick) && (
+          <section className="my-6">
+            <h2 className="text-xl font-bold mb-2">Destaques</h2>
+            {products
+              .filter(product => product.topPick)
+              .map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  setIsAnyProductModalOpen={setIsAnyProductModalOpen}
+                />
+              ))}
+          </section>
+        )}
 
         {categories.map((category) => {
           const productsOfCategory = products.filter(

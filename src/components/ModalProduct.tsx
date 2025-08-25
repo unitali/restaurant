@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaSave, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { ButtonOutline, ButtonPrimary, ImageUpload, Input, Modal, Select, Switch } from ".";
@@ -17,6 +17,7 @@ const initialProductState: ProductType = {
     categoryId: "",
     image: null,
     observationDisplay: false,
+    topPick: false,
     createdAt: new Date(),
     updatedAt: new Date(),
     options: [],
@@ -40,25 +41,13 @@ export function ProductModal(props: ProductModalProps) {
     const { addProduct, updateProduct } = useProducts();
     const { updateImage } = useImages();
 
-    const initializedRef = useRef(false);
     const [loading, setLoading] = useState(false);
     const [product, setProduct] = useState<ProductType>(initialProductState);
     const [originalImage, setOriginalImage] = useState<ImageType | null>(null);
     const [imageState, setImageState] = useState<ImageState>(initialImageState);
-    const [newOption, setNewOption] = useState<ProductOptionsType>({
-        id: "",
-        name: "",
-        price: 0
-    });
+    const [newOption, setNewOption] = useState<ProductOptionsType>({ id: "", name: "", price: 0 });
     const [showOptionInputs, setShowOptionInputs] = useState(false);
-    const [isActive, setIsActive] = useState(product.observationDisplay ?? false);
-
-    useEffect(() => {
-        setProduct(prev => ({
-            ...prev,
-            observationDisplay: isActive
-        }));
-    }, [isActive]);
+    const [isDirty, setIsDirty] = useState(false);
 
     const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
     const products: ProductType[] = Array.isArray(restaurant?.products) ? restaurant.products : [];
@@ -66,60 +55,70 @@ export function ProductModal(props: ProductModalProps) {
     const resetForm = useCallback(() => {
         setProduct({
             ...initialProductState,
-            categoryId: Array.isArray(categories) && categories.length > 0 ? categories[0]?.id ?? "" : ""
+            categoryId: categories[0]?.id ?? ""
         });
         setOriginalImage(null);
         setImageState(initialImageState);
     }, [categories]);
 
     useEffect(() => {
-        const loadData = async () => {
-            try {
-                setLoading(true);
-                if (!props.isOpen) {
-                    initializedRef.current = false;
-                    return;
-                }
-                if (props.productId) {
-                    const productData = products.find(p => p.id === props.productId) || null;
-                    if (productData) {
-                        setProduct(productData);
-                        setOriginalImage(productData.image || null);
-                        setImageState({
-                            file: null,
-                            removed: false,
-                            dirty: false,
-                            previewUrl: productData.image?.url || null
-                        });
-                    } 
-                } else {
-                    resetForm();
-                }
-            } catch (error) {
-                console.error("Erro ao carregar produto:", error);
-            } finally {
-                setLoading(false);
+        setLoading(true);
+        if (!props.isOpen) return;
+        if (props.productId) {
+            const productData = products.find(p => p.id === props.productId);
+            if (productData) {
+                setProduct(productData);
+                setOriginalImage(productData.image || null);
+                setImageState({
+                    file: null,
+                    removed: false,
+                    dirty: false,
+                    previewUrl: productData.image?.url || null
+                });
             }
-        };
-
-        loadData();
+        } else {
+            resetForm();
+        }
+        setLoading(false);
     }, [props.isOpen, props.productId, products, resetForm]);
+
+    useEffect(() => {
+        if (!props.productId) {
+            setIsDirty(true);
+            return;
+        }
+        const original = products.find(p => p.id === props.productId);
+        if (!original) {
+            setIsDirty(false);
+            return;
+        }
+        const changed =
+            product.name !== original.name ||
+            product.description !== original.description ||
+            product.price !== original.price ||
+            product.categoryId !== original.categoryId ||
+            product.observationDisplay !== original.observationDisplay ||
+            product.topPick !== original.topPick ||
+            JSON.stringify(product.options) !== JSON.stringify(original.options) ||
+            (product.image?.url ?? null) !== (original.image?.url ?? null);
+        setIsDirty(changed);
+    }, [product, props.productId, products]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        if (name === "optionName") {
-            setNewOption(prev => ({ ...prev, name: value }));
-        } else if (name === "optionPrice") {
-            const numeric = Number(value.replace(/\D/g, "")) / 100;
-            setNewOption(prev => ({ ...prev, price: isNaN(numeric) ? 0 : numeric }));
-        } else {
-            setProduct(prev => ({
-                ...prev,
-                [name]: name === "price"
-                    ? (Number(value.replace(/\D/g, "")) / 100)
-                    : value
-            }));
-        }
+        setProduct(prev => ({
+            ...prev,
+            [name]: name === "price"
+                ? (Number(value.replace(/\D/g, "")) / 100)
+                : value
+        }));
+    };
+
+    const handleSwitch = (name: "observationDisplay" | "topPick", value: boolean) => {
+        setProduct(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleRemoveOption = (index: number) => {
@@ -149,6 +148,16 @@ export function ProductModal(props: ProductModalProps) {
         setShowOptionInputs(false);
     };
 
+    const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (name === "optionName") {
+            setNewOption(prev => ({ ...prev, name: value }));
+        } else if (name === "optionPrice") {
+            const numeric = Number(value.replace(/\D/g, "")) / 100;
+            setNewOption(prev => ({ ...prev, price: isNaN(numeric) ? 0 : numeric }));
+        }
+    };
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
@@ -167,11 +176,7 @@ export function ProductModal(props: ProductModalProps) {
                             url: imageResult.url ?? "",
                             imageId: imageResult.imageId ?? ""
                         }
-                        : {
-                            path: "",
-                            url: "",
-                            imageId: ""
-                        };
+                        : { path: "", url: "", imageId: "" };
                 } else if (imageState.removed && originalImage?.path) {
                     await updateImage({ oldImagePath: originalImage.path, restaurantId, file: new File([""], "dummy.txt") });
                     productToSave.image = null;
@@ -221,7 +226,7 @@ export function ProductModal(props: ProductModalProps) {
                             id="product-name"
                             label="Produto"
                             name="name"
-                            value={product?.name || ""}
+                            value={product.name}
                             onChange={handleChange}
                             required
                         />
@@ -229,7 +234,7 @@ export function ProductModal(props: ProductModalProps) {
                             id="product-description"
                             label="Descrição"
                             name="description"
-                            value={product?.description || ""}
+                            value={product.description}
                             onChange={handleChange}
                         />
                         <div className="flex gap-4">
@@ -258,15 +263,27 @@ export function ProductModal(props: ProductModalProps) {
                                 />
                             </div>
                         </div>
-                        <div className="flex items-center justify-between mb-2 p-4 border bg-white rounded border-teal-500">
-                            <span className="text-teal-500 mr-2">
-                                Adicionar Campo Observação?
-                            </span>
-                            <Switch
-                                id="product-observation"
-                                value={isActive}
-                                onChange={setIsActive}
-                            />
+                        <div className="flex flex-col md:flex-row gap-2 mb-2">
+                            <div className="flex flex-1 items-center justify-between p-4 border bg-white rounded border-teal-500">
+                                <span className="text-teal-500 mr-2">
+                                    Adicionar Campo Observação?
+                                </span>
+                                <Switch
+                                    id="product-observation"
+                                    value={product.observationDisplay}
+                                    onChange={val => handleSwitch("observationDisplay", val)}
+                                />
+                            </div>
+                            <div className="flex flex-1 items-center justify-between p-4 border bg-white rounded border-teal-500">
+                                <span className="text-teal-500 mr-2">
+                                    Produto em Destaque?
+                                </span>
+                                <Switch
+                                    id="product-top-pick"
+                                    value={product.topPick}
+                                    onChange={val => handleSwitch("topPick", val)}
+                                />
+                            </div>
                         </div>
                         {showOptionInputs && (
                             <div className="border bg-gray-100 rounded p-2 pt-4 border-teal-500">
@@ -275,7 +292,7 @@ export function ProductModal(props: ProductModalProps) {
                                     label="Nome do opcional"
                                     name="optionName"
                                     value={newOption.name}
-                                    onChange={handleChange}
+                                    onChange={handleOptionChange}
                                     required
                                 />
                                 <div className="flex flex-row justify-center align-items-center gap-2">
@@ -285,7 +302,7 @@ export function ProductModal(props: ProductModalProps) {
                                             label="Preço"
                                             name="optionPrice"
                                             value={formatCurrencyBRL(newOption.price ?? 0)}
-                                            onChange={handleChange}
+                                            onChange={handleOptionChange}
                                         />
                                     </div>
                                     {newOption.name ? (
@@ -333,7 +350,7 @@ export function ProductModal(props: ProductModalProps) {
                             <ButtonPrimary
                                 id="product-submit"
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || !isDirty}
                             >
                                 {props.productId ? "Salvar Alterações" : "Criar Produto"}
                             </ButtonPrimary>

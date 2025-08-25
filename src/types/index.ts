@@ -62,6 +62,7 @@ export interface ProductType {
     createdAt: Date;
     updatedAt: Date;
     observationDisplay: boolean;
+    topPick: boolean;
     observation?: string;
     description?: string;
     image?: ImageType | null;

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { ButtonPrimary, ConfirmModal, Input, ProductModal, ProductTable, Select } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
-import { LoadingPage } from "../pages/LoadingPage";
 import { useProducts } from "../hooks/useProducts";
+import { LoadingPage } from "../pages/LoadingPage";
 import type { CategoryType, ProductType } from "../types";
 
 export function ProductsTab() {
@@ -14,7 +14,7 @@ export function ProductsTab() {
     const [isOpenModalProduct, setIsOpenModalProduct] = useState(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] = useState(false);
     const [productSelected, setProductSelected] = useState<string | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("all");
 
     const products: ProductType[] = Array.isArray(restaurant?.products) ? restaurant.products : [];
     const categories: CategoryType[] = Array.isArray(restaurant?.categories) ? restaurant.categories : [];
@@ -46,6 +46,26 @@ export function ProductsTab() {
         setIsOpenModalConfirm(true);
     };
 
+    const filteredProducts = (() => {
+        let result = products;
+
+        if (selectedCategory === "topPick") {
+            result = result.filter(product => product.topPick === true);
+        } else if (selectedCategory !== "all") {
+            result = result.filter(product => product.categoryId === selectedCategory);
+        }
+
+        if (search.trim() && result.length > 0) {
+            const searchLower = search.trim().toLowerCase();
+            result = result.filter(product =>
+                product.name?.toLowerCase().includes(searchLower) ||
+                product.description?.toLowerCase().includes(searchLower)
+            );
+        }
+
+        return result;
+    })();
+
     if (restaurantLoading || loading) {
         return <LoadingPage />;
     }
@@ -73,9 +93,10 @@ export function ProductsTab() {
                                         onChange={e => setSelectedCategory(e.target.value)}
                                         required={false}
                                         options={[
-                                            { value: "", label: "Todas" },
+                                            { value: "all", label: "Todas" },
+                                            { value: "topPick", label: "Destaques" },
                                             ...categories.map(category => ({
-                                                value: category.id ?? "",
+                                                value: category.id || "",
                                                 label: category.name,
                                             }))
                                         ]}
@@ -99,8 +120,7 @@ export function ProductsTab() {
                         <p id="no-products-message" className="text-gray-500 text-center">Nenhum produto encontrado.</p>
                     ) : (
                         <ProductTable
-                            products={products}
-                            search={search}
+                            products={filteredProducts}
                             selectedCategory={selectedCategory}
                             onEdit={handleEditProduct}
                             onDelete={handleDeleteProduct}

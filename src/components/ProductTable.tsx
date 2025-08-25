@@ -4,20 +4,15 @@ import { formatCurrencyBRL } from "../utils/currency";
 
 interface ProductTableProps {
     products: ProductType[];
-    search: string;
     selectedCategory: string;
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
 }
 
 export function ProductTable(props: ProductTableProps) {
-    const filteredProducts = props.products.filter(
-        (product) =>
-            product.name.toLowerCase().includes(props.search.toLowerCase()) &&
-            (props.selectedCategory === "" || product.categoryId === props.selectedCategory)
-    );
+    const products = props.products;
 
-    if (filteredProducts.length === 0) {
+    if (products.length === 0) {
         return (
             <p id="no-products-message" className="text-gray-500 text-center">
                 Nenhum produto encontrado.
@@ -37,7 +32,7 @@ export function ProductTable(props: ProductTableProps) {
                 </tr>
             </thead>
             <tbody>
-                {filteredProducts.map((product, idx) => (
+                {products.map((product, idx) => (
                     <tr
                         key={product.id}
                         className={idx % 2 === 0 ? "bg-gray-100" : "bg-teal-100"}
