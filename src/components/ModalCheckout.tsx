@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CartDelivery, CartPayment, CartProducts, CartSummary, Modal } from ".";
+import { useOrder } from "../contexts/OrderContext";
 interface ModalCheckoutProps {
     isOpen: boolean;
     onClose: () => void;
@@ -7,6 +8,13 @@ interface ModalCheckoutProps {
 
 export function ModalCheckout(props: ModalCheckoutProps) {
     const [step, setStep] = useState(1);
+    const { cart } = useOrder();
+
+    useEffect(() => {
+        if (cart.length === 0) {
+            props.onClose();
+        }
+    }, [cart]);
 
     const nextStep = () => setStep((s) => Math.min(s + 1, 4));
     const prevStep = () => setStep((s) => Math.max(s - 1, 1));
