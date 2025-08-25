@@ -13,7 +13,7 @@ interface CartSummaryProps {
 }
 
 export function CartSummary(props: CartSummaryProps) {
-    const { cart, total, deliveryAddress, paymentMethod, clearOrder } = useOrder();
+    const { cart, total, deliveryAddress, paymentMethod, clearOrder, deliveryTax } = useOrder();
     const { createOrder } = useOrders();
     const { sendWhatsAppOrder } = useWhatsApp();
     const isDelivery = !!deliveryAddress;
@@ -50,19 +50,27 @@ export function CartSummary(props: CartSummaryProps) {
                         </div>
                     ))}
                 </div>
+                {isDelivery && deliveryTax > 0 && (
+                    <div className="flex justify-between my-2">
+                        <span>Taxa de Entrega</span>
+                        <span>{formatCurrencyBRL(deliveryTax)}</span>
+                    </div>
+                )}
                 <div className="flex justify-between font-semibold">
                     <span>Total</span>
-                    <span className="font-semibold">{formatCurrencyBRL(total)}</span>
+                    <span className="font-semibold">{isDelivery ? formatCurrencyBRL(total) : formatCurrencyBRL(total)}</span>
                 </div>
             </div>
-            {isDelivery && typeof deliveryAddress === "object" && (
-                <div>
-                    <h5 className="font-semibold">Endereço de entrega</h5>
+            {
+                isDelivery && typeof deliveryAddress === "object" && (
                     <div>
-                        {addressFormat(deliveryAddress)}
+                        <h5 className="font-semibold">Endereço de entrega</h5>
+                        <div>
+                            {addressFormat(deliveryAddress)}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
             <div>
                 <h5 className="font-semibold">Forma de pagamento</h5>
                 <div>{paymentLabel}</div>
@@ -75,6 +83,6 @@ export function CartSummary(props: CartSummaryProps) {
                     onClick={handleSendOrder}
                     children="Confirmar" />
             </div>
-        </div>
+        </div >
     );
 }

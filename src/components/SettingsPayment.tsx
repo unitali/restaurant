@@ -6,7 +6,7 @@ import { LoadingPage } from "../pages/LoadingPage";
 import type { PaymentMethodsType } from "../types";
 
 export function SettingsPayment() {
-    const { restaurantId, refresh } = useRestaurant();
+    const { restaurantId, refresh, restaurant } = useRestaurant();
     const { updateRestaurant } = useRestaurants();
     const initialPaymentMethods: PaymentMethodsType = {
         card: false,
@@ -64,7 +64,7 @@ export function SettingsPayment() {
                 <div className="flex items-center">
                     <Switch
                         id="card"
-                        value={paymentMethods.card}
+                        value={restaurant?.paymentMethods?.card ?? false}
                         onChange={(val) => handleChange("card", val)}
                         disabled={!isEditing}
                     />
@@ -73,7 +73,7 @@ export function SettingsPayment() {
                 <div className="flex items-center">
                     <Switch
                         id="cash"
-                        value={paymentMethods.cash}
+                        value={restaurant?.paymentMethods?.cash ?? false}
                         onChange={(val) => handleChange("cash", val)}
                         disabled={!isEditing}
                     />
@@ -82,7 +82,7 @@ export function SettingsPayment() {
                 <div className="flex items-center">
                     <Switch
                         id="pix"
-                        value={paymentMethods.pix}
+                        value={restaurant?.paymentMethods?.pix ?? false}
                         onChange={(val) => handleChange("pix", val)}
                         disabled={!isEditing}
                     />

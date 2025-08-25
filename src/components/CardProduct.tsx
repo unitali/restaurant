@@ -87,7 +87,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
         <>
             <button
                 type="button"
-                className="bg-white rounded shadow p-3 flex flex-row items-center w-full min-h-[110px] mb-3 transition-all duration-300 outline-none hover:scale-102"
+                className="bg-white rounded shadow p-3 flex flex-row items-center w-full h-28 mb-3 transition-all duration-300 outline-none hover:scale-102"
                 onClick={openModal}
             >
                 <div className="flex-1 flex flex-col justify-center">
@@ -97,12 +97,12 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
                         {formatCurrencyBRL(product.price)}
                     </span>
                 </div>
-                <div className="ml-4 flex-shrink-0 flex items-center justify-center h-24 w-24">
+                <div className="ml-4 flex-shrink-0 flex items-center justify-center h-22 w-22">
                     {product.image?.url ? (
                         <img
                             src={product.image?.url}
                             alt={product.name}
-                            className="object-cover rounded h-24 w-24"
+                            className="object-cover rounded"
                         />
                     ) : (
                         <FaFileImage className="w-16 h-16 text-gray-200 rounded" />

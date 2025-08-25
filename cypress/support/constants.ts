@@ -6,7 +6,12 @@ export const userCredentials = {
 };
 
 export const userSettings = {
-    companyAddress: "Rua Nova, 456",
+    companyStreet: "Rua Nova",
+    companyNumber: "456",
+    companyNeighborhood: "Centro",
+    companyCity: "São Paulo",
+    companyState: "SP",
+    companyZipcode: "12345-678",
     companyPhone: "11988888888",
     companyName: "Restaurante Novo"
 };

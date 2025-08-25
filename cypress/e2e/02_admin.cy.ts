@@ -62,7 +62,7 @@ describe('AdminPage', () => {
     let skipBefore = true;
 
     before(() => {
-        if (skipBefore) return;
+        if (!skipBefore) return;
 
         cy.visit(loginUrl);
         cy.get(adminElements.inputEmail).type(userCredentials.email);
@@ -87,7 +87,7 @@ describe('AdminPage', () => {
     });
 
     beforeEach(() => {
-        cy.visit(adminUrl);
+        cy.visit(loginUrl);
         cy.get(adminElements.inputEmail).type(userCredentials.email);
         cy.get(adminElements.inputPassword).type(userCredentials.password, { log: false });
         cy.get(adminElements.buttonSubmit).click();
@@ -114,7 +114,7 @@ describe('AdminPage', () => {
 
         cy.get(adminCompanySettingsTab.labelCompanyAddress).should('have.text', 'Endereço*');
         cy.get(adminCompanySettingsTab.inputCompanyAddress).should('have.attr', 'required');
-        cy.get(adminCompanySettingsTab.inputCompanyAddress).should('have.value', userSettings.companyAddress);
+        cy.get(adminCompanySettingsTab.inputCompanyAddress).should('have.value', userSettings.companyStreet);
 
         cy.get(adminCompanySettingsTab.labelCompanyPhone).should('have.text', 'WhatsApp*');
         cy.get(adminCompanySettingsTab.inputCompanyPhone).should('have.attr', 'required');

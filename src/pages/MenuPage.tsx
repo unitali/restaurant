@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { FaShoppingBasket } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { HeaderMenu, ModalCheckout, ProductCard, ProductCarousel } from "../components";
+import { HeaderMenu, ModalCheckout, ProductCard } from "../components";
 import { OrderProvider, useOrder } from "../contexts/OrderContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
@@ -70,10 +70,13 @@ function MenuContent() {
       <main className="w-full mx-auto p-2 max-w-2xl bg-gray-50 relative">
         <section className="my-6">
           <h2 className="text-xl font-bold mb-2">Destaques</h2>
-          <ProductCarousel
-            products={featuredProducts}
-            setIsAnyProductModalOpen={setIsAnyProductModalOpen}
-          />
+          {featuredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              setIsAnyProductModalOpen={setIsAnyProductModalOpen}
+            />
+          ))}
         </section>
 
         {categories.map((category) => {
