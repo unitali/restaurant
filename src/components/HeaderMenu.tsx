@@ -82,7 +82,7 @@ export function HeaderMenu() {
                 </div>
             )}
             <div className="absolute left-1/2 -translate-x-1/2 z-10">
-                <div className="bg-white rounded-full shadow-lg flex items-center justify-center w-32 h-32 border-4 border-teal-500">
+                <div className="bg-white rounded-full shadow-lg flex items-center justify-center w-32 h-32 border-4 border-unitali-blue-600">
                     {restaurant?.company.logo?.url && (
                         <img
                             src={restaurant.company.logo.url}

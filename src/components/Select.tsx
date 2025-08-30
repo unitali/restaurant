@@ -16,7 +16,7 @@ export function Select({ fixed, ...props }: SelectProps) {
         <div className="relative w-full">
             <label
                 htmlFor={props.id}
-                className="absolute left-3 top-1 text-teal-500 text-sm"
+                className="absolute left-3 top-1 text-unitali-blue-600 text-sm"
             >
                 {props.label}
                 {props.required && <span className="mx-1">*</span>}
@@ -24,7 +24,7 @@ export function Select({ fixed, ...props }: SelectProps) {
             <select
                 id={props.id}
                 name={props.name}
-                className={`w-full p-3 pt-6 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"} border border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 ${disabledClasses}`}
+                className={`w-full p-3 pt-6 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"} border border-unitali-blue-500 focus:outline-none focus:ring-2 focus:ring-unitali-blue-500 ${disabledClasses}`}
                 onChange={props.onChange}
                 value={props.value}
                 disabled={props.disabled}

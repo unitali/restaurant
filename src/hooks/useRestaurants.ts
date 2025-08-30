@@ -14,6 +14,7 @@ export function useRestaurants() {
     const [currentRestaurant, setCurrentRestaurant] = useState<RestaurantType | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
+    const navigate = useNavigate();
 
     const fetchAllRestaurants = useCallback(async () => {
         setLoading(true);
@@ -75,11 +76,11 @@ export function useRestaurants() {
                 products: [],
                 isOpen: false,
                 openingHours: {},
-                paymentMethods: {
-                    card: false,
-                    cash: false,
-                    pix: false
-                },
+                paymentMethods: [
+                    { type: "card", enabled: false },
+                    { type: "cash", enabled: false },
+                    { type: "pix", enabled: false }
+                ],
                 delivery: null
             };
 
@@ -104,7 +105,6 @@ export function useRestaurants() {
             onError?: (err: any) => void
         ) => {
             setLoading(true);
-            const navigate = useNavigate();
             let createdUser = null;
             try {
                 if (userAdmin.password !== userAdmin.confirmPassword) {
@@ -127,6 +127,7 @@ export function useRestaurants() {
                 const userExists = await fetchSignInMethodsForEmail(auth, userAdmin.email);
                 if (userExists.length > 0) {
                     toast.error("E-mail já cadastrado");
+                    setLoading(false);
                     return;
                 }
                 const restaurantData = {
@@ -160,8 +161,8 @@ export function useRestaurants() {
                     }
                 }
                 if (err.code === "auth/email-already-in-use") {
-                    const error = err instanceof Error ? err : new Error("E-mail já cadastrado");
-                    setError(error);
+                    toast.error("E-mail já cadastrado. Contate o suporte.");
+                    setError(err);
                 } else {
                     const error = err instanceof Error ? err : new Error("Erro ao criar restaurante ou admin. Tente Novamente.");
                     setError(error);
@@ -170,10 +171,10 @@ export function useRestaurants() {
 
             } finally {
                 setLoading(false);
-                toast.error(error ? error.message : "Erro ao criar restaurante ou admin. Tente Novamente.");
+                // Remova o toast.error duplicado daqui para evitar mostrar mensagem errada
             }
         },
-        [createRestaurant]
+        [createRestaurant, navigate]
     );
 
     const updateRestaurant = useCallback(async (restaurantId: string, data: Partial<RestaurantType>) => {

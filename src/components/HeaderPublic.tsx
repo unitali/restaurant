@@ -10,7 +10,7 @@ export function HeaderPublic() {
     const isHomePage = location.pathname === webRoutes.home;
 
     return (
-        <header className="bg-gray-800 p-4 flex top-0 left-0 w-full z-50 fixed">
+        <header className="bg-unitali-blue-700 p-4 flex top-0 left-0 w-full z-50 fixed">
             {!isHomePage && (
                 <button
                     className="text-white flex flex-row items-center px-4 cursor-pointer"

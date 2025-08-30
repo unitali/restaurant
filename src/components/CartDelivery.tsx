@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { ButtonOutline, ButtonPrimary, Input, RadioButton } from ".";
 import { useOrder } from "../contexts/OrderContext";
+import { useRestaurant } from "../contexts/RestaurantContext";
+import { formatCurrencyBRL } from "../utils/currency";
 import type { AddressType } from "../types";
 
 
 export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-    const { addDeliveryAddress, deliveryAddress } = useOrder();
+    const { addDeliveryAddress, deliveryAddress, setDeliveryTax } = useOrder();
+    const { restaurant } = useRestaurant();
     const [isDelivery, setIsDelivery] = useState(false);
 
     const [address, setAddress] = useState<AddressType | null>(
@@ -49,6 +52,7 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
     const handleNext = () => {
         if (isDelivery && address) {
             addDeliveryAddress(address);
+            setDeliveryTax(restaurant?.delivery?.tax[0]?.price ?? 0);
         } else {
             addDeliveryAddress(null);
         }
@@ -80,6 +84,9 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
             <div className="flex flex-col gap-4">
                 {isDelivery && address && (
                     <>
+                        <span>
+                            Taxa de Entrega:  {formatCurrencyBRL(restaurant?.delivery?.tax[0]?.price ?? 0)}
+                        </span>
                         <Input
                             id="delivery-street"
                             name="street"

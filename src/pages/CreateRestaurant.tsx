@@ -37,8 +37,6 @@ export function CreateRestaurant() {
     const { createRestaurantWithAdmin, loading } = useRestaurants();
     const [restaurant, setRestaurant] = useState<CompanyType>(restaurantInitialState);
     const [userAdmin, setUserAdmin] = useState<UserType>(userInitialState);
-
-    // Validação simples de senha
     const isPasswordValid = userAdmin.password.length >= 6;
     const isPasswordMatch = userAdmin.password === userAdmin.confirmPassword;
 

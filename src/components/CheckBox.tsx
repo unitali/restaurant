@@ -20,7 +20,7 @@ export function CheckBox({
                     name={name}
                     checked={checked}
                     onChange={onChange}
-                    className={`peer appearance-none h-8 w-8 border-2 border-teal-500 bg-white rounded checked:bg-teal-500 checked:border-teal-500 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    className={`peer appearance-none h-8 w-8 border-2 border-unitali-blue-600 bg-white rounded checked:bg-unitali-blue-600 checked:border-unitali-blue-600 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                     disabled={disabled}
                 />
                 <svg

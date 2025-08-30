@@ -10,7 +10,7 @@ export function Switch(props: SwitchProps) {
         <button
             id={`button-${props.id}`}
             type="button"
-            className={`flex items-center cursor-pointer focus:outline-none ${props.disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`flex items-center focus:outline-none ${props.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
             onClick={() => !props.disabled && props.onChange(!props.value)}
             aria-pressed={props.value}
             disabled={props.disabled}
@@ -24,7 +24,7 @@ export function Switch(props: SwitchProps) {
                 disabled={props.disabled}
             />
             <div className="relative flex items-center">
-                <div className={`block w-12 h-6 rounded-full transition-colors ${props.value ? "bg-teal-500" : "bg-gray-200"}`} />
+                <div className={`block w-12 h-6 rounded-full transition-colors ${props.value ? "bg-unitali-blue-600" : "bg-gray-200"}`} />
                 <div
                     className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${props.value ? "translate-x-6" : ""}`}
                     style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.10)" }}

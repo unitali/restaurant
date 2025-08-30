@@ -9,7 +9,7 @@ import { paymentMethods } from '../utils/paymentsMethods';
 
 export function useWhatsApp() {
     const [loading, setLoading] = useState(false);
-    const { cart, total, deliveryAddress, paymentMethod } = useOrder();
+    const { cart, total, deliveryAddress, paymentMethod, deliveryTax } = useOrder();
     const { restaurant } = useRestaurant();
 
     const sendWhatsAppOrder = useCallback(async (orderNumber: string) => {
@@ -59,8 +59,9 @@ export function useWhatsApp() {
             const message =
                 `Pedido Nº: *${orderNumber}*\n\n` +
                 `${itemsMsg}\n` +
+                `${deliveryTax > 0 ? `Taxa de Entrega: *${formatCurrencyBRL(deliveryTax)}*\n` : ""}` +
                 `\nTotal: *${formatCurrencyBRL(total).trim()}* \n` +
-                `\nEntrega: ${deliveryAddress ? `*${addressFormat(deliveryAddress)}*` : "*RETIRADA NO LOCAL*"}\n` +
+                `\nEntrega: ${deliveryAddress ? `*${addressFormat(deliveryAddress).trim()}*` : "*RETIRADA NO LOCAL*"}\n` +
                 `\nPagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label}*` : "*Não informado*"}\n` +
                 `\n*Obrigado pelo pedido!*`;
 

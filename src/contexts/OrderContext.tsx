@@ -30,6 +30,8 @@ interface OrderContextType {
     orderNumber: string | null;
     createOrderNumber: () => string;
     ORDER_KEY: typeof ORDER_KEY;
+    deliveryTax: number;
+    setDeliveryTax: (tax: number) => void;
 }
 
 
@@ -39,6 +41,7 @@ const OrderContext = createContext<OrderContextType | null>(null);
 export function OrderProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [deliveryAddress, setDeliveryAddress] = useState<AddressType | null>(null);
+    const [deliveryTax, setDeliveryTax] = useState<number>(0);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethodsType | null>(null);
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
@@ -59,7 +62,19 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         const singleItemPrice = (product.price ?? 0) + optionsPricePerUnit;
         const lineItemTotal = singleItemPrice * product.quantity;
         return grandTotal + lineItemTotal;
-    }, 0);
+    }, 0) + (deliveryAddress && deliveryTax ? deliveryTax : 0);
+
+    function setDeliveryTaxValue(tax: number) {
+        setDeliveryTax(tax);
+
+        const storedOrder = localStorage.getItem(ORDER_KEY);
+        let orderData = storedOrder ? JSON.parse(storedOrder) : {};
+        orderData = {
+            ...orderData,
+            deliveryTax: tax
+        };
+        localStorage.setItem(ORDER_KEY, JSON.stringify(orderData));
+    }
 
     function addToOrder(productToAdd: CartItem) {
         const signatureToAdd = generateItemSignature(productToAdd);
@@ -160,7 +175,9 @@ export function OrderProvider({ children }: { children: ReactNode }) {
                 setPaymentMethod: setPaymentMethodAndPersist,
                 ORDER_KEY,
                 orderNumber,
-                createOrderNumber
+                createOrderNumber,
+                deliveryTax,
+                setDeliveryTax: setDeliveryTaxValue 
             }}
         >
             {children}
