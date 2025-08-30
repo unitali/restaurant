@@ -1,11 +1,9 @@
 import { useRef, useState } from "react";
-import { FaShoppingBasket } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { HeaderMenu, ModalCheckout, ProductCard } from "../components";
+import { ButtonCartMenu, HeaderMenu, ModalCheckout, ProductCard } from "../components";
 import { OrderProvider, useOrder } from "../contexts/OrderContext";
 import { RestaurantProvider, useRestaurant } from "../contexts/RestaurantContext";
 import type { CategoryType, ProductType } from "../types";
-import { formatCurrencyBRL } from "../utils/currency";
 import { LoadingPage } from "./LoadingPage";
 
 export function MenuPage() {
@@ -24,7 +22,7 @@ export function MenuPage() {
 
 function MenuContent() {
   const { restaurant, loading } = useRestaurant();
-  const { cart, total } = useOrder();
+  const { cart } = useOrder();
   const [isOpenCart, setIsOpenCart] = useState(false);
   const [isAnyProductModalOpen, setIsAnyProductModalOpen] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -42,8 +40,6 @@ function MenuContent() {
   if (loading) return <LoadingPage />;
   if (!restaurant) return null;
 
-  const featuredProducts = products.slice(0, 3);
-
   const handleOpenCart = () => {
     setIsOpenCart(true);
     setIsAnyProductModalOpen(false);
@@ -60,24 +56,28 @@ function MenuContent() {
           .map((category) => (
             <button
               key={category.id}
-              className="text-teal-700 font-semibold px-3 py-1 rounded hover:bg-teal-50 transition cursor-pointer"
+              className="text-unitali-blue-600 font-semibold px-3 py-1 rounded hover:bg-unitali-blue-100 transition cursor-pointer"
               onClick={() => category.id && scrollToCategory(category.id)}
             >
               {category.name}
             </button>
           ))}
       </nav>
-      <main className="w-full mx-auto p-2 max-w-2xl bg-gray-50 relative">
-        <section className="my-6">
-          <h2 className="text-xl font-bold mb-2">Destaques</h2>
-          {featuredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              setIsAnyProductModalOpen={setIsAnyProductModalOpen}
-            />
-          ))}
-        </section>
+      <main className="w-full mx-auto p-2 max-w-2xl bg-unitali-blue-50 relative">
+        {products.some(product => product.topPick) && (
+          <section className="my-6">
+            <h2 className="text-xl font-bold mb-2 text-unitali-blue-600">Destaques</h2>
+            {products
+              .filter(product => product.topPick)
+              .map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  setIsAnyProductModalOpen={setIsAnyProductModalOpen}
+                />
+              ))}
+          </section>
+        )}
 
         {categories.map((category) => {
           const productsOfCategory = products.filter(
@@ -87,7 +87,7 @@ function MenuContent() {
           return (
             <section key={category.id} className="my-8">
               <h3
-                className="text-lg font-semibold mb-2 scroll-mt-30"
+                className="text-lg font-semibold mb-2 scroll-mt-30 text-unitali-blue-600"
                 ref={(el: HTMLHeadingElement | null) => {
                   if (category.id) categoryRefs.current[category.id] = el;
                 }}
@@ -108,18 +108,7 @@ function MenuContent() {
         <ModalCheckout isOpen={isOpenCart} onClose={() => setIsOpenCart(false)} />
 
         {cart && cart.length > 0 && !isAnyProductModalOpen && !isOpenCart && (
-          <nav
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md flex justify-center"
-            style={{ pointerEvents: "auto" }}
-          >
-            <button
-              className="bg-red-600 text-white font-bold px-6 py-3 shadow-lg transition hover:bg-red-700 w-full flex items-center justify-center gap-2"
-              onClick={handleOpenCart}
-            >
-              <FaShoppingBasket className="text-xl mx-2" />
-              <span>{`Ver Carrinho (${formatCurrencyBRL(total)})`}</span>
-            </button>
-          </nav>
+          <ButtonCartMenu handleOpenCart={handleOpenCart} />
         )}
       </main>
     </>

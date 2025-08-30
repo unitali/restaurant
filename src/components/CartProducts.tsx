@@ -11,7 +11,7 @@ export function CartProducts({ onNext }: { onNext: () => void }) {
                 {cart.map((product, index) => (
                     <div
                         key={`product-${index}`}
-                        className="bg-white rounded-lg shadow p-5 flex flex-col gap-1 border border-gray-100 w-full"
+                        className="bg-white rounded-lg shadow p-5 flex flex-col gap-1 border border-unitali-blue-100 w-full"
                     >
                         <div className="font-bold text-base mb-1">
                             {product.name}
@@ -37,7 +37,7 @@ export function CartProducts({ onNext }: { onNext: () => void }) {
                                 onClick={() => removeFromOrder(product.productId!)}
                                 quantity={product.quantity}
                             />
-                            <span className="font-semibold">{product.quantity}</span>
+                            <span className="font-semibold mx-2 text-unitali-blue-700">{product.quantity}</span>
                             <ButtonPrimaryPlus
                                 id={`add-item-${index}`}
                                 onClick={() => addToOrder({ ...product, quantity: 1 })}

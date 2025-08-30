@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, CategoryModal, CategoryTable, ConfirmModal, Input } from ".";
+import { ButtonPrimary, CategoryModal, TableCategory, ConfirmModal, Input } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useCategories } from "../hooks/useCategories";
 import { LoadingPage } from "../pages/LoadingPage";
@@ -82,7 +82,7 @@ export function CategoriesTab() {
                 </div>
             </div>
             {categories.length > 0 && (
-                <CategoryTable
+                <TableCategory
                     categories={categories}
                     search={search}
                     onEdit={handleEditCategory}

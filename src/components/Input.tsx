@@ -24,7 +24,7 @@ export function Input({ ...props }: InputProps) {
             <label
                 id={`label-${props.id}`}
                 htmlFor={`input-${props.id}`}
-                className={`absolute p-1 left-3 top-0 text-teal-500 text-sm ${props.classNameLabel}`}
+                className={`absolute p-1 left-3 top-0 text-unitali-blue-600 text-sm ${props.classNameLabel}`}
             >
                 {props.label}
                 {props.required && <span className="mx-1">*</span>}
@@ -34,7 +34,7 @@ export function Input({ ...props }: InputProps) {
                 {...props}
                 id={`input-${props.id}`}
                 type={inputType}
-                className={`w-full pb-2 ps-4 pt-7 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-teal-500 focus:ring-teal-500"}`}
+                className={`w-full pb-2 ps-4 pt-7 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-unitali-blue-600 focus:ring-unitali-blue-700"}`}
                 onBlur={(e) => {
                     setTouched(true);
                     props.onBlur && props.onBlur(e);
@@ -77,7 +77,7 @@ export function InputColor({ ...props }: InputColorProps) {
             <label
                 id={`label-${props.id}`}
                 htmlFor={`input-${props.id}`}
-                className={`absolute left-3 top-0 text-teal-500 text-sm p-1 ${props.classNameLabel}`}
+                className={`absolute left-3 top-0 text-unitali-blue-600 text-sm p-1 ${props.classNameLabel}`}
             >
                 {props.label}
                 {props.required && <span className="mx-1">*</span>}
@@ -85,7 +85,7 @@ export function InputColor({ ...props }: InputColorProps) {
             <div
                 className={`flex items-center w-full ps-3 pt-5 rounded 
                     ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-black"}
-                    border border-teal-500 focus-within:ring-2 focus-within:ring-teal-500 
+                    border border-unitali-blue-600 focus-within:ring-2 focus-within:ring-unitali-blue-500
                     ${props.classNameInput} ${isRequiredError ? "border-red-500" : ""}`}
             >
                 <input

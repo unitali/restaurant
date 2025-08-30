@@ -270,21 +270,23 @@ export function CompanyTab() {
                 >
                     {buttonText()}
                 </ButtonPrimary>
-                {restaurant?.shortUrlMenu ? (
-                    <LabelCopy
-                        id="link-menu"
-                        label="Link do Cardapio"
-                        name="menuLink"
-                        value={restaurant?.shortUrlMenu}
-                        disabled={!editCompany || updateLoading || restaurantLoading}
-                    />
-                ) : (
-                    <ButtonOutline
-                        id="create-menu-link"
-                        children="Criar Link do Cardápio"
-                        onClick={handleCreateShortUrl}
-                    />
-                )}
+                <div className="pt-3">
+                    {restaurant?.shortUrlMenu ? (
+                        <LabelCopy
+                            id="link-menu"
+                            label="Link do Cardapio"
+                            name="menuLink"
+                            value={restaurant?.shortUrlMenu}
+                            disabled={!editCompany || updateLoading || restaurantLoading}
+                        />
+                    ) : (
+                        <ButtonOutline
+                            id="create-menu-link"
+                            children="Criar Link do Cardápio"
+                            onClick={handleCreateShortUrl}
+                        />
+                    )}
+                </div>
             </form>
         </section>
     );

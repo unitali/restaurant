@@ -76,11 +76,11 @@ export function useRestaurants() {
                 products: [],
                 isOpen: false,
                 openingHours: {},
-                paymentMethods: {
-                    card: false,
-                    cash: false,
-                    pix: false
-                },
+                paymentMethods: [
+                    { type: "card", enabled: false },
+                    { type: "cash", enabled: false },
+                    { type: "pix", enabled: false }
+                ],
                 delivery: null
             };
 

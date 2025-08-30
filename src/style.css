@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+@theme {
+  --color-unitali-green-50: oklch(0.966 0.02 153);
+  --color-unitali-green-100: oklch(0.925 0.04 154);
+  --color-unitali-green-200: oklch(0.85 0.07 155);
+  --color-unitali-green-300: oklch(0.762 0.11 155);
+  --color-unitali-green-400: oklch(0.67 0.14 155);
+  --color-unitali-green-500: oklch(0.58 0.16 156);
+  --color-unitali-green-600: oklch(0.485 0.16 157);
+  --color-unitali-green-700: oklch(0.395 0.14 158);
+  --color-unitali-green-800: oklch(0.306 0.12 160);
+  --color-unitali-green-900: oklch(0.22 0.09 161);
+  --color-unitali-green-950: oklch(0.162 0.07 162);
+
+  --color-unitali-red-50: oklch(0.963 0.02 36);
+  --color-unitali-red-100: oklch(0.92 0.04 36);
+  --color-unitali-red-200: oklch(0.84 0.08 36);
+  --color-unitali-red-300: oklch(0.73 0.13 36);
+  --color-unitali-red-400: oklch(0.615 0.19 36);
+  --color-unitali-red-500: oklch(0.52 0.23 35);
+  --color-unitali-red-600: oklch(0.44 0.23 35);
+  --color-unitali-red-700: oklch(0.35 0.21 34);
+  --color-unitali-red-800: oklch(0.26 0.18 33);
+  --color-unitali-red-900: oklch(0.185 0.14 32);
+  --color-unitali-red-950: oklch(0.13 0.11 31);
+
+  --color-unitali-blue-50: oklch(0.957 0.01 267);
+  --color-unitali-blue-100: oklch(0.91 0.02 267);
+  --color-unitali-blue-200: oklch(0.81 0.04 267);
+  --color-unitali-blue-300: oklch(0.69 0.06 267);
+  --color-unitali-blue-400: oklch(0.58 0.07 267);
+  --color-unitali-blue-500: oklch(0.475 0.08 267);
+  --color-unitali-blue-600: oklch(0.38 0.08 267);
+  --color-unitali-blue-700: oklch(0.29 0.08 268);
+  --color-unitali-blue-800: oklch(0.215 0.07 269);
+  --color-unitali-blue-900: oklch(0.145 0.06 270);
+  --color-unitali-blue-950: oklch(0.11 0.05 271);
+}

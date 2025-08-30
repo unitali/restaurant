@@ -62,6 +62,7 @@ export interface ProductType {
     createdAt: Date;
     updatedAt: Date;
     observationDisplay: boolean;
+    topPick: boolean;
     observation?: string;
     description?: string;
     image?: ImageType | null;
@@ -103,7 +104,7 @@ export interface RestaurantType {
     products: ProductType[];
     orders: OrderType[];
     delivery?: DeliveryType | null;
-    paymentMethods?: PaymentMethodsType;
+    paymentMethods?: PaymentMethodsType[];
     isOpen?: boolean;
     openingHours?: OpeningHoursType;
     plan?: PlanType;
@@ -115,9 +116,8 @@ export interface RestaurantType {
 }
 
 export interface PaymentMethodsType {
-    card: boolean;
-    cash: boolean;
-    pix: boolean;
+    type: "card" | "cash" | "pix";
+    enabled: boolean;
 }
 
 export interface OrderType {

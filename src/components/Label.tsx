@@ -10,7 +10,7 @@ export function Label({ id, label, required, classNameLabel, ...props }: LabelPr
         <label
             id={`label-${id}`}
             htmlFor={`input-${id}`}
-            className={`absolute p-1 left-3 top-0 text-teal-500 text-sm ${classNameLabel ?? ""}`}
+            className={`absolute p-1 left-3 top-0 text-unitali-blue-600 text-sm ${classNameLabel ?? ""}`}
             {...props}
         >
             {label}

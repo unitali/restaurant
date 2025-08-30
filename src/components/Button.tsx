@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { FaMinus, FaPlus } from "react-icons/fa";
+import { FaMinus, FaPlus, FaShoppingBasket } from "react-icons/fa";
+import { formatCurrencyBRL } from "../utils/currency";
+import { useOrder } from "../contexts/OrderContext";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     loading?: boolean;
     id: string;
@@ -14,7 +16,7 @@ export function ButtonPrimary({ ...props }: ButtonProps) {
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`flex justify-center p-4 items-center bg-teal-500 hover:bg-teal-600 text-white font-bold rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
+            className={`flex justify-center p-4 items-center bg-unitali-blue-600 hover:bg-unitali-blue-500 text-white font-bold rounded w-full cursor-pointer ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
@@ -49,14 +51,14 @@ export function ButtonPrimaryPlus({ ...props }: ButtonProps) {
             onMouseUp={() => setClicked(false)}
             onMouseLeave={() => setClicked(false)}
             id="add-to-cart"
-            className={`w-8 h-8 rounded-full flex items-center justify-center ml-2 transition-colors duration-150
+            className={`w-5 h-5 rounded-full flex items-center justify-center ml-2 transition-colors duration-150
                 ${clicked ? "bg-green-700" : "bg-green-500 hover:bg-green-600"} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {(props.quantity ?? 0) > 0 ? (
                 <span className="text-white font-bold">{props.quantity ?? 0}</span>
             ) : (
-                <FaPlus size={14} className="text-white" />
+                <FaPlus size={10} className="text-white" />
             )}
         </button>
     )
@@ -74,11 +76,11 @@ export function ButtonPrimaryMinus({ ...props }: ButtonProps) {
             onMouseDown={() => setClicked(true)}
             onMouseUp={() => setClicked(false)}
             onMouseLeave={() => setClicked(false)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 transition-colors duration-150
+            className={`w-5 h-5 rounded-full flex items-center justify-center mr-1 transition-colors duration-150
                 ${clicked ? "bg-red-700" : "bg-red-500 hover:bg-red-600"} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
-            <FaMinus size={14} className="text-white" />
+            <FaMinus size={10} className="text-white" />
         </button>
     )
 }
@@ -90,7 +92,7 @@ export function ButtonOutline({ ...props }: ButtonProps) {
             id={`button-${props.id}`}
             type={props.type}
             onClick={props.onClick}
-            className={`w-full rounded cursor-pointer border border-teal-500 text-teal-500 hover:bg-teal-600 hover:text-white font-bold p-4 ${props.className} ${disabledStyle}`}
+            className={`w-full rounded cursor-pointer border border-unitali-blue-600 text-unitali-blue-600 hover:bg-unitali-blue-500 hover:text-white font-bold p-4 ${props.className} ${disabledStyle}`}
             disabled={props.disabled || props.loading}
         >
             {props.children}
@@ -110,5 +112,22 @@ export function ButtonOutlineRemove({ ...props }: ButtonProps) {
         >
             {props.children}
         </button>
+    )
+}
+
+export function ButtonCartMenu({ handleOpenCart }: { handleOpenCart: () => void }) {
+    const { total } = useOrder();
+    return (
+        <nav
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl flex justify-center cursor-pointer"
+        >
+            <button
+                className="bg-red-600 text-white font-bold px-6 py-3 shadow-lg transition hover:bg-red-700 w-full flex items-center justify-center gap-2"
+                onClick={handleOpenCart}
+            >
+                <FaShoppingBasket className="text-xl mx-2" />
+                <span>{`Ver Carrinho (${formatCurrencyBRL(total)})`}</span>
+            </button>
+        </nav>
     )
 }

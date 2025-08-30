@@ -87,12 +87,12 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
         <>
             <button
                 type="button"
-                className="bg-white rounded shadow p-3 flex flex-row items-center w-full h-28 mb-3 transition-all duration-300 outline-none hover:scale-102"
+                className="bg-white rounded shadow p-3 flex flex-row cursor-pointer items-center w-full h-28 mb-3 transition-all duration-300 outline-none hover:scale-102"
                 onClick={openModal}
             >
                 <div className="flex-1 flex flex-col justify-center">
-                    <h3 className="font-bold text-base">{product.name}</h3>
-                    <p className="text-gray-600 text-xs">{product.description}</p>
+                    <h3 className="font-bold text-unitali-blue-600">{product.name}</h3>
+                    <p className="text-xs text-unitali-blue-400">{product.description}</p>
                     <span className="font-semibold text-green-700 text-base mt-2">
                         {formatCurrencyBRL(product.price)}
                     </span>
@@ -112,7 +112,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
             <Modal isOpen={isModalOpen} onClose={closeModal} id={`product-modal-${product.id}`}>
                 <form className="max-h-xl overflow-y-auto bg-white" onSubmit={handleSubmit}>
                     <div className="flex flex-col items-center p-2">
-                        <h2 className="text-lg font-semibold text-center mb-4">{product.name}</h2>
+                        <h2 className="text-lg font-semibold text-center mb-4 text-unitali-blue-600">{product.name}</h2>
                         <div className="mb-4">
                             {product.image?.url ? (
                                 <img
