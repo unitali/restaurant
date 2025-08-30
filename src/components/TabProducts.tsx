@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ConfirmModal, Input, ProductModal, ProductTable, Select } from ".";
+import { ButtonPrimary, ConfirmModal, Input, ProductModal, TableProducts, Select } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useProducts } from "../hooks/useProducts";
 import { LoadingPage } from "../pages/LoadingPage";
 import type { CategoryType, ProductType } from "../types";
 
-export function ProductsTab() {
+export function TabProducts() {
     const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
     const { deleteProduct } = useProducts();
     const [search, setSearch] = useState("");
@@ -119,7 +119,7 @@ export function ProductsTab() {
                     {products.length === 0 ? (
                         <p id="no-products-message" className="text-gray-500 text-center">Nenhum produto encontrado.</p>
                     ) : (
-                        <ProductTable
+                        <TableProducts
                             products={filteredProducts}
                             selectedCategory={selectedCategory}
                             onEdit={handleEditProduct}

@@ -33,7 +33,7 @@ export function LabelCopy({ ...props }: LabelCopyProps) {
             <label
                 id={`label-${props.id}`}
                 htmlFor={props.id}
-                className={`absolute left-3 top-0 text-teal-500 text-sm p-1 ${props.classNameLabel}`}
+                className={`absolute left-3 top-0 text-unitali-blue-600 text-sm p-1 ${props.classNameLabel}`}
             >
                 {props.label}
             </label>
@@ -43,14 +43,14 @@ export function LabelCopy({ ...props }: LabelCopyProps) {
                 type="text"
                 disabled
                 tabIndex={-1}
-                className={`w-full p-3 pt-5 rounded border border-teal-500 pr-10 bg-white text-gray-900 pointer-events-none focus:outline-none focus:ring-2 ${props.classNameInput}`}
+                className={`w-full p-3 pt-5 rounded border border-unitali-blue-600 pr-10 bg-white text-gray-900 pointer-events-none focus:outline-none focus:ring-2 ${props.classNameInput}`}
                 onBlur={(e) => {
                     props.onBlur && props.onBlur(e);
                 }}
             />
             <FaCopy
                 id={`icon-${props.id}`}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-teal-500 pointer-events-none"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-unitali-blue-600 pointer-events-none"
                 size={18}
             />
         </button>

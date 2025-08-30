@@ -264,8 +264,8 @@ export function ProductModal(props: ProductModalProps) {
                             </div>
                         </div>
                         <div className="flex flex-col md:flex-row gap-2 mb-2">
-                            <div className="flex flex-1 items-center justify-between p-4 border bg-white rounded border-teal-500">
-                                <span className="text-teal-500 mr-2">
+                            <div className="flex flex-1 items-center justify-between p-4 border bg-white rounded border-unitali-blue-600">
+                                <span className="text-unitali-blue-600 mr-2">
                                     Adicionar Campo Observação?
                                 </span>
                                 <Switch
@@ -274,8 +274,8 @@ export function ProductModal(props: ProductModalProps) {
                                     onChange={val => handleSwitch("observationDisplay", val)}
                                 />
                             </div>
-                            <div className="flex flex-1 items-center justify-between p-4 border bg-white rounded border-teal-500">
-                                <span className="text-teal-500 mr-2">
+                            <div className="flex flex-1 items-center justify-between p-4 border bg-white rounded border-unitali-blue-600">
+                                <span className="text-unitali-blue-600 mr-2">
                                     Produto em Destaque?
                                 </span>
                                 <Switch
@@ -286,7 +286,7 @@ export function ProductModal(props: ProductModalProps) {
                             </div>
                         </div>
                         {showOptionInputs && (
-                            <div className="border bg-gray-100 rounded p-2 pt-4 border-teal-500">
+                            <div className="border bg-gray-100 rounded p-2 pt-4 border-unitali-blue-600">
                                 <Input
                                     id="product-option-name"
                                     label="Nome do opcional"
@@ -308,7 +308,7 @@ export function ProductModal(props: ProductModalProps) {
                                     {newOption.name ? (
                                         <button
                                             type="button"
-                                            className="mb-2 p-3 bg-teal-500 text-white rounded hover:bg-teal-700"
+                                            className="mb-2 p-3 bg-unitali-blue-600 text-white rounded hover:bg-unitali-blue-500"
                                             onClick={handleAddOption}
                                             title="Salvar opcional"
                                         >
@@ -332,7 +332,7 @@ export function ProductModal(props: ProductModalProps) {
                                 <span className="font-semibold">Opcionais Adicionados:</span>
                                 <ul className="list-disc space-y-2">
                                     {product.options.map((opt, idx) => (
-                                        <li key={idx} className="flex items-center w-full p-4 pt-5 rounded left-3 top-0 bg-white text-teal-500 border border-teal-500">
+                                        <li key={idx} className="flex items-center w-full p-4 pt-5 rounded left-3 top-0 bg-white text-unitali-blue-600 border border-unitali-blue-600">
                                             <span>{opt.name} - {formatCurrencyBRL(opt.price ?? 0)}</span>
                                             <FaTrash className="ml-auto text-red-500 cursor-pointer"
                                                 onClick={() => handleRemoveOption(idx)} />

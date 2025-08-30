@@ -58,7 +58,7 @@ export function LoginPage() {
                                 children="Acessar com e-mail e senha"
                             />
                         </form>
-                        <hr className="my-4 text-gray-300" />
+                        <hr className="my-4 text-unitali-blue-300" />
                         <ButtonOutline
                             id="google-login"
                             className="w-full" onClick={handleGoogleLogin}

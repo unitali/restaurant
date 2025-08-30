@@ -104,7 +104,7 @@ export interface RestaurantType {
     products: ProductType[];
     orders: OrderType[];
     delivery?: DeliveryType | null;
-    paymentMethods?: PaymentMethodsType;
+    paymentMethods?: PaymentMethodsType[];
     isOpen?: boolean;
     openingHours?: OpeningHoursType;
     plan?: PlanType;
@@ -116,9 +116,8 @@ export interface RestaurantType {
 }
 
 export interface PaymentMethodsType {
-    card: boolean;
-    cash: boolean;
-    pix: boolean;
+    type: "card" | "cash" | "pix";
+    enabled: boolean;
 }
 
 export interface OrderType {

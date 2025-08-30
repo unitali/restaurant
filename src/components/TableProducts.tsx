@@ -2,19 +2,19 @@ import { FaEdit, FaFileImage, FaTrash } from "react-icons/fa";
 import type { ProductType } from "../types";
 import { formatCurrencyBRL } from "../utils/currency";
 
-interface ProductTableProps {
+interface TableProductsProps {
     products: ProductType[];
     selectedCategory: string;
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
 }
 
-export function ProductTable(props: ProductTableProps) {
+export function TableProducts(props: TableProductsProps) {
     const products = props.products;
 
     if (products.length === 0) {
         return (
-            <p id="no-products-message" className="text-gray-500 text-center">
+            <p id="no-products-message" className="text-unitali-blue-500 text-center">
                 Nenhum produto encontrado.
             </p>
         );
@@ -23,7 +23,7 @@ export function ProductTable(props: ProductTableProps) {
     return (
         <table id="admin-products-table" className="w-full text-sm">
             <thead>
-                <tr className="bg-teal-500 text-white">
+                <tr className="bg-unitali-blue-600 text-white">
                     <th id="product-image" className="p-4" style={{ width: 32, height: 32 }}></th>
                     <th id="product-name" className="p-2 text-left">Nome</th>
                     <th id="product-description" className="p-2 text-left">Descrição</th>
@@ -35,7 +35,7 @@ export function ProductTable(props: ProductTableProps) {
                 {products.map((product, idx) => (
                     <tr
                         key={product.id}
-                        className={idx % 2 === 0 ? "bg-gray-100" : "bg-teal-100"}
+                        className={idx % 2 === 0 ? "bg-unitali-blue-50" : "bg-unitali-blue-100"}
                     >
                         <td id={`product-image-${idx}`} className="p-2" style={{ width: 60, height: 60 }}>
                             {product.image?.url ? (
@@ -56,7 +56,7 @@ export function ProductTable(props: ProductTableProps) {
                                 <FaEdit
                                     id={`product-edit-${idx}`}
                                     size={18}
-                                    className="text-teal-600 hover:text-teal-800 hover:cursor-pointer"
+                                    className="text-unitali-blue-600 hover:text-unitali-blue-500 hover:cursor-pointer"
                                     onClick={() => props.onEdit(product.id!)}
                                     title="Editar produto"
                                 />
