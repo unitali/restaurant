@@ -68,18 +68,22 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
     return (
         <div>
             <div className="flex flex-col gap-2 mb-4">
-                <RadioButton
-                    label="Retirar no local"
-                    name="delivery-type"
-                    checked={!isDelivery}
-                    onChange={() => setIsDelivery(false)}
-                />
-                <RadioButton
-                    label="Entregar no endereço"
-                    name="delivery-type"
-                    checked={isDelivery}
-                    onChange={() => setIsDelivery(true)}
-                />
+                {restaurant?.delivery?.takeout && (
+                    <RadioButton
+                        label="Retirar no local"
+                        name="delivery-type"
+                        checked={!isDelivery}
+                        onChange={() => setIsDelivery(false)}
+                    />
+                )}
+                {restaurant?.delivery?.enabled && (
+                    <RadioButton
+                        label="Entregar no endereço"
+                        name="delivery-type"
+                        checked={isDelivery}
+                        onChange={() => setIsDelivery(true)}
+                    />
+                )}
             </div>
             <div className="flex flex-col gap-4">
                 {isDelivery && address && (

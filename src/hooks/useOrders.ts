@@ -48,7 +48,9 @@ export function useOrders() {
                 status: 'pending',
                 createdAt: new Date(),
                 address: deliveryAddress ?? null,
-                paymentMethod: typeof paymentMethod === "string" ? paymentMethod : String(paymentMethod) ?? "",
+                paymentMethod: typeof paymentMethod === "string"
+                    ? paymentMethod
+                    : paymentMethod?.type ?? "",
             };
 
             const order = await setDoc(orderDocRef, newOrder);

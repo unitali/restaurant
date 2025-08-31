@@ -60,7 +60,7 @@ export function useWhatsApp() {
                 `${lineRepeat("=")}` +
                 `${deliveryAddress ? `*ENTREGA*` : "*RETIRADA NO LOCAL*"}` +
                 `${lineRepeat("=")}` +
-                `Pagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label}*` : "*Não informado*"}` +
+                `Pagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === paymentMethod?.type)?.label.toUpperCase()}*` : "*Não informado*"}` +
                 `${lineRepeat("=")}` +
                 `${itemsMsg}` +
                 `${deliveryTax > 0 ? `Taxa de Entrega: *${formatCurrencyBRL(deliveryTax)}*` : ""}` +

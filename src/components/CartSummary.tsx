@@ -27,7 +27,7 @@ export function CartSummary(props: CartSummaryProps) {
     };
 
     const paymentLabel =
-        paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label || "Não informado";
+        paymentMethods.find(method => method.id === paymentMethod?.type)?.label || "Não informado";
 
     return (
         <div className="flex flex-col gap-4">
