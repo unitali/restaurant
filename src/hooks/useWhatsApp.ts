@@ -9,7 +9,7 @@ import { paymentMethods } from '../utils/paymentsMethods';
 
 export function useWhatsApp() {
     const [loading, setLoading] = useState(false);
-    const { cart, total, deliveryAddress, paymentMethod, deliveryTax } = useOrder();
+    const { cart, total, deliveryAddress, paymentMethod, deliveryTax, name } = useOrder();
     const { restaurant } = useRestaurant();
     const lineRepeat = (char: string) => `\n${char.repeat(25)}\n`;
 
@@ -57,6 +57,7 @@ export function useWhatsApp() {
 
             const message =
                 `Pedido Nº: *${orderNumber}*\n` +
+                `Nome: *${name.toUpperCase()}*\n` +
                 `${lineRepeat("=")}` +
                 `${deliveryAddress ? `*ENTREGA*` : "*RETIRADA NO LOCAL*"}` +
                 `${lineRepeat("=")}` +
@@ -66,8 +67,8 @@ export function useWhatsApp() {
                 `${deliveryTax > 0 ? `Taxa de Entrega: *${formatCurrencyBRL(deliveryTax)}*` : ""}` +
                 `\nTotal: *${formatCurrencyBRL(total).trim()}*\n` +
                 `${lineRepeat("=")}` +
-                `${deliveryAddress ? `Endereço: *${addressFormat(deliveryAddress).trim()}*` : ""}` +
-                `\n*Obrigado pelo pedido!*`;
+                `${deliveryAddress ? `Endereço: ${addressFormat(deliveryAddress).trim()}` : ""}` +
+                `\n*Obrigado pelo seu pedido, ${name}!*`;
 
             const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
             window.open(url, "_blank");
@@ -78,7 +79,7 @@ export function useWhatsApp() {
             setLoading(false);
         }
 
-    }, [cart, total, restaurant]);
+    }, [cart, total, restaurant, name]);
 
     return { sendWhatsAppOrder, loading };
 }

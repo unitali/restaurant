@@ -9,7 +9,7 @@ import type { OrderType } from "../types";
 
 export function useOrders() {
     const [loadingOrder, setLoadingOrder] = useState(false);
-    const { ORDER_KEY, cart, total, deliveryAddress, paymentMethod } = useOrder();
+    const { ORDER_KEY, cart, total, deliveryAddress, paymentMethod, name, clearOrder } = useOrder();
     const { restaurantId } = useRestaurant();
 
     const createOrder = useCallback(async (orderNumber: string) => {
@@ -51,13 +51,13 @@ export function useOrders() {
                 paymentMethod: typeof paymentMethod === "string"
                     ? paymentMethod
                     : paymentMethod?.type ?? "",
+                name,
             };
 
-            const order = await setDoc(orderDocRef, newOrder);
+            await setDoc(orderDocRef, newOrder);
 
             toast.success("Pedido enviado com sucesso!");
-            return order;
-
+            clearOrder();
         } catch (err) {
             console.error("Erro ao criar pedido:", err);
             toast.error("Não foi possível enviar o seu pedido.");
@@ -65,7 +65,7 @@ export function useOrders() {
         } finally {
             setLoadingOrder(false);
         }
-    }, [ORDER_KEY, cart, total, deliveryAddress, paymentMethod, restaurantId]);
+    }, [ORDER_KEY, cart, total, deliveryAddress, paymentMethod, restaurantId, name]);
 
     return {
         loadingOrder,
