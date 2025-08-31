@@ -11,6 +11,7 @@ export function useWhatsApp() {
     const [loading, setLoading] = useState(false);
     const { cart, total, deliveryAddress, paymentMethod, deliveryTax } = useOrder();
     const { restaurant } = useRestaurant();
+    const lineRepeat = (char: string) => `\n${char.repeat(25)}\n`;
 
     const sendWhatsAppOrder = useCallback(async (orderNumber: string) => {
         if (!restaurant) {
@@ -26,7 +27,7 @@ export function useWhatsApp() {
 
         try {
             const itemsMsg = cart
-                .map((product, index) => {
+                .map((product) => {
                     const optionsTotalPerUnit = product.options?.reduce(
                         (acc, opt) => acc + ((opt.price ?? 0) * (opt.quantity ?? 1)),
                         0
@@ -45,24 +46,27 @@ export function useWhatsApp() {
                         : "";
 
                     return (
-                        `${index + 1}. ${product.name}\n` +
-                        `  Quantidade: ${product.quantity}\n` +
+                        `\n${product.quantity} x ${product.name}\n` +
                         `  Preço: ${formatCurrencyBRL(product.price ?? 0)}\n` +
                         optionsString +
                         observationString +
                         `  Subtotal: ${formatCurrencyBRL(lineSubtotal)}\n` +
-                        `${"-".repeat(30)}`
+                        `${lineRepeat("-")}`
                     );
                 })
-                .join("\n\n");
 
             const message =
-                `Pedido Nº: *${orderNumber}*\n\n` +
-                `${itemsMsg}\n` +
-                `${deliveryTax > 0 ? `Taxa de Entrega: *${formatCurrencyBRL(deliveryTax)}*\n` : ""}` +
-                `\nTotal: *${formatCurrencyBRL(total).trim()}* \n` +
-                `\nEntrega: ${deliveryAddress ? `*${addressFormat(deliveryAddress).trim()}*` : "*RETIRADA NO LOCAL*"}\n` +
-                `\nPagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label}*` : "*Não informado*"}\n` +
+                `Pedido Nº: *${orderNumber}*\n` +
+                `${lineRepeat("=")}` +
+                `${deliveryAddress ? `*ENTREGA*` : "*RETIRADA NO LOCAL*"}` +
+                `${lineRepeat("=")}` +
+                `Pagamento: ${paymentMethod ? `*${paymentMethods.find(method => method.id === (paymentMethod as unknown as typeof method.id))?.label}*` : "*Não informado*"}` +
+                `${lineRepeat("=")}` +
+                `${itemsMsg}` +
+                `${deliveryTax > 0 ? `Taxa de Entrega: *${formatCurrencyBRL(deliveryTax)}*` : ""}` +
+                `\nTotal: *${formatCurrencyBRL(total).trim()}*\n` +
+                `${lineRepeat("=")}` +
+                `${deliveryAddress ? `Endereço: *${addressFormat(deliveryAddress).trim()}*` : ""}` +
                 `\n*Obrigado pelo pedido!*`;
 
             const url = `https://wa.me/${restaurant.company.phone}?text=${encodeURIComponent(message)}`;
