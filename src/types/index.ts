@@ -126,6 +126,7 @@ export interface OrderType {
     total?: number;
     address: AddressType | null;
     paymentMethod: string;
+    name: string;
     status: "pending" | "inProgress" | "completed" | "canceled";
     createdAt: Date;
     updatedAt?: Date;

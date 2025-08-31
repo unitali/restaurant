@@ -32,6 +32,8 @@ interface OrderContextType {
     ORDER_KEY: typeof ORDER_KEY;
     deliveryTax: number;
     setDeliveryTax: (tax: number) => void;
+    name: string;
+    setName: (name: string) => void;
 }
 
 
@@ -44,6 +46,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     const [deliveryTax, setDeliveryTax] = useState<number>(0);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethodsType | null>(null);
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
+    const [name, setName] = useState<string>("");
 
     useEffect(() => {
         const stored = localStorage.getItem(ORDER_KEY);
@@ -134,6 +137,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     }
 
     function clearOrder() {
+        localStorage.removeItem(ORDER_KEY);
         setCart([]);
     }
 
@@ -177,7 +181,9 @@ export function OrderProvider({ children }: { children: ReactNode }) {
                 orderNumber,
                 createOrderNumber,
                 deliveryTax,
-                setDeliveryTax: setDeliveryTaxValue 
+                setDeliveryTax: setDeliveryTaxValue,
+                name,
+                setName
             }}
         >
             {children}

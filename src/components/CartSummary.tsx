@@ -1,4 +1,4 @@
-import { ButtonOutline, ButtonPrimary } from ".";
+import { ButtonOutline, ButtonPrimary, Input } from ".";
 import { useOrder } from "../contexts/OrderContext";
 import { useOrders } from "../hooks/useOrders";
 import { useWhatsApp } from "../hooks/useWhatsApp";
@@ -13,7 +13,7 @@ interface CartSummaryProps {
 }
 
 export function CartSummary(props: CartSummaryProps) {
-    const { cart, total, deliveryAddress, paymentMethod, clearOrder, deliveryTax } = useOrder();
+    const { cart, total, deliveryAddress, paymentMethod, deliveryTax, setName, name } = useOrder();
     const { createOrder } = useOrders();
     const { sendWhatsAppOrder } = useWhatsApp();
     const isDelivery = !!deliveryAddress;
@@ -23,11 +23,11 @@ export function CartSummary(props: CartSummaryProps) {
         await sendWhatsAppOrder(orderNumber);
         await createOrder(orderNumber);
         props.onClose();
-        clearOrder();
     };
 
     const paymentLabel =
         paymentMethods.find(method => method.id === paymentMethod?.type)?.label || "Não informado";
+    const isNameFilled = !!name && name.trim().length > 0;
 
     return (
         <div className="flex flex-col gap-4">
@@ -75,13 +75,26 @@ export function CartSummary(props: CartSummaryProps) {
                 <h5 className="font-semibold">Forma de pagamento</h5>
                 <div>{paymentLabel}</div>
             </div>
+            <Input
+                id="summary-name"
+                label="Nome"
+                placeholder="Digite seu nome..."
+                required
+                value={name}
+                onChange={(e) => { setName(e.target.value) }}
+            />
             <div className="flex gap-2">
-                <ButtonOutline id="summary-back"
+                <ButtonOutline
+                    id="summary-back"
                     onClick={props.onBack}
-                    children="Voltar" />
-                <ButtonPrimary id="summary-confirm"
+                    children="Voltar"
+                />
+                <ButtonPrimary
+                    id="summary-confirm"
                     onClick={handleSendOrder}
-                    children="Confirmar" />
+                    children="Confirmar"
+                    disabled={!isNameFilled}
+                />
             </div>
         </div >
     );
