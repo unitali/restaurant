@@ -33,13 +33,27 @@ export function Input({ ...props }: InputProps) {
                 value={props.value}
                 {...props}
                 id={`input-${props.id}`}
-                type={inputType}
+                type={props.type ? props.type : inputType}
                 className={`w-full pb-2 ps-4 pt-7 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-unitali-blue-600 focus:ring-unitali-blue-700"}`}
                 onBlur={(e) => {
                     setTouched(true);
                     props.onBlur && props.onBlur(e);
                 }}
+                style={props.type === "number"
+                    ? { MozAppearance: "textfield", appearance: "textfield" }
+                    : undefined}
             />
+            {props.type === "number" && (
+                <style>
+                    {`
+                    input[type=number]::-webkit-inner-spin-button,
+                    input[type=number]::-webkit-outer-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                    }
+                    `}
+                </style>
+            )}
             {isPassword && (
                 <button
                     id={`show-${props.id}`}

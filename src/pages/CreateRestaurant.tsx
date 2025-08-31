@@ -56,11 +56,12 @@ export function CreateRestaurant() {
     return (
         <>
             <HeaderPublic />
-            <div className="flex justify-center items-center min-h-screen">
+            <div className="flex justify-center items-center min-h-screen bg-gray-50">
                 {loading ? <LoadingPage /> : (
-                    <div className="w-full max-w-md bg-white p-8 rounded shadow">
-                        <h2 id="create-restaurant-title" className="text-xl font-bold m-6">Criar Restaurante e Admin</h2>
-                        <form className="space-y-4" onSubmit={handleSubmit}>
+                    <div className="w-full max-w-4xl bg-white p-8 rounded shadow flex flex-col md:flex-row gap-8">
+                        {/* Dados do restaurante */}
+                        <form className="flex-1 flex flex-col space-y-4" onSubmit={handleSubmit}>
+                            <h2 id="create-restaurant-title" className="text-xl font-bold mb-6">Dados do Restaurante</h2>
                             <Input
                                 id="restaurant-name"
                                 label="Nome do restaurante"
@@ -75,49 +76,60 @@ export function CreateRestaurant() {
                                 onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, street: e.target.value } })}
                                 required
                             />
-                            <Input
-                                id="restaurant-address-number"
-                                label="Número"
-                                value={restaurant.address.number}
-                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, number: e.target.value } })}
-                                required
-                            />
-                            <Input
-                                id="restaurant-address-neighborhood"
-                                label="Bairro"
-                                value={restaurant.address.neighborhood}
-                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, neighborhood: e.target.value } })}
-                                required
-                            />
-                            <Input
-                                id="restaurant-address-city"
-                                label="Cidade"
-                                value={restaurant.address.city}
-                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, city: e.target.value } })}
-                                required
-                            />
-                            <Input
-                                id="restaurant-address-state"
-                                label="Estado"
-                                value={restaurant.address.state}
-                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, state: e.target.value } })}
-                                required
-                            />
-                            <Input
-                                id="restaurant-address-zip-code"
-                                label="CEP"
-                                value={restaurant.address.zipCode}
-                                onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, zipCode: e.target.value } })}
-                                required
-                            />
-                            <Input
-                                id="restaurant-phone"
-                                type="tel"
-                                label="Telefone"
-                                value={restaurant.phone}
-                                onChange={e => setRestaurant({ ...restaurant, phone: e.target.value })}
-                                required
-                            />
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <Input
+                                    id="restaurant-address-number"
+                                    label="Número"
+                                    value={restaurant.address.number}
+                                    onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, number: e.target.value } })}
+                                    required
+                                />
+                                <Input
+                                    id="restaurant-address-neighborhood"
+                                    label="Bairro"
+                                    value={restaurant.address.neighborhood}
+                                    onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, neighborhood: e.target.value } })}
+                                    required
+                                />
+                            </div>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <Input
+                                    id="restaurant-address-city"
+                                    label="Cidade"
+                                    value={restaurant.address.city}
+                                    onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, city: e.target.value } })}
+                                    required
+                                />
+                                <Input
+                                    id="restaurant-address-state"
+                                    label="Estado"
+                                    value={restaurant.address.state}
+                                    onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, state: e.target.value } })}
+                                    required
+                                />
+                            </div>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <Input
+                                    id="restaurant-address-zip-code"
+                                    type="number"
+                                    label="CEP"
+                                    value={restaurant.address.zipCode}
+                                    onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, zipCode: e.target.value } })}
+                                    required
+                                />
+                                <Input
+                                    id="restaurant-phone"
+                                    type="number"
+                                    label="Telefone"
+                                    value={restaurant.phone}
+                                    onChange={e => setRestaurant({ ...restaurant, phone: e.target.value })}
+                                    required
+                                />
+                            </div>
+                        </form>
+
+                        <form className="flex-1 flex flex-col space-y-4" onSubmit={handleSubmit}>
+                            <h2 className="text-xl font-bold mb-6">Dados do Administrador</h2>
                             <Input
                                 id="admin-email"
                                 type="email"
@@ -145,7 +157,7 @@ export function CreateRestaurant() {
                             />
                             <ButtonPrimary
                                 id="create-restaurant-button"
-                                className="w-full"
+                                className="w-full mt-8"
                                 type="submit"
                                 disabled={!isPasswordValid || !isPasswordMatch}
                                 children="Iniciar Período de Teste"
