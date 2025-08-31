@@ -15,7 +15,6 @@ export function SettingsPayment() {
     const { restaurantId, refresh, restaurant } = useRestaurant();
     const { updateRestaurant } = useRestaurants();
 
-    // Inicializa como array de métodos
     const initialPaymentMethods: PaymentMethodsType[] = [
         { type: "card", enabled: false },
         { type: "cash", enabled: false },
@@ -27,8 +26,6 @@ export function SettingsPayment() {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethodsType[]>(initialPaymentMethods);
     const [isChanged, setIsChanged] = useState(false);
 
-
-    // Carrega métodos do restaurante ao abrir
     useEffect(() => {
         if (restaurant?.paymentMethods && Array.isArray(restaurant.paymentMethods)) {
             setPaymentMethods(restaurant.paymentMethods);
@@ -37,18 +34,14 @@ export function SettingsPayment() {
         }
     }, [restaurant]);
 
-    // Detecta alterações
     useEffect(() => {
-        if (!restaurant?.paymentMethods) {
-            setIsChanged(false);
-            return;
-        }
         setIsChanged(
-            JSON.stringify(paymentMethods) !== JSON.stringify(restaurant.paymentMethods)
+            restaurant?.paymentMethods
+                ? JSON.stringify(paymentMethods) !== JSON.stringify(restaurant.paymentMethods)
+                : false
         );
-    }, [paymentMethods, restaurant]);
+    }, [paymentMethods, restaurant?.paymentMethods]);
 
-    // Altera o estado de um método
     const handleSwitch = (type: string, value: boolean) => {
         setPaymentMethods(prev =>
             prev.map(pm =>
@@ -66,12 +59,15 @@ export function SettingsPayment() {
         if (isChanged) {
             setLoading(true);
             await updateRestaurant(restaurantId, {
-                paymentMethods: paymentMethods
+                paymentMethods
             });
+            await refresh();
+            if (restaurant?.paymentMethods && Array.isArray(restaurant.paymentMethods)) {
+                setPaymentMethods(restaurant.paymentMethods);
+            }
             setLoading(false);
             setIsEditing(false);
             setIsChanged(false);
-            refresh();
         } else {
             setIsEditing(false);
             setPaymentMethods(
@@ -82,34 +78,41 @@ export function SettingsPayment() {
         }
     };
 
-    { loading && <LoadingPage /> }
-
     return (
         <div className="shadow rounded p-2 bg-white max-w-md w-full mt-8">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Configurações de Pagamento</h2>
-            </div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                {paymentMethods.map(pm => (
-                    <div key={pm.type} className="flex items-center">
-                        <Switch
-                            id={pm.type}
-                            value={pm.enabled}
-                            onChange={val => handleSwitch(pm.type, val)}
-                            disabled={!isEditing}
-                        />
-                        <span className="ml-2">{paymentLabels[pm.type]}</span>
+            {loading && (
+                <div className="flex justify-center items-center min-h-[120px]">
+                    <LoadingPage />
+                </div>
+            )}
+            {!loading && (
+                <>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold">Configurações de Pagamento</h2>
                     </div>
-                ))}
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        {paymentMethods.map(pm => (
+                            <div key={pm.type} className="flex items-center">
+                                <Switch
+                                    id={pm.type}
+                                    value={pm.enabled}
+                                    onChange={val => handleSwitch(pm.type, val)}
+                                    disabled={!isEditing}
+                                />
+                                <span className="ml-2">{paymentLabels[pm.type]}</span>
+                            </div>
+                        ))}
 
-                <ButtonPrimary
-                    id="delivery"
-                    type="submit"
-                    disabled={loading || (isEditing && !isChanged)}
-                >
-                    {!isEditing ? "Editar" : isChanged ? "Salvar" : "Cancelar"}
-                </ButtonPrimary>
-            </form>
+                        <ButtonPrimary
+                            id="delivery"
+                            type="submit"
+                            disabled={loading}
+                        >
+                            {!isEditing ? "Editar" : isChanged ? "Salvar" : "Cancelar"}
+                        </ButtonPrimary>
+                    </form>
+                </>
+            )}
         </div>
     );
 }

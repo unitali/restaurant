@@ -100,9 +100,10 @@ export function ProductModal(props: ProductModalProps) {
             product.observationDisplay !== original.observationDisplay ||
             product.topPick !== original.topPick ||
             JSON.stringify(product.options) !== JSON.stringify(original.options) ||
-            (product.image?.url ?? null) !== (original.image?.url ?? null);
+            (product.image?.url ?? null) !== (original.image?.url ?? null) ||
+            imageState.dirty || imageState.removed;
         setIsDirty(changed);
-    }, [product, props.productId, products]);
+    }, [product, imageState, props.productId, products]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { ButtonPrimary, Input, Modal, TextArea, type ModalProps } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useCategories } from "../hooks/useCategories";
@@ -59,12 +58,10 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                     description: category.description,
                 };
                 await updateCategory(props.restaurantId, newCategory);
-                toast.success("Categoria atualizada com sucesso!");
                 setCategory(newCategory);
                 props.onClose();
             } else if (category) {
                 await addCategory(props.restaurantId, category);
-                toast.success("Categoria cadastrada com sucesso!");
                 setCategory(initialCategoryState);
             } else {
                 throw new Error("Categoria inválida");
@@ -74,12 +71,9 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
             }
         } catch (error) {
             console.error("Erro ao salvar categoria:", error);
-            toast.error("Erro ao salvar categoria");
         } finally {
             setLoading(false);
             refresh();
-
-
         }
     };
 
