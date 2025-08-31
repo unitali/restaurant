@@ -115,7 +115,6 @@ export function useImages() {
         setError(null);
         try {
             await _remove(imagePath);
-            toast.success("Imagem removida com sucesso!");
         } catch (err) {
             console.error("Erro ao remover imagem:", err);
             const error = err instanceof Error ? err : new Error("Ocorreu um erro desconhecido.");
