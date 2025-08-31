@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ButtonOutline, ButtonPrimary, RadioButton } from ".";
 import { useOrder } from "../contexts/OrderContext";
 import { useRestaurant } from "../contexts/RestaurantContext";
+import type { PaymentMethodsType } from "../types";
 
 
 const paymentLabels: Record<string, string> = {
@@ -13,21 +14,21 @@ const paymentLabels: Record<string, string> = {
 export function CartPayment({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
     const { restaurant } = useRestaurant();
     const { paymentMethod, setPaymentMethod } = useOrder();
-    const activePaymentMethods = (restaurant?.paymentMethods ?? []).filter(pm => pm.enabled);
-    const [selectedMethod, setSelectedMethod] = useState<string>(
-        typeof paymentMethod === "string"
-            ? paymentMethod
-            : activePaymentMethods[0]?.type ?? ""
+    const activePaymentMethods: PaymentMethodsType[] = (restaurant?.paymentMethods ?? []).filter(pm => pm.enabled);
+    const [selectedType, setSelectedType] = useState<PaymentMethodsType["type"] | null>(
+        typeof paymentMethod === "object" && paymentMethod !== null
+            ? paymentMethod.type
+            : (activePaymentMethods[0]?.type ?? null)
     );
 
     useEffect(() => {
-        if (!selectedMethod && activePaymentMethods.length > 0) {
-            setSelectedMethod(activePaymentMethods[0].type);
+        if (!selectedType && activePaymentMethods.length > 0) {
+            setSelectedType(activePaymentMethods[0].type);
         }
-    }, [activePaymentMethods, selectedMethod]);
+    }, [activePaymentMethods, selectedType]);
 
     const handleNext = () => {
-        const selectedPaymentMethod = activePaymentMethods.find(pm => pm.type === selectedMethod) ?? null;
+        const selectedPaymentMethod = activePaymentMethods.find(pm => pm.type === selectedType) ?? null;
         setPaymentMethod(selectedPaymentMethod);
         onNext();
     };
@@ -35,13 +36,13 @@ export function CartPayment({ onNext, onBack }: { onNext: () => void; onBack: ()
     return (
         <div>
             <div className="flex flex-col gap-2">
-                {activePaymentMethods.map((pm, index) => (
+                {activePaymentMethods.map((pm) => (
                     <RadioButton
-                        key={index}
+                        key={pm.type}
                         name="payment-method"
                         label={paymentLabels[pm.type] ?? pm.type}
-                        checked={selectedMethod === pm.type}
-                        onChange={() => setSelectedMethod(pm.type)}
+                        checked={selectedType === pm.type}
+                        onChange={() => setSelectedType(pm.type)}
                     />
                 ))}
             </div>
@@ -55,7 +56,7 @@ export function CartPayment({ onNext, onBack }: { onNext: () => void; onBack: ()
                     id="payment-next"
                     onClick={handleNext}
                     children="Continuar"
-                    disabled={!selectedMethod}
+                    disabled={!selectedType}
                 />
             </div>
         </div>
