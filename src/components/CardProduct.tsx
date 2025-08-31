@@ -118,7 +118,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
                                 <img
                                     src={product.image?.url}
                                     alt={product.name}
-                                    className="object-cover rounded mx-auto w-24 h-24"
+                                    className="object-cover rounded mx-auto h-24"
                                 />
                             ) : (
                                 <FaFileImage className="w-24 h-24 text-gray-200 rounded mx-auto" />
