@@ -82,12 +82,12 @@ export function HeaderMenu() {
                 </div>
             )}
             <div className="absolute left-1/2 -translate-x-1/2 z-10">
-                <div className="bg-white rounded-full shadow-lg flex items-center justify-center w-32 h-32 border-4 border-unitali-blue-600">
+                <div className="bg-white rounded-full shadow-lg flex items-center justify-center w-32 h-32 border-4 border-unitali-blue-600 relative overflow-hidden">
                     {restaurant?.company.logo?.url && (
                         <img
                             src={restaurant.company.logo.url}
                             alt="Logo do restaurante"
-                            className="w-28 h-28 object-contain rounded-full"
+                            className="w-28 h-28 object-contain rounded-full relative z-10"
                         />
                     )}
                 </div>
