@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, ConfirmModal, Input, ProductModal, TableProducts, Select } from ".";
+import { ButtonPrimary, ConfirmModal, InputText, ProductModal, TableProducts, Select } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useProducts } from "../hooks/useProducts";
 import { LoadingPage } from "../pages/LoadingPage";
@@ -77,7 +77,7 @@ export function TabProducts() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         {products.length !== 0 && (
                             <>
-                                <Input
+                                <InputText
                                     id="search-product"
                                     type="text"
                                     label="Buscar produto"

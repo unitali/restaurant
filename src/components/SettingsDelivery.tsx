@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ButtonPrimary, Input, Switch } from ".";
+import { ButtonPrimary, InputText, Switch } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useRestaurants } from "../hooks/useRestaurants";
 import { LoadingPage } from "../pages/LoadingPage";
@@ -131,7 +131,7 @@ export function SettingsDelivery() {
                     <div>
                         <div className="flex flex-row items-center mb-2 gap-2">
                             <div className="flex flex-col flex-1">
-                                <Input
+                                <InputText
                                     type="number"
                                     id="delivery-distance-input"
                                     label="Distância (KM)"
@@ -144,7 +144,7 @@ export function SettingsDelivery() {
                                 />
                             </div>
                             <div className="flex flex-col flex-1">
-                                <Input
+                                <InputText
                                     id="delivery-price-input"
                                     label="Preço"
                                     name="deliveryPrice"

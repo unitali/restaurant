@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaSave, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { ButtonOutline, ButtonPrimary, ImageUpload, Input, Modal, Select, Switch } from ".";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useImages } from '../hooks/useImages';
-import { useProducts } from "../hooks/useProducts";
-import { LoadingPage } from "../pages/LoadingPage";
-import type { CategoryType, ImageState, ImageType, ProductOptionsType, ProductType } from '../types';
-import { formatCurrencyBRL } from "../utils/currency";
+import { ButtonOutline, ButtonPrimary, ImageUpload, InputText, Modal, Select, Switch } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useImages } from '../../hooks/useImages';
+import { useProducts } from "../../hooks/useProducts";
+import { LoadingPage } from "../../pages/LoadingPage";
+import type { CategoryType, ImageState, ImageType, ProductOptionsType, ProductType } from '../../types';
+import { formatCurrencyBRL } from "../../utils/currency";
 
 const initialProductState: ProductType = {
     id: "",
@@ -223,7 +223,7 @@ export function ProductModal(props: ProductModalProps) {
                             initialUrl={originalImage?.url || null}
                             onStateChange={setImageState}
                         />
-                        <Input
+                        <InputText
                             id="product-name"
                             label="Produto"
                             name="name"
@@ -231,7 +231,7 @@ export function ProductModal(props: ProductModalProps) {
                             onChange={handleChange}
                             required
                         />
-                        <Input
+                        <InputText
                             id="product-description"
                             label="Descrição"
                             name="description"
@@ -240,7 +240,7 @@ export function ProductModal(props: ProductModalProps) {
                         />
                         <div className="flex gap-4">
                             <div className="flex-1">
-                                <Input
+                                <InputText
                                     id="product-price"
                                     label="Preço"
                                     name="price"
@@ -288,7 +288,7 @@ export function ProductModal(props: ProductModalProps) {
                         </div>
                         {showOptionInputs && (
                             <div className="border bg-gray-100 rounded p-2 pt-4 border-unitali-blue-600">
-                                <Input
+                                <InputText
                                     id="product-option-name"
                                     label="Nome do opcional"
                                     name="optionName"
@@ -298,7 +298,7 @@ export function ProductModal(props: ProductModalProps) {
                                 />
                                 <div className="flex flex-row justify-center align-items-center gap-2">
                                     <div className="flex-1">
-                                        <Input
+                                        <InputText
                                             id="option-price"
                                             label="Preço"
                                             name="optionPrice"

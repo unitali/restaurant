@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ButtonOutline, ButtonPrimary, Input, RadioButton } from ".";
+import { ButtonOutline, ButtonPrimary, InputText, RadioButton } from ".";
 import { useOrder } from "../contexts/OrderContext";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { formatCurrencyBRL } from "../utils/currency";
@@ -91,7 +91,7 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                         <span>
                             Taxa de Entrega:  {formatCurrencyBRL(restaurant?.delivery?.tax[0]?.price ?? 0)}
                         </span>
-                        <Input
+                        <InputText
                             id="delivery-street"
                             name="street"
                             label="Rua"
@@ -101,7 +101,7 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                             className="mb-2"
                         />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <Input
+                            <InputText
                                 id="delivery-number"
                                 name="number"
                                 label="Número"
@@ -109,7 +109,7 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                                 onChange={handleChange}
                                 required
                             />
-                            <Input
+                            <InputText
                                 id="delivery-state"
                                 name="neighborhood"
                                 label="Bairro"
@@ -117,14 +117,14 @@ export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: (
                                 onChange={handleChange}
                                 required
                             />
-                            <Input
+                            <InputText
                                 id="delivery-reference"
                                 name="reference"
                                 label="Referência"
                                 value={address.reference || ""}
                                 onChange={handleChange}
                             />
-                            <Input
+                            <InputText
                                 id="delivery-zipCode"
                                 name="zipCode"
                                 label="CEP"

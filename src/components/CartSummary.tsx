@@ -1,4 +1,4 @@
-import { ButtonOutline, ButtonPrimary, Input } from ".";
+import { ButtonOutline, ButtonPrimary, InputText } from ".";
 import { useOrder } from "../contexts/OrderContext";
 import { useOrders } from "../hooks/useOrders";
 import { useWhatsApp } from "../hooks/useWhatsApp";
@@ -75,7 +75,7 @@ export function CartSummary(props: CartSummaryProps) {
                 <h5 className="font-semibold">Forma de pagamento</h5>
                 <div>{paymentLabel}</div>
             </div>
-            <Input
+            <InputText
                 id="summary-name"
                 label="Nome"
                 placeholder="Digite seu nome..."

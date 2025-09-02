@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonOutline, ButtonPrimary, ImageUpload, Input, LabelCopy } from ".";
+import { ButtonOutline, ButtonPrimary, ImageUpload, InputText, LabelCopy } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useImages } from "../hooks/useImages";
 import { useRestaurants as useRestaurantsManager } from "../hooks/useRestaurants";
@@ -165,7 +165,7 @@ export function CompanyTab() {
                 className="flex flex-col"
             >
                 <h2 className="text-xl font-semibold">Dados da Empresa</h2>
-                <Input
+                <InputText
                     id="company-legal-name"
                     label="Razão Social / Nome Completo"
                     name="legalName"
@@ -174,7 +174,7 @@ export function CompanyTab() {
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
                 <div className="flex flex-col md:flex-row md:gap-2">
-                    <Input
+                    <InputText
                         id="company-name"
                         label="Nome Fantasia"
                         name="brandName"
@@ -183,7 +183,7 @@ export function CompanyTab() {
                         onChange={handleChange}
                         disabled={!editCompany || updateLoading || restaurantLoading}
                     />
-                    <Input
+                    <InputText
                         id="company-document"
                         label="CNPJ / CPF"
                         name="document"
@@ -193,7 +193,7 @@ export function CompanyTab() {
                         disabled={!editCompany || updateLoading || restaurantLoading}
                     />
                 </div>
-                <Input
+                <InputText
                     id="company-street"
                     label="Endereço"
                     name="addressStreet"
@@ -203,7 +203,7 @@ export function CompanyTab() {
                     disabled={!editCompany || updateLoading || restaurantLoading}
                 />
                 <div className="flex flex-col md:flex-row md:gap-2">
-                    <Input
+                    <InputText
                         id="company-city"
                         label="Cidade"
                         name="addressCity"
@@ -213,7 +213,7 @@ export function CompanyTab() {
                         disabled={!editCompany || updateLoading || restaurantLoading}
                         className="flex-1"
                     />
-                    <Input
+                    <InputText
                         id="company-state"
                         label="Estado"
                         name="addressState"
@@ -223,7 +223,7 @@ export function CompanyTab() {
                         disabled={!editCompany || updateLoading || restaurantLoading}
                         className="flex-1"
                     />
-                    <Input
+                    <InputText
                         id="company-zip-code"
                         label="CEP"
                         name="addressZipCode"
@@ -234,7 +234,7 @@ export function CompanyTab() {
                         disabled={!editCompany || updateLoading || restaurantLoading}
                         className="flex-1"
                     />
-                    <Input
+                    <InputText
                         id="company-phone"
                         label="WhatsApp"
                         name="phone"

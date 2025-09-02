@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ButtonPrimary, Input, Modal, TextArea, type ModalProps } from ".";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useCategories } from "../hooks/useCategories";
-import { LoadingPage } from "../pages/LoadingPage";
-import type { CategoryType } from "../types";
+import { ButtonPrimary, InputText, Modal, TextArea, type ModalProps } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useCategories } from "../../hooks/useCategories";
+import { LoadingPage } from "../../pages/LoadingPage";
+import type { CategoryType } from "../../types";
 
 interface CategoryModalProps extends ModalProps {
     restaurantId: string;
@@ -89,7 +89,7 @@ export function CategoryModal({ ...props }: CategoryModalProps) {
                         {props.category ? "Editar Categoria" : "Criar Categoria"}
                     </h2>
                     <form id="category-form" onSubmit={handleSubmit}>
-                        <Input
+                        <InputText
                             id="category-name"
                             type="text"
                             label="Nome da Categoria"

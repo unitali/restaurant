@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, CategoryModal, TableCategory, ConfirmModal, Input } from ".";
+import { ButtonPrimary, CategoryModal, TableCategory, ConfirmModal, InputText } from ".";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { useCategories } from "../hooks/useCategories";
 import { LoadingPage } from "../pages/LoadingPage";
@@ -59,7 +59,7 @@ export function CategoriesTab() {
             <div className="w-full max-w-2xl md:max-w-none mx-auto">
                 <div className="mb-2 md:mb-4 flex flex-col md:flex-row gap-2">
                     {categories.length > 0 && (
-                        <Input
+                        <InputText
                             id="search-category"
                             type="text"
                             label="Buscar categoria"

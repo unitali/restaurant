@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ButtonPrimary, CheckBox, Input } from '.';
+import { ButtonPrimary, CheckBox, InputText } from '.';
 import { useRestaurant } from '../contexts/RestaurantContext';
 import { useRestaurants } from '../hooks/useRestaurants';
 import { LoadingPage } from '../pages/LoadingPage';
@@ -99,7 +99,7 @@ export function CompanyOpeningHours() {
                         </div>
                         {openingDays[dayName].open ? (
                             <div className="flex-1">
-                                <Input
+                                <InputText
                                     id={`${dayName}-hours`}
                                     label="Horário de Funcionamento"
                                     placeholder="Ex: 18:00 - 23:00"

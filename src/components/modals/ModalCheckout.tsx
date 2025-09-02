@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { CartDelivery, CartPayment, CartProducts, CartSummary, Modal } from ".";
-import { useOrder } from "../contexts/OrderContext";
+import { CartDelivery, CartPayment, CartProducts, CartSummary, Modal } from "..";
+import { useOrder } from "../../contexts/OrderContext";
 interface ModalCheckoutProps {
     isOpen: boolean;
     onClose: () => void;

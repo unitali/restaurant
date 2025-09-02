@@ -4,6 +4,7 @@ import { useRestaurant } from "../contexts/RestaurantContext";
 import { useSettings } from "../hooks/useSettings";
 import type { SettingsType } from "../types";
 
+
 const defaultSettings: SettingsType = {
     primaryColor: "#2563eb",
     primaryTextColor: "#ffffff",
