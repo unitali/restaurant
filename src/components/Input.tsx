@@ -13,10 +13,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export function Input({ ...props }: InputProps) {
     const [showPassword, setShowPassword] = React.useState(false);
     const [touched, setTouched] = React.useState(false);
-
     const isPassword = props.type === "password";
-    const allowedTypes = ["text", "password"];
-    const inputType = isPassword && showPassword ? "text" : allowedTypes.includes(props.type || "") ? props.type : "text";
+    const inputType = isPassword && showPassword ? "text" : props.type || "text";
     const isRequiredError = props.required && touched && !props.value;
 
     return (
@@ -33,7 +31,7 @@ export function Input({ ...props }: InputProps) {
                 value={props.value}
                 {...props}
                 id={`input-${props.id}`}
-                type={props.type ? props.type : inputType}
+                type={inputType}
                 className={`w-full pb-2 ps-4 pt-7 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-unitali-blue-600 focus:ring-unitali-blue-700"}`}
                 onBlur={(e) => {
                     setTouched(true);
@@ -43,17 +41,6 @@ export function Input({ ...props }: InputProps) {
                     ? { MozAppearance: "textfield", appearance: "textfield" }
                     : undefined}
             />
-            {props.type === "number" && (
-                <style>
-                    {`
-                    input[type=number]::-webkit-inner-spin-button,
-                    input[type=number]::-webkit-outer-spin-button {
-                        -webkit-appearance: none;
-                        margin: 0;
-                    }
-                    `}
-                </style>
-            )}
             {isPassword && (
                 <button
                     id={`show-${props.id}`}
@@ -64,6 +51,17 @@ export function Input({ ...props }: InputProps) {
                 >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
+            )}
+            {props.type === "number" && (
+                <style>
+                    {`
+                    input[type=number]::-webkit-inner-spin-button,
+                    input[type=number]::-webkit-outer-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                    }
+                    `}
+                </style>
             )}
         </div>
     );
