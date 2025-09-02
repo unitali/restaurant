@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCamera, FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { useImages } from '../hooks/useImages';
-import type { ImageState } from '../types';
+import { useImages } from '../../hooks/useImages';
+import type { ImageState } from '../../types';
 interface ImageUploadProps {
     id: string;
     disabled?: boolean;

@@ -22,7 +22,6 @@ export function RadioButton(props: RadioButtonProps) {
                 />
                 <span
                     className={`absolute left-2 top-2 w-4 h-4 rounded-full bg-white pointer-events-none transition-opacity ${props.checked ? 'bg-unitali-blue-600 opacity-100' : 'transparent opacity-0'}`}
-                    //style={{ backgroundColor: props.checked ? '#14b8a6' : 'transparent' }}
                 />
             </span>
             <span className="text-gray-700">{props.label}</span>
