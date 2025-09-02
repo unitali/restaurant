@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { ButtonPrimary, InputText, InputPassword } from "../components";
-import { HeaderPublic } from "../components/HeaderPublic";
+import { ButtonPrimary, HeaderPublic, InputNumber, InputPassword, InputText } from "../components";
 import { useRestaurants } from "../hooks/useRestaurants";
 import type { CompanyType, UserType } from "../types";
 import { LoadingPage } from "./LoadingPage";
-import { InputNumber } from "../components/inputs/InputNumber";
 
 const restaurantInitialState: CompanyType = {
     id: "",

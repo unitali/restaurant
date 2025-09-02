@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ButtonOutline, ButtonPrimary, InputText } from "../components";
-import { HeaderPublic } from "../components/HeaderPublic";
+import { ButtonOutline, ButtonPrimary, HeaderPublic, InputText } from "../components";
 import { useAuth } from "../hooks/useAuth";
 import { webRoutes } from "../routes";
 import type { UserType } from "../types";

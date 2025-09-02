@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaShop, FaShopLock } from "react-icons/fa6";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { daysLabels, daysOfWeek } from "../utils/date";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { daysLabels, daysOfWeek } from "../../utils/date";
 
 
 export function HeaderMenu() {

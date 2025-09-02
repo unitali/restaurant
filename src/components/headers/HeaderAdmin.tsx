@@ -2,11 +2,11 @@ import { FaSignOutAlt, FaUtensils } from 'react-icons/fa';
 import { FaShop, FaShopLock } from "react-icons/fa6";
 
 import { useState } from 'react';
-import { useRestaurant } from '../contexts/RestaurantContext';
-import { useAuth } from '../hooks/useAuth';
-import { useRestaurants } from '../hooks/useRestaurants';
-import { LoadingPage } from '../pages/LoadingPage';
-import { PopUpConfirmOpen } from './PopUpConfirmOpen';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useRestaurants } from '../../hooks/useRestaurants';
+import { LoadingPage } from '../../pages/LoadingPage';
+import { PopUpConfirmOpen } from './../PopUpConfirmOpen';
 
 export function HeaderAdmin() {
     const { restaurantId, restaurant, refresh, loading: restaurantLoading } = useRestaurant();
