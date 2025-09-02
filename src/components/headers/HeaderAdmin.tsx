@@ -6,7 +6,7 @@ import { useRestaurant } from '../../contexts/RestaurantContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useRestaurants } from '../../hooks/useRestaurants';
 import { LoadingPage } from '../../pages/LoadingPage';
-import { PopUpConfirmOpen } from './../PopUpConfirmOpen';
+import { PopUpConfirmOpen } from '../popUps/PopUpConfirmOpen';
 
 export function HeaderAdmin() {
     const { restaurantId, restaurant, refresh, loading: restaurantLoading } = useRestaurant();

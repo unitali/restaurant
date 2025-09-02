@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ButtonPrimary, Switch } from ".";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useRestaurants } from "../hooks/useRestaurants";
-import { LoadingPage } from "../pages/LoadingPage";
-import type { PaymentMethodsType } from "../types";
+import { ButtonPrimary, Switch } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useRestaurants } from "../../hooks/useRestaurants";
+import { LoadingPage } from "../../pages/LoadingPage";
+import type { PaymentMethodsType } from "../../types";
 
 const paymentLabels: Record<string, string> = {
     card: "Cartão",

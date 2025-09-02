@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { ButtonPrimary, InputColor } from ".";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useSettings } from "../hooks/useSettings";
-import type { SettingsType } from "../types";
+import { ButtonPrimary, InputColor } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useSettings } from "../../hooks/useSettings";
+import type { SettingsType } from "../../types";
 
 
 const defaultSettings: SettingsType = {

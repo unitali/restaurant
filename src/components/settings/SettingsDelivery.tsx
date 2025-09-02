@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { ButtonPrimary, InputText, Switch } from ".";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useRestaurants } from "../hooks/useRestaurants";
-import { LoadingPage } from "../pages/LoadingPage";
-import { formatCurrencyBRL } from "../utils/currency";
+import { ButtonPrimary, InputText, Switch } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useRestaurants } from "../../hooks/useRestaurants";
+import { LoadingPage } from "../../pages/LoadingPage";
+import { formatCurrencyBRL } from "../../utils/currency";
 
 export function SettingsDelivery() {
     const { restaurant, restaurantId, refresh } = useRestaurant();
