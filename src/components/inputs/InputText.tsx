@@ -1,5 +1,4 @@
 import React from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface InputTextProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -11,10 +10,7 @@ interface InputTextProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function InputText({ ...props }: InputTextProps) {
-    const [showPassword, setShowPassword] = React.useState(false);
     const [touched, setTouched] = React.useState(false);
-    const isPassword = props.type === "password";
-    const inputType = isPassword && showPassword ? "text" : props.type || "text";
     const isRequiredError = props.required && touched && !props.value;
 
     return (
@@ -31,7 +27,7 @@ export function InputText({ ...props }: InputTextProps) {
                 value={props.value}
                 {...props}
                 id={`input-${props.id}`}
-                type={inputType}
+                type={props.type ?? "text"}
                 className={`w-full pb-2 ps-4 pt-7 rounded ${props.disabled ? "bg-gray-100 text-gray-400 hover:cursor-not-allowed" : "bg-white text-gray-900"} border focus:outline-none focus:ring-2  ${isRequiredError ? "border-red-500 focus:ring-red-500" : "border-unitali-blue-600 focus:ring-unitali-blue-700"}`}
                 onBlur={(e) => {
                     setTouched(true);
@@ -41,28 +37,6 @@ export function InputText({ ...props }: InputTextProps) {
                     ? { MozAppearance: "textfield", appearance: "textfield" }
                     : undefined}
             />
-            {isPassword && (
-                <button
-                    id={`show-${props.id}`}
-                    type="button"
-                    tabIndex={-1}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    onClick={() => setShowPassword((v) => !v)}
-                >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-            )}
-            {props.type === "number" && (
-                <style>
-                    {`
-                    input[type=number]::-webkit-inner-spin-button,
-                    input[type=number]::-webkit-outer-spin-button {
-                        -webkit-appearance: none;
-                        margin: 0;
-                    }
-                    `}
-                </style>
-            )}
         </div>
     );
 }
