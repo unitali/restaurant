@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ButtonPrimary, CheckBox, InputText } from '.';
-import { useRestaurant } from '../contexts/RestaurantContext';
-import { useRestaurants } from '../hooks/useRestaurants';
-import { LoadingPage } from '../pages/LoadingPage';
-import { daysLabels, daysOfWeek } from "../utils/date";
+import { ButtonPrimary, CheckBox, InputText } from '..';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { useRestaurants } from '../../hooks/useRestaurants';
+import { LoadingPage } from '../../pages/LoadingPage';
+import { daysLabels, daysOfWeek } from "../../utils/date";
 
 
 type OpeningDaysState = {
@@ -13,7 +13,7 @@ type OpeningDaysState = {
     };
 };
 
-export function CompanyOpeningHours() {
+export function SettingsCompanyOpeningHours() {
     const { restaurantId, restaurant } = useRestaurant();
     const { updateRestaurant, loading } = useRestaurants();
     const [edit, setEdit] = useState(false);

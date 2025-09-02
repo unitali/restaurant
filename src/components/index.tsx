@@ -12,7 +12,7 @@ export * from './cart/CartPayment';
 export * from './cart/CartProducts';
 export * from './cart/CartSummary';
 export * from './CheckBox';
-export * from './CompanyOpeningHours';
+export * from './settings/SettingsCompanyOpeningHours';
 export * from './Footer';
 export * from './headers/HeaderAdmin';
 export * from './headers/HeaderMenu';
