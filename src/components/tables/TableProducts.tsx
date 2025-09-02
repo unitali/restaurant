@@ -1,6 +1,6 @@
 import { FaEdit, FaFileImage, FaTrash } from "react-icons/fa";
-import type { ProductType } from "../types";
-import { formatCurrencyBRL } from "../utils/currency";
+import type { ProductType } from "../../types";
+import { formatCurrencyBRL } from "../../utils/currency";
 
 interface TableProductsProps {
     products: ProductType[];

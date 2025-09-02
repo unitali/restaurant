@@ -35,11 +35,11 @@ export * from './Settings';
 export * from './SettingsDelivery';
 export * from './SettingsPayment';
 export * from './Switch';
+export * from './tables/TableCategory';
+export * from './tables/TableProducts';
 export * from './tabs/TabCategories';
 export * from './tabs/TabCompany';
 export * from './tabs/TabProducts';
 export * from './tabs/TabSettings';
-export * from './TableCategory';
-export * from './TableProducts';
 export * from './TextArea';
 

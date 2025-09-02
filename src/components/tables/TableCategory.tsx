@@ -1,5 +1,5 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
-import type { CategoryType } from "../types";
+import type { CategoryType } from "../../types";
 
 interface TableCategoryProps {
   categories: CategoryType[];
