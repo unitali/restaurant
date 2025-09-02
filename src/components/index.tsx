@@ -22,6 +22,7 @@ export * from './inputs/InputColor';
 export * from './inputs/InputNumber';
 export * from './inputs/InputPassword';
 export * from './inputs/InputText';
+export * from './inputs/InputHours';
 export * from './labels/Label';
 export * from './labels/LabelCopy';
 export * from './modals/Modal';

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ButtonPrimary, CheckBox, InputText } from '..';
+import { ButtonPrimary, CheckBox, InputHours } from '..';
 import { useRestaurant } from '../../contexts/RestaurantContext';
 import { useRestaurants } from '../../hooks/useRestaurants';
 import { LoadingPage } from '../../pages/LoadingPage';
 import { daysLabels, daysOfWeek } from "../../utils/date";
+import { formatHours } from "../../utils/hours";
 
 
 type OpeningDaysState = {
@@ -30,7 +31,7 @@ export function SettingsCompanyOpeningHours() {
             setOpeningDays(() => {
                 const bd = restaurant.openingHours || {};
                 return daysOfWeek.reduce((acc, day) => {
-                    acc[day] =  bd[day]
+                    acc[day] = bd[day]
                         ? { open: !!bd[day].open, hours: bd[day].hours || "" }
                         : { open: false, hours: "" };
                     return acc;
@@ -59,7 +60,7 @@ export function SettingsCompanyOpeningHours() {
             ...prev,
             [day]: {
                 ...prev[day],
-                hours: value,
+                hours: formatHours(value),
             },
         }));
     };
@@ -99,10 +100,9 @@ export function SettingsCompanyOpeningHours() {
                         </div>
                         {openingDays[dayName].open ? (
                             <div className="flex-1">
-                                <InputText
+                                <InputHours
                                     id={`${dayName}-hours`}
                                     label="Horário de Funcionamento"
-                                    placeholder="Ex: 18:00 - 23:00"
                                     name={`${dayName}-hours`}
                                     value={openingDays[dayName].hours}
                                     onChange={handleHoursChange}
