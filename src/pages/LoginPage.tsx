@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ButtonOutline, ButtonPrimary, Input } from "../components";
-import { HeaderPublic } from "../components/HeaderPublic";
+import { ButtonOutline, ButtonPrimary, HeaderPublic, InputText } from "../components";
 import { useAuth } from "../hooks/useAuth";
 import { webRoutes } from "../routes";
 import type { UserType } from "../types";
@@ -36,7 +35,7 @@ export function LoginPage() {
                     <div className="w-full max-w-md bg-white p-8 rounded shadow">
                         <h2 className="text-xl font-bold mb-6">Acessar a Aplicação</h2>
                         <form className="space-y-4" onSubmit={e => { e.preventDefault(); handleLogin(user?.email || "", user?.password || ""); }}>
-                            <Input
+                            <InputText
                                 id="email"
                                 type="email"
                                 label="E-mail"
@@ -44,7 +43,7 @@ export function LoginPage() {
                                 onChange={e => setUser(prevUser => ({ ...prevUser, email: e.target.value } as UserType))}
                                 required
                             />
-                            <Input
+                            <InputText
                                 id="password"
                                 type="password"
                                 label="Senha"

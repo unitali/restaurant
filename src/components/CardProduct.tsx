@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { FaFileImage } from "react-icons/fa";
-import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, Input, Modal } from ".";
+import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, InputText, Modal } from ".";
 import { useOrder } from "../contexts/OrderContext";
 import type { ProductType } from "../types";
 import { formatCurrencyBRL } from "../utils/currency";
@@ -165,7 +165,7 @@ export function ProductCard({ product, setIsAnyProductModalOpen }: ProductCardPr
                             </div>
                         )}
                         {product.observationDisplay && (
-                            <Input
+                            <InputText
                                 id={`product-observation-${product.id}`}
                                 label="Observação"
                                 value={observation}

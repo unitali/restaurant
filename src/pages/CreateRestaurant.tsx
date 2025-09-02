@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { ButtonPrimary, Input } from "../components";
-import { HeaderPublic } from "../components/HeaderPublic";
+import { ButtonPrimary, HeaderPublic, InputNumber, InputPassword, InputText } from "../components";
 import { useRestaurants } from "../hooks/useRestaurants";
 import type { CompanyType, UserType } from "../types";
 import { LoadingPage } from "./LoadingPage";
@@ -62,14 +61,14 @@ export function CreateRestaurant() {
                         {/* Dados do restaurante */}
                         <form className="flex-1 flex flex-col space-y-4" onSubmit={handleSubmit}>
                             <h2 id="create-restaurant-title" className="text-xl font-bold mb-6">Dados do Restaurante</h2>
-                            <Input
+                            <InputText
                                 id="restaurant-name"
                                 label="Nome do restaurante"
                                 value={restaurant.brandName}
                                 onChange={e => setRestaurant({ ...restaurant, brandName: e.target.value })}
                                 required
                             />
-                            <Input
+                            <InputText
                                 id="restaurant-address-street"
                                 label="Endereço"
                                 value={restaurant.address.street}
@@ -77,14 +76,14 @@ export function CreateRestaurant() {
                                 required
                             />
                             <div className="flex flex-col md:flex-row gap-4">
-                                <Input
+                                <InputText
                                     id="restaurant-address-number"
                                     label="Número"
                                     value={restaurant.address.number}
                                     onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, number: e.target.value } })}
                                     required
                                 />
-                                <Input
+                                <InputText
                                     id="restaurant-address-neighborhood"
                                     label="Bairro"
                                     value={restaurant.address.neighborhood}
@@ -93,14 +92,14 @@ export function CreateRestaurant() {
                                 />
                             </div>
                             <div className="flex flex-col md:flex-row gap-4">
-                                <Input
+                                <InputText
                                     id="restaurant-address-city"
                                     label="Cidade"
                                     value={restaurant.address.city}
                                     onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, city: e.target.value } })}
                                     required
                                 />
-                                <Input
+                                <InputText
                                     id="restaurant-address-state"
                                     label="Estado"
                                     value={restaurant.address.state}
@@ -109,17 +108,15 @@ export function CreateRestaurant() {
                                 />
                             </div>
                             <div className="flex flex-col md:flex-row gap-4">
-                                <Input
+                                <InputNumber
                                     id="restaurant-address-zip-code"
-                                    type="number"
                                     label="CEP"
                                     value={restaurant.address.zipCode}
                                     onChange={e => setRestaurant({ ...restaurant, address: { ...restaurant.address, zipCode: e.target.value } })}
                                     required
                                 />
-                                <Input
+                                <InputNumber
                                     id="restaurant-phone"
-                                    type="number"
                                     label="Telefone"
                                     value={restaurant.phone}
                                     onChange={e => setRestaurant({ ...restaurant, phone: e.target.value })}
@@ -130,7 +127,7 @@ export function CreateRestaurant() {
 
                         <form className="flex-1 flex flex-col space-y-4" onSubmit={handleSubmit}>
                             <h2 className="text-xl font-bold mb-6">Dados do Administrador</h2>
-                            <Input
+                            <InputText
                                 id="admin-email"
                                 type="email"
                                 label="E-mail do admin"
@@ -138,18 +135,16 @@ export function CreateRestaurant() {
                                 onChange={e => setUserAdmin({ ...userAdmin, email: e.target.value })}
                                 required
                             />
-                            <Input
+                            <InputPassword
                                 id="admin-password"
-                                type="password"
                                 label="Senha do admin"
                                 value={userAdmin.password}
                                 onChange={e => setUserAdmin({ ...userAdmin, password: e.target.value })}
                                 required
                                 minLength={6}
                             />
-                            <Input
+                            <InputPassword
                                 id="admin-confirm-password"
-                                type="password"
                                 label="Confirmar Senha do admin"
                                 value={userAdmin.confirmPassword}
                                 onChange={e => setUserAdmin({ ...userAdmin, confirmPassword: e.target.value })}
