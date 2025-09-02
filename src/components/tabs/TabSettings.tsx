@@ -1,5 +1,4 @@
-import { CompanyOpeningHours, SettingsDelivery } from ".";
-import { SettingsPayment } from "./SettingsPayment";
+import { CompanyOpeningHours, SettingsDelivery, SettingsPayment } from "..";
 
 export function TabSettings() {
     return (

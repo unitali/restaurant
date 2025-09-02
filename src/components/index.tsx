@@ -33,12 +33,13 @@ export * from './RadioButton';
 export * from './Select';
 export * from './Settings';
 export * from './SettingsDelivery';
+export * from './SettingsPayment';
 export * from './Switch';
-export * from './TabCategories';
-export * from './TabCompany';
+export * from './tabs/TabCategories';
+export * from './tabs/TabCompany';
+export * from './tabs/TabProducts';
+export * from './tabs/TabSettings';
 export * from './TableCategory';
 export * from './TableProducts';
-export * from './TabProducts';
-export * from './TabSettings';
 export * from './TextArea';
 

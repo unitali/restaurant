@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonOutline, ButtonPrimary, ImageUpload, InputText, LabelCopy } from ".";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useImages } from "../hooks/useImages";
-import { useRestaurants as useRestaurantsManager } from "../hooks/useRestaurants";
-import type { CompanyType, ImageState } from "../types";
-import { getShortUrl } from "../utils/shortUrl";
+import { ButtonOutline, ButtonPrimary, ImageUpload, InputText, LabelCopy } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useImages } from "../../hooks/useImages";
+import { useRestaurants as useRestaurantsManager } from "../../hooks/useRestaurants";
+import type { CompanyType, ImageState } from "../../types";
+import { getShortUrl } from "../../utils/shortUrl";
 
 export function CompanyTab() {
     const { restaurant, refresh, loading: restaurantLoading, restaurantId } = useRestaurant();

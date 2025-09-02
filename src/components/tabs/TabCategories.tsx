@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ButtonPrimary, CategoryModal, TableCategory, ConfirmModal, InputText } from ".";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { useCategories } from "../hooks/useCategories";
-import { LoadingPage } from "../pages/LoadingPage";
-import type { CategoryType } from "../types";
+import { ButtonPrimary, CategoryModal, TableCategory, ConfirmModal, InputText } from "..";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import { useCategories } from "../../hooks/useCategories";
+import { LoadingPage } from "../../pages/LoadingPage";
+import type { CategoryType } from "../../types";
 
 export function CategoriesTab() {
     const { restaurant, loading: restaurantLoading, refresh, restaurantId } = useRestaurant();
