@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { FaFileImage } from "react-icons/fa";
-import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, InputText, Modal } from ".";
-import { useOrder } from "../contexts/OrderContext";
-import type { ProductType } from "../types";
-import { formatCurrencyBRL } from "../utils/currency";
+import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus, InputText, Modal } from "..";
+import { useOrder } from "../../contexts/OrderContext";
+import type { ProductType } from "../../types";
+import { formatCurrencyBRL } from "../../utils/currency";
 interface ProductCardProps {
     product: ProductType;
     setIsAnyProductModalOpen: (isOpen: boolean) => void;
