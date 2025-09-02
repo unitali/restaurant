@@ -1,11 +1,11 @@
-import { ButtonOutline, ButtonPrimary, InputText } from ".";
-import { useOrder } from "../contexts/OrderContext";
-import { useOrders } from "../hooks/useOrders";
-import { useWhatsApp } from "../hooks/useWhatsApp";
-import { addressFormat } from "../utils/addressFormat";
-import { formatCurrencyBRL } from "../utils/currency";
-import { createOrderNumber } from "../utils/orderNumber";
-import { paymentMethods } from "../utils/paymentsMethods";
+import { ButtonOutline, ButtonPrimary, InputText } from "..";
+import { useOrder } from "../../contexts/OrderContext";
+import { useOrders } from "../../hooks/useOrders";
+import { useWhatsApp } from "../../hooks/useWhatsApp";
+import { addressFormat } from "../../utils/addressFormat";
+import { formatCurrencyBRL } from "../../utils/currency";
+import { createOrderNumber } from "../../utils/orderNumber";
+import { paymentMethods } from "../../utils/paymentsMethods";
 
 interface CartSummaryProps {
     onBack: () => void;

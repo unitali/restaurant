@@ -4,7 +4,6 @@ import { FaPlus } from "react-icons/fa";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     loading?: boolean;
     id: string;
-    quantity: number;
 }
 
 export function ButtonPrimaryPlus({ ...props }: ButtonProps) {

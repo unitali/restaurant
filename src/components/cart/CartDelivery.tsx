@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { ButtonOutline, ButtonPrimary, InputText, RadioButton } from ".";
-import { useOrder } from "../contexts/OrderContext";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import { formatCurrencyBRL } from "../utils/currency";
-import type { AddressType } from "../types";
+import { useEffect, useState } from "react";
+import { ButtonOutline, ButtonPrimary, InputText, RadioButton } from "..";
+import { useOrder } from "../../contexts/OrderContext";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import type { AddressType } from "../../types";
+import { formatCurrencyBRL } from "../../utils/currency";
 
 
 export function CartDelivery({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {

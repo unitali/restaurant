@@ -1,6 +1,6 @@
-import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus } from ".";
-import { useOrder } from "../contexts/OrderContext";
-import { formatCurrencyBRL } from "../utils/currency";
+import { ButtonPrimary, ButtonPrimaryMinus, ButtonPrimaryPlus } from "..";
+import { useOrder } from "../../contexts/OrderContext";
+import { formatCurrencyBRL } from "../../utils/currency";
 
 
 export function CartProducts({ onNext }: { onNext: () => void }) {
@@ -35,7 +35,6 @@ export function CartProducts({ onNext }: { onNext: () => void }) {
                             <ButtonPrimaryMinus
                                 id={`remove-item-${index}`}
                                 onClick={() => removeFromOrder(product.productId!)}
-                                quantity={product.quantity}
                             />
                             <span className="font-semibold mx-2 text-unitali-blue-700">{product.quantity}</span>
                             <ButtonPrimaryPlus

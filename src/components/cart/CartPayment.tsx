@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { ButtonOutline, ButtonPrimary, RadioButton } from ".";
-import { useOrder } from "../contexts/OrderContext";
-import { useRestaurant } from "../contexts/RestaurantContext";
-import type { PaymentMethodsType } from "../types";
+import { ButtonOutline, ButtonPrimary, RadioButton } from "..";
+import { useOrder } from "../../contexts/OrderContext";
+import { useRestaurant } from "../../contexts/RestaurantContext";
+import type { PaymentMethodsType } from "../../types";
 
 
 const paymentLabels: Record<string, string> = {
